@@ -2,104 +2,83 @@
 using System.Diagnostics;
 namespace YouTubeDownloadUI
 {
-  
-  class YoutubeDownloader
+  class YoutubeDownloader : DownloadTarget
   {
-    #region Private
+    Process shellProcess;
     
-
-    string HasPL { get { return GetPlaylist ? "--yes-playlist" : ""; } }
+    //short
+    string StrIgnoreErrors { get { return IgnoreErrors ? $"-i" : string.Empty; } }
+    string StrContinue { get { return Continue ? $"-c" : string.Empty; } }
+    //common
+    string StrAddMetaData { get { return AddMetaData ? $"--add-metadata" : string.Empty; } }
+    string StrEmbedThumbnail { get { return EmbedThumbnail ? $"--embed-thumbnail" : string.Empty; } }
+    string StrPlaylist { get { return GetPlaylist ? "--yes-playlist" : string.Empty; } }
+    string StrTargetType { get { return HasTargetType ? $"-f {TargetType}" : string.Empty; } }
+    string StrVerbose { get { return Verbose ? $"--verbose" : string.Empty; } }
+    // subs
+    string StrEmbedSubs { get { return EmbedSubs ? "--embed-subs" : string.Empty; } }
+    string StrSubLang { get { return !string.IsNullOrEmpty(SubLang) ? " --sub-lang {SubLang}" : string.Empty; } }
+    string StrWriteAutoSub { get { return WriteAutoSub ? "--write-auto-sub" : string.Empty; } }
+    string StrWriteSub { get { return WriteSub ? "--write-sub" : string.Empty; } }
     
-    Process yt_process;
-    
-    #endregion
-    
-    public bool IsVerbose { get; set; } = true;
-    public bool UrlHasPlaylist { get { return this.UriInput.Contains("&list"); } }
-    public bool GetPlaylist { get; set; } = false;
-    
-    public string OutputPath { get; set; }
-    
-    /// <summary>
-    /// Set to m4a, any or mp4 among others.
-    /// </summary>
-    public string TargetType { get; set; }
-    /// <summary>
-    /// the youtube url.
-    /// </summary>
-    public string UriInput { get; set; }
-    
-    public string UriInputFiltered {
-      get
-      {
-        return UriInput
-          .Replace("&","^&")
-          ;
-      }
-    }
-    
-    public string CommandText {
-      get {
-        return $"-c -f {TargetType}" +
-          " --write-sub" +
-          $" {HasPL}" +
-          " --sub-lang en" +// skip
-          " --write-auto-sub" +// skip
-          " --embed-subs" +// skip
-          " --embed-thumbnail" +
-          " --add-metadata" +
-          " --verbose" +
-          $" \"{UriInputFiltered}\"";
-      }
-    }
-    
-    public bool HasDownloader { get { return yt_process != null; } }
+    public string CommandText { get { return $"{StrIgnoreErrors} {StrContinue} {StrTargetType} {StrWriteSub} {StrPlaylist} {StrSubLang} {StrWriteAutoSub} {StrEmbedSubs} {StrEmbedThumbnail} {StrAddMetaData} {StrVerbose} \"{UriFiltered}\""; } }
     
     ProcessStartInfo NewStartInfo {
       get {
-        var si = new ProcessStartInfo("youtube-dl",CommandText){
-          UseShellExecute = false,
 //          StandardOutputEncoding = Encoding.UTF8,
 //          StandardErrorEncoding = Encoding.UTF8,
+        var si = new ProcessStartInfo("youtube-dl",CommandText){
+          UseShellExecute = false,
           RedirectStandardError = true,
           RedirectStandardOutput = true,
           CreateNoWindow = true,
-          WorkingDirectory = OutputPath
+          WorkingDirectory = TargetPath
         };
         // si.RedirectStandardInput = false;
         return si;
       }
     }
-    public YoutubeDownloader(
-      string url,
-      string output,
+    
+    void InitEvents(
       DataReceivedEventHandler onOutput,
       DataReceivedEventHandler onError,
       EventHandler onCompleted)
     {
-      OutputPath = output;
-      UriInput = url;
-      yt_process = new Process(){
+      shellProcess.OutputDataReceived += onOutput;
+      shellProcess.ErrorDataReceived += onError;
+      Completed += onCompleted;
+    }
+    
+    public YoutubeDownloader(string url,string output)
+    {
+      TargetUri = url;
+      TargetPath = output;
+      shellProcess = new Process(){
         StartInfo = NewStartInfo,
         EnableRaisingEvents = true
       };
-      yt_process.OutputDataReceived += onOutput;
-      yt_process.ErrorDataReceived += onError;
-      yt_process.Exited += WeDone;
-      yt_process.Disposed += WeDisposed;
-      Completed += onCompleted;
+      ExitCode = 0;
     }
+    
+    public YoutubeDownloader(string url, string output, DataReceivedEventHandler onOutput, DataReceivedEventHandler onError, EventHandler onCompleted)
+      : this(url,output)
+    {
+      InitEvents(onOutput, onError, onCompleted);
+    }
+    
     public void Go(){
-      yt_process.StartInfo = NewStartInfo;
-      yt_process.Start();
-      yt_process.BeginOutputReadLine();
-      yt_process.BeginErrorReadLine();
-      yt_process.WaitForExit();
+      shellProcess.StartInfo = NewStartInfo;
+      shellProcess.Exited += WeDone;
+      shellProcess.Disposed += WeDisposed;
+      shellProcess.Start();
+      shellProcess.BeginOutputReadLine();
+      shellProcess.BeginErrorReadLine();
+      shellProcess.WaitForExit();
     }
     
     public void Abort()
     {
-      yt_process.Close();
+      shellProcess.Close();
     }
     
     public event EventHandler Completed;
@@ -109,20 +88,20 @@ namespace YouTubeDownloadUI
       if (handler != null) handler(this, EventArgs.Empty);
     }
     
-    public int ExitCode { get; set; } = 0;
+    public int ExitCode { get; set; }
     
     void WeDone(object sender, EventArgs e) {
       try {
-        ExitCode = yt_process.ExitCode;
+        ExitCode = shellProcess.ExitCode;
         Console.Write("[app]: {0}\n", ExitCode);
-        yt_process.Dispose();
+        shellProcess.Dispose();
       }
       catch {}
     }
     
     void WeDisposed(object sender, EventArgs e) {
 //      yt_process = null;
-      ExitCode = yt_process.ExitCode;
+      ExitCode = shellProcess.ExitCode;
       OnCompleted();
     }
     
