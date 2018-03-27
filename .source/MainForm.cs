@@ -35,12 +35,11 @@ namespace YouTubeDownloadUI
       }
       else if (!string.IsNullOrEmpty(text) && text.Contains(msgAllreadyDownloaded))
       {
-        obj.Abort();
         obj.KnownTargetFile = text
           .Replace(msgDownloadHeading, "")
           .Replace(msgAllreadyDownloaded, "")
           .Trim();
-        richTextBox1.AppendText($"[abort] due to EXISITING FILE: {obj.KnownTargetFile}\n");
+        obj.Abort($"[abort] due to EXISITING FILE: {obj.KnownTargetFile}\n");
         Text=$"[EXISTS] {obj.KnownTargetFile}";
       }
     }
@@ -77,7 +76,8 @@ namespace YouTubeDownloadUI
       }
       richTextBox1.BackColor = SystemColors.ControlLight;
       richTextBox1.ForeColor = Color.FromArgb(64,64,64);
-      richTextBox1.AppendText($"[exit-code]: {obj.ExitCode}\n");
+      var abort = !string.IsNullOrEmpty(obj.AbortMessage) ? $"\n{obj.AbortMessage}" : string.Empty;
+      richTextBox1.AppendText($"[exit-code]: {obj.ExitCode}{abort}\n");
       lbM4a.Enabled = true;
       lbMp3.Enabled = true;
       lbMp4.Enabled = true;

@@ -17,6 +17,7 @@ namespace YouTubeDownloadUI
 		public string SubLang { get; set; }
 		
     public bool AbortOnDuplicate { get; set; }
+    public string AbortMessage { get; set; }
 		
 		public bool AddMetaData { get; set; }
 		public bool Continue { get; set; } // -c

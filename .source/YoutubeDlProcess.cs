@@ -78,9 +78,10 @@ namespace YouTubeDownloadUI
       shellProcess.WaitForExit();
     }
     
-    public void Abort()
+    public void Abort(string msgAbort)
     {
       Aborted = true;
+      AbortMessage = msgAbort;
       shellProcess.Kill();
       shellProcess.Close();
     }
