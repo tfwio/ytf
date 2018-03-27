@@ -30,24 +30,18 @@ namespace YouTubeDownloadUI
     {
       if (!string.IsNullOrEmpty(text) && text.Contains(msgDownloadDestination))
       {
-        var filen = text.Replace(msgDownloadDestination, "").Trim();
-        if (File.Exists(Path.Combine(obj.TargetPath,filen)) && obj.AbortOnDuplicate)
-        {
-          obj.Abort();
-          richTextBox1.AppendText($"[abort] due to EXISITING FILE: {filen}\n");
-          Text=$"[EXISTS] {filen}";
-        }
-        else Text = filen;
+        obj.KnownTargetFile = text.Replace(msgDownloadDestination, "").Trim();
+        Text = obj.KnownTargetFile;
       }
       else if (!string.IsNullOrEmpty(text) && text.Contains(msgAllreadyDownloaded))
       {
         obj.Abort();
-        var filen = text
+        obj.KnownTargetFile = text
           .Replace(msgDownloadHeading, "")
           .Replace(msgAllreadyDownloaded, "")
           .Trim();
-        richTextBox1.AppendText($"[abort] due to EXISITING FILE: {filen}\n");
-        Text=$"[EXISTS] {filen}";
+        richTextBox1.AppendText($"[abort] due to EXISITING FILE: {obj.KnownTargetFile}\n");
+        Text=$"[EXISTS] {obj.KnownTargetFile}";
       }
     }
     
@@ -73,6 +67,14 @@ namespace YouTubeDownloadUI
     
     void UI_WorkerProcess_Post(YoutubeDownloader obj)
     {
+      if (obj.Aborted)
+      {
+        var fi = new FileInfo(Path.Combine(obj.TargetPath, obj.KnownTargetFile));
+        var jpg = fi.FullName.Replace(fi.Extension,".jpg");
+        var temp = fi.FullName.Replace(fi.Extension,$".temp.{fi.Extension}");
+        if (File.Exists(jpg)) File.Delete(jpg);
+        if (File.Exists(temp)) File.Delete(temp);
+      }
       richTextBox1.BackColor = SystemColors.ControlLight;
       richTextBox1.ForeColor = Color.FromArgb(64,64,64);
       richTextBox1.AppendText($"[exit-code]: {obj.ExitCode}\n");

@@ -6,6 +6,8 @@ namespace YouTubeDownloadUI
   {
     Process shellProcess;
     
+    public bool Aborted { get; private set; }
+    
     //short
     string StrIgnoreErrors { get { return IgnoreErrors ? $"-i" : string.Empty; } }
     string StrContinue { get { return Continue ? $"-c" : string.Empty; } }
@@ -78,8 +80,9 @@ namespace YouTubeDownloadUI
     
     public void Abort()
     {
+      Aborted = true;
       shellProcess.Kill();
-      // shellProcess.Close();
+      shellProcess.Close();
     }
     
     public event EventHandler Completed;

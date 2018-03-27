@@ -11,6 +11,7 @@ namespace YouTubeDownloadUI
 	{
 		public string TargetUri { get; set; }
 
+		public string KnownTargetFile { get; set; }
 		public string TargetPath { get; set; } // directory
 		public string TargetType { get; set; } // m4a, best, mp4, mp3, ogg
 		public string SubLang { get; set; }
