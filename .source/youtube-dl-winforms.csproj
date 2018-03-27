@@ -34,7 +34,7 @@
     <DebugType>Full</DebugType>
     <Optimize>False</Optimize>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>DEBUG;TRACE;NCORE</DefineConstants>
     <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -43,7 +43,8 @@
     <DebugType>None</DebugType>
     <Optimize>True</Optimize>
     <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;NCORE</DefineConstants>
+    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'Win32' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -85,6 +86,10 @@
     <Compile Include="DownloadTarget.cs" />
     <Compile Include="extensions\DirectoryHelper.cs" />
     <Compile Include="extensions\DragDropFormsExtension.cs" />
+    <Compile Include="extensions\EnumHelper.cs" />
+    <Compile Include="extensions\FileSystemExtensions.cs" />
+    <Compile Include="extensions\PropertyInfoHelper.cs" />
+    <Compile Include="extensions\VariousStringExtensions.cs" />
     <Compile Include="MainViewForm.cs" />
     <Compile Include="MainViewForm.Designer.cs">
       <DependentUpon>MainViewForm.cs</DependentUpon>
