@@ -17,21 +17,84 @@ namespace YouTubeDownloadUI
     YoutubeDownloader downloader;
     Thread thread;
     
+    string DragDropButtonText = string.Empty;
+    
     string NextTargetType { get; set; }
     
     ContextMenuStrip cm;
     
-    void downloader_Completed(object sender, EventArgs e) { worker.CancelAsync(); }
+    void UI_WorkerThread_DataFilter(string text)
+    {
+      if (!string.IsNullOrEmpty(text) && text.Contains("[download] Destination: "))
+        Text=text.Replace("[download] Destination: ", "").Trim();
+    }
     
+    void UI_WorkerThread_DataHandler(string data, bool isError)
+    {
+      if (!isError) UI_WorkerThread_DataFilter(data);
+      richTextBox1.AppendText($"{data}\n");
+    }
+    
+    void UI_WorkerProcess_Pre(YoutubeDownloader obj)
+    {
+      richTextBox1.BackColor = Color.FromArgb(64,64,64);
+      richTextBox1.ForeColor = SystemColors.ControlLight;
+      lbM4a.Enabled = false;
+      lbMp4.Enabled = false;
+      lbBest.Enabled = false;
+      lbMp3.Enabled = false;
+      lbLast.Enabled = false;
+    }
+    
+    void UI_WorkerProcess_Post(YoutubeDownloader obj)
+    {
+      richTextBox1.BackColor = SystemColors.ControlLight;
+      richTextBox1.ForeColor = Color.FromArgb(64,64,64);
+      richTextBox1.AppendText($"[exit-code]: {obj.ExitCode}\n");
+      lbM4a.Enabled = true;
+      lbMp3.Enabled = true;
+      lbMp4.Enabled = true;
+      lbBest.Enabled = true;
+      lbLast.Enabled = true;
+    }
+
+    void WorkerThread_Completed(object sender, EventArgs e) { worker.CancelAsync(); }
+    
+    void WorkerThread_DataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
+    {
+      if (InvokeRequired) Invoke(new Action(()=>UI_WorkerThread_DataHandler(e.Data,false)));
+      else UI_WorkerThread_DataHandler(e.Data,false);
+    }
+    
+    void WorkerThread_ErrorReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
+    {
+      if (InvokeRequired) Invoke(new Action(()=>UI_WorkerThread_DataHandler(e.Data,true)));
+      else UI_WorkerThread_DataHandler(e.Data,true);
+    }
+    
+    void Worker_Begin()
+    {
+      if (worker!=null && worker.IsBusy) {
+        return;
+      }
+      worker = new BackgroundWorker();
+      worker.DoWork += WorkerEvent_DoWork;
+      worker.Disposed += WorkerEvent_Disposed;
+      worker.RunWorkerCompleted += WorkerEvent_Complete;;
+      worker.WorkerSupportsCancellation = true;
+      worker.WorkerReportsProgress = false;
+      worker.RunWorkerAsync();
+    }
+
     void Worker_PrepareThread()
     {
       var downloads = DirectoryHelper.EnsureLocalDirectory("downloads");
       downloader = new YoutubeDownloader(
         textBox1.Text,
         downloads,
-        DataReceived,
-        ErrorReceived,
-        downloader_Completed
+        WorkerThread_DataReceived,
+        WorkerThread_ErrorReceived,
+        WorkerThread_Completed
        ){
         TargetType = this.NextTargetType,
         Verbose=mVerbose.Checked,
@@ -46,65 +109,16 @@ namespace YouTubeDownloadUI
       };
       
       if (InvokeRequired) {
-        Invoke(new Action(ControlsHide));
+        Invoke(new Action(()=>UI_WorkerProcess_Pre(downloader)));
         Invoke(new Action(richTextBox1.Clear));
         Invoke(new Action(()=>richTextBox1.AppendText($"[to youtube-dl]: {downloader.CommandText}\n")));
       } else {
-        ControlsHide();
+        UI_WorkerProcess_Pre(downloader);
         richTextBox1.Clear();
         richTextBox1.AppendText($"[to youtube-dl]: {downloader.CommandText}\n");
       }
       
       downloader.Go();
-    }
-    
-    #region Data Received
-    
-    void FilterOutputData(string text)
-    {
-      if (!string.IsNullOrEmpty(text) && text.Contains("[download] Destination: "))
-        Text=text.Replace("[download] Destination: ", "").Trim();
-    }
-    
-    void DataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
-    {
-      if (InvokeRequired) {
-        Invoke(new Action(()=>FilterOutputData(e.Data)));
-        Invoke(new Action(()=>richTextBox1.AppendText($"{e.Data}\n")));
-      } else {
-        FilterOutputData(e.Data);
-        richTextBox1.AppendText($"{e.Data}\n");
-      }
-    }
-    
-    void ErrorReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
-    {
-      if (InvokeRequired) {
-        Invoke(new Action(()=>richTextBox1.AppendText($"{e.Data}\n")));
-      } else {
-        richTextBox1.AppendText($"{e.Data}\n");
-      }
-    }
-    
-    #endregion
-    
-    /// <summary>
-    /// hi there
-    /// </summary>
-    void Worker_Begin()
-    {
-      ControlsHide();
-      
-      if (worker!=null && worker.IsBusy) {
-        return;
-      }
-      worker = new BackgroundWorker();
-      worker.DoWork += WorkerEvent_DoWork;
-      worker.Disposed += WorkerEvent_Disposed;
-      worker.RunWorkerCompleted += WorkerEvent_Complete;;
-      worker.WorkerSupportsCancellation = true;
-      worker.WorkerReportsProgress = false;
-      worker.RunWorkerAsync();
     }
     
     void WorkerEvent_DoWork(object sender, DoWorkEventArgs e)
@@ -118,45 +132,12 @@ namespace YouTubeDownloadUI
 
     void WorkerEvent_Complete(object sender, RunWorkerCompletedEventArgs e)
     {
-      if (InvokeRequired) {
-        Invoke(new Action(()=>richTextBox1.AppendText("[exit-code]: {downloader.ExitCode}\n")));
-        Invoke(new Action(ControlsShow));
-      }
-      else {
-        richTextBox1.AppendText($"[exit-code]: {downloader.ExitCode}\n");
-        ControlsShow();
-      }
+      if (InvokeRequired) Invoke(new Action(()=>UI_WorkerProcess_Post(downloader)));
+      else UI_WorkerProcess_Post(downloader);
       worker.Dispose();
     }
     
-    void WorkerEvent_Disposed(object sender, EventArgs e)
-    {
-      worker = null;
-    }
-    
-    void ControlsShow()
-    {
-      richTextBox1.BackColor = SystemColors.ControlLight;
-      richTextBox1.ForeColor = Color.FromArgb(64,64,64);;
-      lbM4a.Enabled = true;
-      lbMp3.Enabled = true;
-      lbMp4.Enabled = true;
-      lbBest.Enabled = true;
-      lbLast.Enabled = true;
-    }
-    
-    void ControlsHide()
-    {
-      richTextBox1.BackColor = Color.FromArgb(64,64,64);
-      richTextBox1.ForeColor = SystemColors.ControlLight;
-      lbM4a.Enabled = false;
-      lbMp4.Enabled = false;
-      lbBest.Enabled = false;
-      lbMp3.Enabled = false;
-      lbLast.Enabled = false;
-    }
-    
-    string DragDropButtonText = string.Empty;
+    void WorkerEvent_Disposed(object sender, EventArgs e) { worker = null; }
     
     ToolStripMenuItem mOptions, mAddMetadata, mContinue, mEmbedSubs, mEmbedThumb, mGetPlaylist, mSep, mIgnoreErrors, mVerbose, mWriteAutoSubs, mWriteSubs;
 
@@ -201,10 +182,7 @@ namespace YouTubeDownloadUI
       
     }
     
-    void ShowButtonMenu(Control target)
-    {
-      cm.Show(target, new Point(target.Width,target.Height), ToolStripDropDownDirection.BelowLeft);
-    }
+    void ShowButtonMenu(Control target) { cm.Show(target, new Point(target.Width,target.Height), ToolStripDropDownDirection.BelowLeft); }
     
     public MainForm()
     {
@@ -244,23 +222,10 @@ namespace YouTubeDownloadUI
         });
     }
     
-    void Event_BeginDownloadType(object sender, LinkLabelLinkClickedEventArgs e)
-    {
-      var l = sender as LinkLabel;
-      NextTargetType = l.Text;
-      lbLast.Text = $"[{NextTargetType}]";
-      Worker_Begin();
-    }
+    void Event_BeginDownloadType(object sender, LinkLabelLinkClickedEventArgs e) { var l = sender as LinkLabel; NextTargetType = l.Text; lbLast.Text = $"[{NextTargetType}]"; Worker_Begin(); }
+    void Event_BeginDownload(object sender, LinkLabelLinkClickedEventArgs e) { Worker_Begin(); }
     
-    void Event_BeginDownload(object sender, LinkLabelLinkClickedEventArgs e)
-    {
-      Worker_Begin();
-    }
-    
-    void TextBox1TextChanged(object sender, EventArgs e)
-    {
-      ckHasPlaylist.Checked = textBox1.Text.Contains("&list=");
-    }
+    void TextBox1TextChanged(object sender, EventArgs e) { ckHasPlaylist.Checked = textBox1.Text.Contains("&list="); }
     
     void Button1MouseDown(object sender, MouseEventArgs e)
     {
