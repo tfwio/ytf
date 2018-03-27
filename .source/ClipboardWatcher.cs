@@ -10,15 +10,7 @@ namespace System
   /// </summary>
   public class ClipboardWatcher : IDisposable
   {
-    public bool HasCbImage { get { return Clipboard.ContainsImage(); } }
-
-    public bool HasCbUniText { get { return Clipboard.ContainsText(TextDataFormat.UnicodeText); } }
-
-    public bool HasCbText { get { return Clipboard.ContainsText(TextDataFormat.Text); } }
-
-    readonly Timer fTimer = new Timer { Interval = 1000, };
-
-    public Action<object, EventArgs> TimerInterval { get; set; }
+    #region Image Related
     
     const string mime_start = "data:image";
     const string MimeUndefined = "data:unknown";
@@ -27,7 +19,11 @@ namespace System
     public string ImageTextStatus { get; set; }
     public bool HasMimeImage { get; set; }
     
-    void DefaultAction(object sender, EventArgs e)
+    public static bool HasCbImage { get { return Clipboard.ContainsImage(); } }
+    public static bool HasCbUniText { get { return Clipboard.ContainsText(TextDataFormat.UnicodeText); } }
+    public static bool HasCbText { get { return Clipboard.ContainsText(TextDataFormat.Text); } }
+    
+    void DefaultImageWatchingAction(object sender, EventArgs e)
     {
       MimeText = MimeUndefined;
       var text = HasCbText ? Clipboard.GetText(TextDataFormat.UnicodeText) : null;
@@ -39,11 +35,15 @@ namespace System
       }
     }
     
-    public ClipboardWatcher(Action<object,EventArgs> defaultAction)
+    #endregion
+
+    readonly Timer fTimer = new Timer { Interval = 1000, };
+    public Action<object, EventArgs> TimerInterval { get; set; }
+    
+    public ClipboardWatcher(Action<object,EventArgs> defaultIntervalAction)
     {
-      TimerInterval = defaultAction;
-      fTimer.Tick += DefaultAction;
-      fTimer.Tick += (object a, EventArgs e) => defaultAction(a, e);
+      TimerInterval = defaultIntervalAction ?? DefaultImageWatchingAction;
+      fTimer.Tick += DefaultImageWatchingAction;
       fTimer.Start();
     }
     
@@ -59,3 +59,5 @@ namespace System
     
   }
 }
+
+
