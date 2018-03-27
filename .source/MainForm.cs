@@ -19,7 +19,7 @@ namespace YouTubeDownloadUI
     
     string DragDropButtonText = string.Empty;
     
-    string NextTargetType { get; set; }
+    string NextTargetType { get; set; } = "m4a";
     
     ContextMenuStrip cm;
     
@@ -169,6 +169,7 @@ namespace YouTubeDownloadUI
       cm.Items.Add("[browse] Download Path");
       cm.Items.Add("[browse] FFmpeg");
       cm.Items.Add("[browse] youtube-dl");
+      lbLast.Text = $"[{NextTargetType}]";
       
       mAbortOnDuplicate = mOptions.DropDownItems.Add("Abort on Duplicate (File Exists)") as ToolStripMenuItem;
       mAddMetadata = mOptions.DropDownItems.Add("Add MetaData") as ToolStripMenuItem;
