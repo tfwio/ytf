@@ -18,6 +18,7 @@ namespace YouTubeDownloadUI
     BackgroundWorker worker;
     YoutubeDownloader downloader;
     Thread thread;
+    MainSettings AppSettings = MainSettings.Load();
     
     string DragDropButtonText = string.Empty;
     
@@ -28,6 +29,7 @@ namespace YouTubeDownloadUI
     const string msgAllreadyDownloaded = "has already been downloaded";
     const string msgDownloadHeading = "[download] ";
     const string msgDownloadDestination = "[download] Destination: ";
+    
     void UI_WorkerThread_DataFilter(string text, YoutubeDownloader obj)
     {
       if (!string.IsNullOrEmpty(text) && text.Contains(msgDownloadDestination))
@@ -156,15 +158,13 @@ namespace YouTubeDownloadUI
     
     void WorkerEvent_Disposed(object sender, EventArgs e) { worker = null; }
     
-    ToolStripMenuItem mOptions, mAbortOnDuplicate, mAddMetadata, mContinue, mEmbedSubs, mEmbedThumb, mGetPlaylist, mSep, mIgnoreErrors, mVerbose, mWriteAutoSubs, mWriteSubs;
+    ToolStripMenuItem mOptions, mAbortOnDuplicate, mAddMetadata, mContinue, mEmbedSubs, mEmbedThumb, mGetPlaylist, mSep, mIgnoreErrors, mVerbose, mWriteAutoSubs, mWriteSubs, mDownloadTargets;
     
     void CreateToolStrip()
     {
       cm = new ContextMenuStrip();
       mOptions = cm.Items.Add("Options: Flags") as ToolStripMenuItem;
-      cm.Items.Add("[browse] Download Path");
-      cm.Items.Add("[browse] FFmpeg");
-      cm.Items.Add("[browse] youtube-dl");
+      cm.Items.Add("[add] Download Directory");
       lbLast.Text = $"[{NextTargetType}]"; // initial target-type is m4a (itunes audio)
       mAbortOnDuplicate = mOptions.DropDownItems.Add("Abort on Duplicate (File Exists)") as ToolStripMenuItem;
       mAddMetadata      = mOptions.DropDownItems.Add("Add MetaData") as ToolStripMenuItem;
@@ -177,6 +177,7 @@ namespace YouTubeDownloadUI
       mVerbose          = mOptions.DropDownItems.Add("Verbose") as ToolStripMenuItem;
       mWriteAutoSubs    = mOptions.DropDownItems.Add("Write Auto Subtitles (yt: if present)") as ToolStripMenuItem;
       mWriteSubs        = mOptions.DropDownItems.Add("Write Subtitles (yt: if present") as ToolStripMenuItem;
+      mDownloadTargets  = cm.Items.Add("Download Targets") as ToolStripMenuItem;
       foreach (var m in new ToolStripMenuItem[]{ mAbortOnDuplicate,mAddMetadata,mContinue,mEmbedSubs,mEmbedThumb,mGetPlaylist,mIgnoreErrors,mVerbose,mWriteAutoSubs,mWriteSubs}) m.CheckOnClick = true;
       // load defaults
       mAbortOnDuplicate.Checked  = DownloadTarget.Default.AbortOnDuplicate;
@@ -189,6 +190,32 @@ namespace YouTubeDownloadUI
       mVerbose.Checked           = DownloadTarget.Default.Verbose;
       mWriteAutoSubs.Checked     = DownloadTarget.Default.WriteAutoSub;
       mWriteSubs.Checked         = DownloadTarget.Default.WriteSub;
+      UpdateDownloadTargets();
+    }
+    
+    void DownloadTargetClickHandler(object sender, EventArgs e)
+    {
+      var value =  (sender as ToolStripMenuItem).Tag as string;
+      var n = Path.GetFileName(DownloadTarget.Default.TargetPath = value);
+      DownloadTarget.Default.TargetPath = (AppSettings.TargetOutputDirectory = value);
+      Text = $"Dir: {n}";
+      UpdateDownloadTargets();
+      AppSettings.Save();
+    }
+    
+    void UpdateDownloadTargets()
+    {
+      mDownloadTargets.DropDownItems.Clear();
+      var dt = new List<string>(AppSettings.DownloadTargetsList).ToArray();
+      Array.Sort(dt);
+      foreach (var i in dt)
+      {
+        var itm = mDownloadTargets.DropDownItems.Add(Path.GetFileName(i)) as ToolStripMenuItem;
+        itm.Tag = i;
+        itm.ToolTipText = i;
+        itm.Checked = (i == AppSettings.TargetOutputDirectory);
+        itm.Click += DownloadTargetClickHandler;
+      }
     }
     
     void ShowButtonMenu(Control target) { cm.Show(target, new Point(target.Width,target.Height), ToolStripDropDownDirection.BelowLeft); }
@@ -196,7 +223,11 @@ namespace YouTubeDownloadUI
     public MainForm()
     {
       InitializeComponent();
+      
+      FormClosing += (object sender, FormClosingEventArgs e) => AppSettings.Save();
+      
       CreateToolStrip();
+      
       this.ApplyDragDropMethod(
         (sender,e)=>{
           if (e.Data.GetDataPresent(DataFormats.Text) ||
@@ -215,6 +246,9 @@ namespace YouTubeDownloadUI
             {
               cm.Show(button1,new Point(button1.Width,button1.Height), ToolStripDropDownDirection.BelowLeft);
               Text = "is directory";
+              AppSettings.AddDirectory(DragDropButtonText);
+              UpdateDownloadTargets();
+              DownloadTarget.Default.TargetPath = DragDropButtonText;
             }
             else if (File.Exists(DragDropButtonText))
             {
