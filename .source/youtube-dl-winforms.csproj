@@ -76,16 +76,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClipboardImageWatcher.cs" />
-    <Compile Include="ClipboardWatcher.cs" />
-    <Compile Include="DirectoryHelper.cs" />
+    <Compile Include="cor3\ClipboardImageWatcher.cs" />
+    <Compile Include="cor3\ClipboardWatcher.cs" />
+    <Compile Include="cor3\ini.cs" />
+    <Compile Include="cor3\ITaskContext.cs" />
+    <Compile Include="cor3\KeyStrings.cs" />
     <Compile Include="DownloadTarget.cs" />
-    <Compile Include="DragDropFormsExtension.cs" />
+    <Compile Include="extensions\DirectoryHelper.cs" />
+    <Compile Include="extensions\DragDropFormsExtension.cs" />
     <Compile Include="MainViewForm.cs" />
     <Compile Include="MainViewForm.Designer.cs">
       <DependentUpon>MainViewForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="KeyStrings.cs" />
     <Compile Include="MainForm.cs" />
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
@@ -97,6 +99,7 @@
     <Compile Include="SelectTargetPath.Designer.cs">
       <DependentUpon>SelectTargetPath.cs</DependentUpon>
     </Compile>
+    <Compile Include="SimpleProgressEventArgs.cs" />
     <Compile Include="ThreadedDownloaderWorker.cs" />
     <Compile Include="YoutubeDlProcess.cs" />
   </ItemGroup>
@@ -113,6 +116,10 @@
     <EmbeddedResource Include="SelectTargetPath.resx">
       <DependentUpon>SelectTargetPath.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="cor3" />
+    <Folder Include="extensions" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

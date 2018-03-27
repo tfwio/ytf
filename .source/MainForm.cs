@@ -3,16 +3,18 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 
 namespace YouTubeDownloadUI
 {
+  // if (DragDropButtonText.Contains("https://youtu.be")) ShowButtonMenu(button1);
+  // else if (DragDropButtonText.Contains("https://youtube.com")) ShowButtonMenu(button1);
+  // else if (DragDropButtonText.Contains("https://soundcloud.com")) ShowButtonMenu(button1);
+  // else if (DragDropButtonText.Contains("https://mixcloud.com")) ShowButtonMenu(button1);
   public partial class MainForm : Form
   {
-    static readonly string textformat = DataFormats.Text;
-    static readonly string fileformat = DataFormats.FileDrop;
-    
     BackgroundWorker worker;
     YoutubeDownloader downloader;
     Thread thread;
@@ -54,15 +56,13 @@ namespace YouTubeDownloadUI
     {
       richTextBox1.BackColor = Color.FromArgb(64,64,64);
       richTextBox1.ForeColor = SystemColors.ControlLight;
-      lbM4a.Enabled = false;
-      lbMp4.Enabled = false;
-      lbBest.Enabled = false;
-      lbMp3.Enabled = false;
-      lbLast.Enabled = false;
+      foreach (var c in TogglableControls) c.Enabled = false;
       richTextBox1.Clear();
-      richTextBox1.AppendText($"[to youtube-dl]: {obj.CommandText}\n");
+      richTextBox1.AppendText($"<APP>: {obj.CommandText}\n");
       richTextBox1.Focus();
     }
+    
+    Control[] TogglableControls { get { return new Control[]{lbM4a, lbMp3, lbMp4, lbBest, lbLast}; } }
     
     void UI_WorkerProcess_Post(YoutubeDownloader obj)
     {
@@ -77,12 +77,8 @@ namespace YouTubeDownloadUI
       richTextBox1.BackColor = SystemColors.ControlLight;
       richTextBox1.ForeColor = Color.FromArgb(64,64,64);
       var abort = !string.IsNullOrEmpty(obj.AbortMessage) ? $"\n{obj.AbortMessage}" : string.Empty;
-      richTextBox1.AppendText($"[exit-code]: {obj.ExitCode}{abort}\n");
-      lbM4a.Enabled = true;
-      lbMp3.Enabled = true;
-      lbMp4.Enabled = true;
-      lbBest.Enabled = true;
-      lbLast.Enabled = true;
+      richTextBox1.AppendText($"<APP:ERRORSTATUS>: {obj.ExitCode}{abort}\n");
+      foreach (var c in TogglableControls) c.Enabled = true;
     }
 
     void WorkerThread_Completed(object sender, EventArgs e) { worker.CancelAsync(); }
@@ -161,7 +157,7 @@ namespace YouTubeDownloadUI
     void WorkerEvent_Disposed(object sender, EventArgs e) { worker = null; }
     
     ToolStripMenuItem mOptions, mAbortOnDuplicate, mAddMetadata, mContinue, mEmbedSubs, mEmbedThumb, mGetPlaylist, mSep, mIgnoreErrors, mVerbose, mWriteAutoSubs, mWriteSubs;
-
+    
     void CreateToolStrip()
     {
       cm = new ContextMenuStrip();
@@ -169,53 +165,30 @@ namespace YouTubeDownloadUI
       cm.Items.Add("[browse] Download Path");
       cm.Items.Add("[browse] FFmpeg");
       cm.Items.Add("[browse] youtube-dl");
-      lbLast.Text = $"[{NextTargetType}]";
-      
+      lbLast.Text = $"[{NextTargetType}]"; // initial target-type is m4a (itunes audio)
       mAbortOnDuplicate = mOptions.DropDownItems.Add("Abort on Duplicate (File Exists)") as ToolStripMenuItem;
-      mAddMetadata = mOptions.DropDownItems.Add("Add MetaData") as ToolStripMenuItem;
-      mContinue = mOptions.DropDownItems.Add("Continue Unfinished Downloads") as ToolStripMenuItem;
-      mEmbedSubs = mOptions.DropDownItems.Add("Embed Subtitles") as ToolStripMenuItem;
-      mEmbedThumb = mOptions.DropDownItems.Add("Embed Thumbnail") as ToolStripMenuItem;
-      mGetPlaylist = mOptions.DropDownItems.Add("Get Playlist") as ToolStripMenuItem;
-      mSep = mOptions.DropDownItems.Add("-") as ToolStripMenuItem;
-      mIgnoreErrors = mOptions.DropDownItems.Add("Ignore Errors") as ToolStripMenuItem;
-      mVerbose = mOptions.DropDownItems.Add("Verbose") as ToolStripMenuItem;
-      mWriteAutoSubs = mOptions.DropDownItems.Add("Write Auto Subtitles (yt: if present)") as ToolStripMenuItem;
-      mWriteSubs = mOptions.DropDownItems.Add("Write Subtitles (yt: if present") as ToolStripMenuItem;
-      
-      mAbortOnDuplicate.CheckOnClick = true;
-      mAbortOnDuplicate.ToolTipText =
-        "If this is checked, and you have\n" +
-        "Continue Downloads checked also,\n" +
-        "provides you a conflict of interest.\n" +
-        "note:\n" +
-        "When CONTINUE-DOWNLOADS is enabled\n" +
-        "and you attempt to re-download something\n" +
-        "the file will always be over-written\n" +
-        "particularly if you updated the file\n" +
-        "such as by way of EMBEDDED-METADATA, \n" +
-        "or COVER-IMAGE.";
-      mAddMetadata.CheckOnClick = true;
-      mContinue.CheckOnClick = true;
-      mEmbedSubs.CheckOnClick = true;
-      mEmbedThumb.CheckOnClick = true;
-      mGetPlaylist.CheckOnClick = true;
-      mIgnoreErrors.CheckOnClick = true;
-      mVerbose.CheckOnClick = true;
-      mWriteAutoSubs.CheckOnClick = true;
-      mWriteSubs.CheckOnClick = true;
-      
-      mAbortOnDuplicate.Checked = DownloadTarget.Default.AbortOnDuplicate;
-      mAddMetadata.Checked = DownloadTarget.Default.AddMetaData;
-      mContinue.Checked = DownloadTarget.Default.Continue;
-      mEmbedSubs.Checked = DownloadTarget.Default.EmbedSubs;
-      mEmbedThumb.Checked = DownloadTarget.Default.EmbedThumbnail;
-      mGetPlaylist.Checked = DownloadTarget.Default.GetPlaylist;
-      mIgnoreErrors.Checked = DownloadTarget.Default.IgnoreErrors;
-      mVerbose.Checked = DownloadTarget.Default.Verbose;
-      mWriteAutoSubs.Checked = DownloadTarget.Default.WriteAutoSub;
-      mWriteSubs.Checked = DownloadTarget.Default.WriteSub;
-      
+      mAddMetadata      = mOptions.DropDownItems.Add("Add MetaData") as ToolStripMenuItem;
+      mContinue         = mOptions.DropDownItems.Add("Continue Unfinished Downloads") as ToolStripMenuItem;
+      mEmbedSubs        = mOptions.DropDownItems.Add("Embed Subtitles") as ToolStripMenuItem;
+      mEmbedThumb       = mOptions.DropDownItems.Add("Embed Thumbnail") as ToolStripMenuItem;
+      mGetPlaylist      = mOptions.DropDownItems.Add("Get Playlist") as ToolStripMenuItem;
+      mSep              = mOptions.DropDownItems.Add("-") as ToolStripMenuItem;
+      mIgnoreErrors     = mOptions.DropDownItems.Add("Ignore Errors") as ToolStripMenuItem;
+      mVerbose          = mOptions.DropDownItems.Add("Verbose") as ToolStripMenuItem;
+      mWriteAutoSubs    = mOptions.DropDownItems.Add("Write Auto Subtitles (yt: if present)") as ToolStripMenuItem;
+      mWriteSubs        = mOptions.DropDownItems.Add("Write Subtitles (yt: if present") as ToolStripMenuItem;
+      foreach (var m in new ToolStripMenuItem[]{ mAbortOnDuplicate,mAddMetadata,mContinue,mEmbedSubs,mEmbedThumb,mGetPlaylist,mIgnoreErrors,mVerbose,mWriteAutoSubs,mWriteSubs}) m.CheckOnClick = true;
+      // load defaults
+      mAbortOnDuplicate.Checked  = DownloadTarget.Default.AbortOnDuplicate;
+      mAddMetadata.Checked       = DownloadTarget.Default.AddMetaData;
+      mContinue.Checked          = DownloadTarget.Default.Continue;
+      mEmbedSubs.Checked         = DownloadTarget.Default.EmbedSubs;
+      mEmbedThumb.Checked        = DownloadTarget.Default.EmbedThumbnail;
+      mGetPlaylist.Checked       = DownloadTarget.Default.GetPlaylist;
+      mIgnoreErrors.Checked      = DownloadTarget.Default.IgnoreErrors;
+      mVerbose.Checked           = DownloadTarget.Default.Verbose;
+      mWriteAutoSubs.Checked     = DownloadTarget.Default.WriteAutoSub;
+      mWriteSubs.Checked         = DownloadTarget.Default.WriteSub;
     }
     
     void ShowButtonMenu(Control target) { cm.Show(target, new Point(target.Width,target.Height), ToolStripDropDownDirection.BelowLeft); }
@@ -223,37 +196,31 @@ namespace YouTubeDownloadUI
     public MainForm()
     {
       InitializeComponent();
-      
       CreateToolStrip();
-      
-      button1.ApplyDragDropMethod(
+      this.ApplyDragDropMethod(
         (sender,e)=>{
-          if (e.Data.GetDataPresent(textformat) |
-              e.Data.GetDataPresent(fileformat)) e.Effect = DragDropEffects.Copy;
+          if (e.Data.GetDataPresent(DataFormats.Text) ||
+              e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
         },
         (sender,e)=>{
-          if (e.Data.GetDataPresent(textformat))
+          if (e.Data.GetDataPresent(DataFormats.Text))
           {
-            DragDropButtonText = (string)e.Data.GetData(textformat);
-            if (DragDropButtonText.Contains("https://youtu.be")) ShowButtonMenu(button1);
-            else if (DragDropButtonText.Contains("https://youtube.com")) ShowButtonMenu(button1);
-            else if (DragDropButtonText.Contains("https://soundcloud.com")) ShowButtonMenu(button1);
-            else if (DragDropButtonText.Contains("https://mixcloud.com")) ShowButtonMenu(button1);
+            DragDropButtonText = (string)e.Data.GetData(DataFormats.Text);
+            textBox1.Text = (string)e.Data.GetData(DataFormats.Text);
           }
-          else if (e.Data.GetDataPresent(fileformat))
+          else if (e.Data.GetDataPresent(DataFormats.FileDrop))
           {
-            DragDropButtonText = (string)e.Data.GetData(fileformat);
+            DragDropButtonText = (e.Data.GetData(DataFormats.FileDrop) as string[]).FirstOrDefault();
             if (Directory.Exists(DragDropButtonText))
+            {
               cm.Show(button1,new Point(button1.Width,button1.Height), ToolStripDropDownDirection.BelowLeft);
-          }
-        });
-      
-      textBox1.ApplyDragDropMethod(
-        (sender,e)=>{ if (e.Data.GetDataPresent(textformat)) e.Effect = DragDropEffects.Copy; },
-        (sender,e)=>{
-          if (e.Data.GetDataPresent(textformat))
-          {
-            textBox1.Text = (string)e.Data.GetData(textformat);
+              Text = "is directory";
+            }
+            else if (File.Exists(DragDropButtonText))
+            {
+              cm.Show(button1,new Point(button1.Width,button1.Height), ToolStripDropDownDirection.BelowLeft);
+              Text = "is file";
+            }
           }
         });
     }
