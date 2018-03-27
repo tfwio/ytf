@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
@@ -10,6 +11,7 @@ namespace YouTubeDownloadUI
   public partial class MainForm : Form
   {
     static readonly string textformat = DataFormats.Text;
+    static readonly string fileformat = DataFormats.FileDrop;
     
     BackgroundWorker worker;
     YoutubeDownloader downloader;
@@ -42,8 +44,8 @@ namespace YouTubeDownloadUI
        ){
         TargetType = this.nextType,
         IsVerbose=ckVerbose.Checked,
-//        IsEmbedSubs=ckEmbedSubs.Checked,
-//        IsGetPlaylist=ckUsePlaylist.Checked
+        //        IsEmbedSubs=ckEmbedSubs.Checked,
+        //        IsGetPlaylist=ckUsePlaylist.Checked
       };
       richTextBox1.AppendText($"[to youtube-dl]: {downloader.CommandText}\n");
       downloader.Go();
@@ -127,10 +129,37 @@ namespace YouTubeDownloadUI
       if (InvokeRequired) Invoke(new Action(ControlsHide));
       else ControlsHide();
     }
+    ContextMenuStrip cm;
+    
+    string DragDropButtonText = string.Empty;
     
     public MainForm()
     {
       InitializeComponent();
+      cm = new ContextMenuStrip();
+      cm.Items.Add("[browse] Download Path");
+      cm.Items.Add("[browse] FFmpeg");
+      cm.Items.Add("[browse] youtube-dl");
+      
+      button1.ApplyDragDropMethod(
+        (sender,e)=>{
+          if (e.Data.GetDataPresent(textformat) ||
+              e.Data.GetDataPresent(fileformat)) e.Effect = DragDropEffects.Copy;
+        },
+        (sender,e)=>{
+          if (e.Data.GetDataPresent(textformat))
+          {
+            DragDropButtonText = (string)e.Data.GetData(textformat);
+            cm.Show(button1,new Point(button1.Width,button1.Height), ToolStripDropDownDirection.BelowLeft);
+          }
+          else if (e.Data.GetDataPresent(fileformat))
+          {
+            DragDropButtonText = (string)e.Data.GetData(fileformat);
+            if (Directory.Exists(DragDropButtonText))
+              cm.Show(button1,new Point(button1.Width,button1.Height), ToolStripDropDownDirection.BelowLeft);
+          }
+        });
+      
       textBox1.ApplyDragDropMethod(
         (sender,e)=>{ if (e.Data.GetDataPresent(textformat)) e.Effect = DragDropEffects.Copy; },
         (sender,e)=>{
@@ -163,6 +192,12 @@ namespace YouTubeDownloadUI
     void TextBox1TextChanged(object sender, EventArgs e)
     {
       ckHasPlaylist.Checked = textBox1.Text.Contains("&list=");
+    }
+    
+    void Button1MouseDown(object sender, MouseEventArgs e)
+    {
+      cm.Show(button1,new Point(button1.Width,button1.Height), ToolStripDropDownDirection.BelowLeft);
+      cm.Focus();
     }
     
   }

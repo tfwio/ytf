@@ -17,6 +17,8 @@
     private System.Windows.Forms.CheckBox ckVerbose;
     private System.Windows.Forms.CheckBox ckEmbedSubs;
     private System.Windows.Forms.LinkLabel linkLabel4;
+    private System.Windows.Forms.Button button1;
+    private System.Windows.Forms.Panel panel2;
     
     /// <summary>
     /// Disposes resources used by the form.
@@ -49,8 +51,11 @@
       this.linkLabel3 = new System.Windows.Forms.LinkLabel();
       this.linkLabel2 = new System.Windows.Forms.LinkLabel();
       this.linkLabel1 = new System.Windows.Forms.LinkLabel();
+      this.panel2 = new System.Windows.Forms.Panel();
+      this.button1 = new System.Windows.Forms.Button();
       this.textBox1 = new System.Windows.Forms.TextBox();
       this.panel1.SuspendLayout();
+      this.panel2.SuspendLayout();
       this.SuspendLayout();
       // 
       // richTextBox1
@@ -62,13 +67,14 @@
       this.richTextBox1.Name = "richTextBox1";
       this.richTextBox1.ReadOnly = true;
       this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedBoth;
-      this.richTextBox1.Size = new System.Drawing.Size(700, 149);
+      this.richTextBox1.Size = new System.Drawing.Size(818, 353);
       this.richTextBox1.TabIndex = 2;
       this.richTextBox1.Text = "";
       this.richTextBox1.WordWrap = false;
       // 
       // panel1
       // 
+      this.panel1.Controls.Add(this.panel2);
       this.panel1.Controls.Add(this.ckEmbedSubs);
       this.panel1.Controls.Add(this.ckVerbose);
       this.panel1.Controls.Add(this.ckUsePlaylist);
@@ -77,11 +83,10 @@
       this.panel1.Controls.Add(this.linkLabel3);
       this.panel1.Controls.Add(this.linkLabel2);
       this.panel1.Controls.Add(this.linkLabel1);
-      this.panel1.Controls.Add(this.textBox1);
       this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
       this.panel1.Location = new System.Drawing.Point(0, 0);
       this.panel1.Name = "panel1";
-      this.panel1.Size = new System.Drawing.Size(700, 108);
+      this.panel1.Size = new System.Drawing.Size(818, 108);
       this.panel1.TabIndex = 5;
       // 
       // ckEmbedSubs
@@ -90,7 +95,7 @@
       this.ckEmbedSubs.AutoSize = true;
       this.ckEmbedSubs.Checked = true;
       this.ckEmbedSubs.CheckState = System.Windows.Forms.CheckState.Checked;
-      this.ckEmbedSubs.Location = new System.Drawing.Point(359, 76);
+      this.ckEmbedSubs.Location = new System.Drawing.Point(477, 76);
       this.ckEmbedSubs.Name = "ckEmbedSubs";
       this.ckEmbedSubs.Size = new System.Drawing.Size(86, 17);
       this.ckEmbedSubs.TabIndex = 6;
@@ -103,7 +108,7 @@
       this.ckVerbose.AutoSize = true;
       this.ckVerbose.Checked = true;
       this.ckVerbose.CheckState = System.Windows.Forms.CheckState.Checked;
-      this.ckVerbose.Location = new System.Drawing.Point(451, 76);
+      this.ckVerbose.Location = new System.Drawing.Point(569, 76);
       this.ckVerbose.Name = "ckVerbose";
       this.ckVerbose.Size = new System.Drawing.Size(65, 17);
       this.ckVerbose.TabIndex = 6;
@@ -114,7 +119,7 @@
       // 
       this.ckUsePlaylist.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.ckUsePlaylist.AutoSize = true;
-      this.ckUsePlaylist.Location = new System.Drawing.Point(608, 76);
+      this.ckUsePlaylist.Location = new System.Drawing.Point(726, 76);
       this.ckUsePlaylist.Name = "ckUsePlaylist";
       this.ckUsePlaylist.Size = new System.Drawing.Size(80, 17);
       this.ckUsePlaylist.TabIndex = 6;
@@ -126,7 +131,7 @@
       this.ckHasPlaylist.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.ckHasPlaylist.AutoCheck = false;
       this.ckHasPlaylist.AutoSize = true;
-      this.ckHasPlaylist.Location = new System.Drawing.Point(522, 76);
+      this.ckHasPlaylist.Location = new System.Drawing.Point(640, 76);
       this.ckHasPlaylist.Name = "ckHasPlaylist";
       this.ckHasPlaylist.Size = new System.Drawing.Size(80, 17);
       this.ckHasPlaylist.TabIndex = 6;
@@ -138,7 +143,7 @@
       this.linkLabel4.AutoSize = true;
       this.linkLabel4.Cursor = System.Windows.Forms.Cursors.Hand;
       this.linkLabel4.Font = new System.Drawing.Font("Roboto", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.linkLabel4.Location = new System.Drawing.Point(120, 46);
+      this.linkLabel4.Location = new System.Drawing.Point(118, 52);
       this.linkLabel4.Name = "linkLabel4";
       this.linkLabel4.Size = new System.Drawing.Size(48, 23);
       this.linkLabel4.TabIndex = 3;
@@ -151,7 +156,7 @@
       this.linkLabel3.AutoSize = true;
       this.linkLabel3.Cursor = System.Windows.Forms.Cursors.Hand;
       this.linkLabel3.Font = new System.Drawing.Font("Roboto", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.linkLabel3.Location = new System.Drawing.Point(174, 46);
+      this.linkLabel3.Location = new System.Drawing.Point(172, 52);
       this.linkLabel3.Name = "linkLabel3";
       this.linkLabel3.Size = new System.Drawing.Size(47, 23);
       this.linkLabel3.TabIndex = 3;
@@ -164,7 +169,7 @@
       this.linkLabel2.AutoSize = true;
       this.linkLabel2.Cursor = System.Windows.Forms.Cursors.Hand;
       this.linkLabel2.Font = new System.Drawing.Font("Roboto", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.linkLabel2.Location = new System.Drawing.Point(66, 46);
+      this.linkLabel2.Location = new System.Drawing.Point(64, 52);
       this.linkLabel2.Name = "linkLabel2";
       this.linkLabel2.Size = new System.Drawing.Size(48, 23);
       this.linkLabel2.TabIndex = 4;
@@ -177,7 +182,7 @@
       this.linkLabel1.AutoSize = true;
       this.linkLabel1.Cursor = System.Windows.Forms.Cursors.Hand;
       this.linkLabel1.Font = new System.Drawing.Font("Roboto", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.linkLabel1.Location = new System.Drawing.Point(13, 46);
+      this.linkLabel1.Location = new System.Drawing.Point(11, 52);
       this.linkLabel1.Name = "linkLabel1";
       this.linkLabel1.Size = new System.Drawing.Size(47, 23);
       this.linkLabel1.TabIndex = 5;
@@ -185,29 +190,53 @@
       this.linkLabel1.Text = "m4a";
       this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkLabel1LinkClicked);
       // 
+      // panel2
+      // 
+      this.panel2.Controls.Add(this.textBox1);
+      this.panel2.Controls.Add(this.button1);
+      this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
+      this.panel2.Location = new System.Drawing.Point(0, 0);
+      this.panel2.Name = "panel2";
+      this.panel2.Padding = new System.Windows.Forms.Padding(9);
+      this.panel2.Size = new System.Drawing.Size(818, 42);
+      this.panel2.TabIndex = 7;
+      // 
+      // button1
+      // 
+      this.button1.Dock = System.Windows.Forms.DockStyle.Right;
+      this.button1.FlatStyle = System.Windows.Forms.FlatStyle.System;
+      this.button1.Font = new System.Drawing.Font("Marlett", 14F);
+      this.button1.Location = new System.Drawing.Point(785, 9);
+      this.button1.Name = "button1";
+      this.button1.Size = new System.Drawing.Size(24, 24);
+      this.button1.TabIndex = 9;
+      this.button1.Text = "6";
+      this.button1.UseVisualStyleBackColor = true;
+      this.button1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Button1MouseDown);
+      // 
       // textBox1
       // 
-      this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-      | System.Windows.Forms.AnchorStyles.Right)));
       this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+      this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
       this.textBox1.Font = new System.Drawing.Font("Roboto", 14.25F, System.Drawing.FontStyle.Bold);
-      this.textBox1.Location = new System.Drawing.Point(13, 13);
+      this.textBox1.Location = new System.Drawing.Point(9, 9);
       this.textBox1.Name = "textBox1";
-      this.textBox1.Size = new System.Drawing.Size(675, 23);
-      this.textBox1.TabIndex = 2;
-      this.textBox1.TextChanged += new System.EventHandler(this.TextBox1TextChanged);
+      this.textBox1.Size = new System.Drawing.Size(776, 23);
+      this.textBox1.TabIndex = 8;
       // 
       // MainForm
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(700, 257);
+      this.ClientSize = new System.Drawing.Size(818, 461);
       this.Controls.Add(this.richTextBox1);
       this.Controls.Add(this.panel1);
       this.Name = "MainForm";
       this.Text = "YouTubeDownloadUI";
       this.panel1.ResumeLayout(false);
       this.panel1.PerformLayout();
+      this.panel2.ResumeLayout(false);
+      this.panel2.PerformLayout();
       this.ResumeLayout(false);
 
     }
