@@ -15,6 +15,8 @@ namespace YouTubeDownloadUI
 		public string TargetType { get; set; } // m4a, best, mp4, mp3, ogg
 		public string SubLang { get; set; }
 		
+    public bool AbortOnDuplicate { get; set; }
+		
 		public bool AddMetaData { get; set; }
 		public bool Continue { get; set; } // -c
 		public bool EmbedSubs { get; set; } // --embed-subs
@@ -35,6 +37,7 @@ namespace YouTubeDownloadUI
 				return new DownloadTarget() {
           TargetType = "best",
 					SubLang = "en",
+          AbortOnDuplicate = true,
           AddMetaData = true,
           Continue = true,
           EmbedSubs = true,

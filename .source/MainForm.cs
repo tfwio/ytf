@@ -23,15 +23,37 @@ namespace YouTubeDownloadUI
     
     ContextMenuStrip cm;
     
-    void UI_WorkerThread_DataFilter(string text)
+    const string msgAllreadyDownloaded = "has already been downloaded";
+    const string msgDownloadHeading = "[download] ";
+    const string msgDownloadDestination = "[download] Destination: ";
+    void UI_WorkerThread_DataFilter(string text, YoutubeDownloader obj)
     {
-      if (!string.IsNullOrEmpty(text) && text.Contains("[download] Destination: "))
-        Text=text.Replace("[download] Destination: ", "").Trim();
+      if (!string.IsNullOrEmpty(text) && text.Contains(msgDownloadDestination))
+      {
+        var filen = text.Replace(msgDownloadDestination, "").Trim();
+        if (File.Exists(Path.Combine(obj.TargetPath,filen)) && obj.AbortOnDuplicate)
+        {
+          obj.Abort();
+          richTextBox1.AppendText($"[abort] due to EXISITING FILE: {filen}\n");
+          Text=$"[EXISTS] {filen}";
+        }
+        else Text = filen;
+      }
+      else if (!string.IsNullOrEmpty(text) && text.Contains(msgAllreadyDownloaded))
+      {
+        obj.Abort();
+        var filen = text
+          .Replace(msgDownloadHeading, "")
+          .Replace(msgAllreadyDownloaded, "")
+          .Trim();
+        richTextBox1.AppendText($"[abort] due to EXISITING FILE: {filen}\n");
+        Text=$"[EXISTS] {filen}";
+      }
     }
     
-    void UI_WorkerThread_DataHandler(string data, bool isError)
+    void UI_WorkerThread_DataHandler(string data, bool isError, YoutubeDownloader obj)
     {
-      if (!isError) UI_WorkerThread_DataFilter(data);
+      if (!isError) UI_WorkerThread_DataFilter(data, obj);
       richTextBox1.AppendText($"{data}\n");
     }
     
@@ -44,6 +66,9 @@ namespace YouTubeDownloadUI
       lbBest.Enabled = false;
       lbMp3.Enabled = false;
       lbLast.Enabled = false;
+      richTextBox1.Clear();
+      richTextBox1.AppendText($"[to youtube-dl]: {obj.CommandText}\n");
+      richTextBox1.Focus();
     }
     
     void UI_WorkerProcess_Post(YoutubeDownloader obj)
@@ -62,14 +87,14 @@ namespace YouTubeDownloadUI
     
     void WorkerThread_DataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
     {
-      if (InvokeRequired) Invoke(new Action(()=>UI_WorkerThread_DataHandler(e.Data,false)));
-      else UI_WorkerThread_DataHandler(e.Data,false);
+      if (InvokeRequired) Invoke(new Action(()=>UI_WorkerThread_DataHandler(e.Data, false, downloader)));
+      else UI_WorkerThread_DataHandler(e.Data, false, downloader);
     }
     
     void WorkerThread_ErrorReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
     {
-      if (InvokeRequired) Invoke(new Action(()=>UI_WorkerThread_DataHandler(e.Data,true)));
-      else UI_WorkerThread_DataHandler(e.Data,true);
+      if (InvokeRequired) Invoke(new Action(()=>UI_WorkerThread_DataHandler(e.Data, true, downloader)));
+      else UI_WorkerThread_DataHandler(e.Data, true, downloader);
     }
     
     void Worker_Begin()
@@ -98,6 +123,7 @@ namespace YouTubeDownloadUI
        ){
         TargetType = this.NextTargetType,
         Verbose=mVerbose.Checked,
+        AbortOnDuplicate = mAbortOnDuplicate.Checked,
         AddMetaData=mAddMetadata.Checked,
         Continue=mContinue.Checked,
         EmbedSubs= mEmbedSubs.Checked,
@@ -108,15 +134,8 @@ namespace YouTubeDownloadUI
         WriteSub=mWriteSubs.Checked,
       };
       
-      if (InvokeRequired) {
-        Invoke(new Action(()=>UI_WorkerProcess_Pre(downloader)));
-        Invoke(new Action(richTextBox1.Clear));
-        Invoke(new Action(()=>richTextBox1.AppendText($"[to youtube-dl]: {downloader.CommandText}\n")));
-      } else {
-        UI_WorkerProcess_Pre(downloader);
-        richTextBox1.Clear();
-        richTextBox1.AppendText($"[to youtube-dl]: {downloader.CommandText}\n");
-      }
+      if (InvokeRequired) Invoke(new Action(()=>UI_WorkerProcess_Pre(downloader)));
+      else UI_WorkerProcess_Pre(downloader);
       
       downloader.Go();
     }
@@ -139,7 +158,7 @@ namespace YouTubeDownloadUI
     
     void WorkerEvent_Disposed(object sender, EventArgs e) { worker = null; }
     
-    ToolStripMenuItem mOptions, mAddMetadata, mContinue, mEmbedSubs, mEmbedThumb, mGetPlaylist, mSep, mIgnoreErrors, mVerbose, mWriteAutoSubs, mWriteSubs;
+    ToolStripMenuItem mOptions, mAbortOnDuplicate, mAddMetadata, mContinue, mEmbedSubs, mEmbedThumb, mGetPlaylist, mSep, mIgnoreErrors, mVerbose, mWriteAutoSubs, mWriteSubs;
 
     void CreateToolStrip()
     {
@@ -149,6 +168,7 @@ namespace YouTubeDownloadUI
       cm.Items.Add("[browse] FFmpeg");
       cm.Items.Add("[browse] youtube-dl");
       
+      mAbortOnDuplicate = mOptions.DropDownItems.Add("Abort on Duplicate (File Exists)") as ToolStripMenuItem;
       mAddMetadata = mOptions.DropDownItems.Add("Add MetaData") as ToolStripMenuItem;
       mContinue = mOptions.DropDownItems.Add("Continue Unfinished Downloads") as ToolStripMenuItem;
       mEmbedSubs = mOptions.DropDownItems.Add("Embed Subtitles") as ToolStripMenuItem;
@@ -160,6 +180,18 @@ namespace YouTubeDownloadUI
       mWriteAutoSubs = mOptions.DropDownItems.Add("Write Auto Subtitles (yt: if present)") as ToolStripMenuItem;
       mWriteSubs = mOptions.DropDownItems.Add("Write Subtitles (yt: if present") as ToolStripMenuItem;
       
+      mAbortOnDuplicate.CheckOnClick = true;
+      mAbortOnDuplicate.ToolTipText =
+        "If this is checked, and you have\n" +
+        "Continue Downloads checked also,\n" +
+        "provides you a conflict of interest.\n" +
+        "note:\n" +
+        "When CONTINUE-DOWNLOADS is enabled\n" +
+        "and you attempt to re-download something\n" +
+        "the file will always be over-written\n" +
+        "particularly if you updated the file\n" +
+        "such as by way of EMBEDDED-METADATA, \n" +
+        "or COVER-IMAGE.";
       mAddMetadata.CheckOnClick = true;
       mContinue.CheckOnClick = true;
       mEmbedSubs.CheckOnClick = true;
@@ -170,6 +202,7 @@ namespace YouTubeDownloadUI
       mWriteAutoSubs.CheckOnClick = true;
       mWriteSubs.CheckOnClick = true;
       
+      mAbortOnDuplicate.Checked = DownloadTarget.Default.AbortOnDuplicate;
       mAddMetadata.Checked = DownloadTarget.Default.AddMetaData;
       mContinue.Checked = DownloadTarget.Default.Continue;
       mEmbedSubs.Checked = DownloadTarget.Default.EmbedSubs;

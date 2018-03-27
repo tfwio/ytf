@@ -25,8 +25,8 @@ namespace YouTubeDownloadUI
     
     ProcessStartInfo NewStartInfo {
       get {
-//          StandardOutputEncoding = Encoding.UTF8,
-//          StandardErrorEncoding = Encoding.UTF8,
+        //          StandardOutputEncoding = Encoding.UTF8,
+        //          StandardErrorEncoding = Encoding.UTF8,
         var si = new ProcessStartInfo("youtube-dl",CommandText){
           UseShellExecute = false,
           RedirectStandardError = true,
@@ -78,7 +78,8 @@ namespace YouTubeDownloadUI
     
     public void Abort()
     {
-      shellProcess.Close();
+      shellProcess.Kill();
+      // shellProcess.Close();
     }
     
     public event EventHandler Completed;
@@ -100,7 +101,7 @@ namespace YouTubeDownloadUI
     }
     
     void WeDisposed(object sender, EventArgs e) {
-//      yt_process = null;
+      //      yt_process = null;
       ExitCode = shellProcess.ExitCode;
       OnCompleted();
     }
