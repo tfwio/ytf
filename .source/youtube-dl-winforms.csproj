@@ -81,6 +81,7 @@
     <Compile Include="cor3\ini.cs" />
     <Compile Include="cor3\ITaskContext.cs" />
     <Compile Include="cor3\KeyStrings.cs" />
+    <Compile Include="cor3\SimpleProgressEventArgs.cs" />
     <Compile Include="DownloadTarget.cs" />
     <Compile Include="extensions\DirectoryHelper.cs" />
     <Compile Include="extensions\DragDropFormsExtension.cs" />
@@ -99,7 +100,6 @@
     <Compile Include="SelectTargetPath.Designer.cs">
       <DependentUpon>SelectTargetPath.cs</DependentUpon>
     </Compile>
-    <Compile Include="SimpleProgressEventArgs.cs" />
     <Compile Include="ThreadedDownloaderWorker.cs" />
     <Compile Include="YoutubeDlProcess.cs" />
   </ItemGroup>
