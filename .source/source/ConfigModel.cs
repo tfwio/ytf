@@ -4,7 +4,7 @@ using System.IO;
 using DH=System.DirectoryHelper;
 namespace YouTubeDownloadUtil
 {
-  class MainSettings
+  class ConfigModel
   {
     static readonly FileInfo confDotIni = new FileInfo(Path.Combine(DH.ExecutableDirectory,"config.ini"));
     
@@ -14,9 +14,9 @@ namespace YouTubeDownloadUtil
       coll.Write(confDotIni);
     }
     
-    static public MainSettings Load()
+    static public ConfigModel Load()
     {
-      var ini = new MainSettings(){
+      var ini = new ConfigModel(){
         TargetOutputDirectory=Path.Combine(DH.ExecutableDirectory,"downloads"),
         DownloadTargets=Path.Combine(DH.ExecutableDirectory,"downloads"),
         PathFFmpeg=Path.Combine(DH.ExecutableDirectory,"bin"),

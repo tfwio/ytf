@@ -18,7 +18,8 @@ namespace YouTubeDownloadUtil
     BackgroundWorker worker;
     YoutubeDownloader downloader;
     Thread thread;
-    MainSettings AppSettings = MainSettings.Load();
+    
+    ConfigModel Conf = ConfigModel.Load();
     
     string DragDropButtonText = string.Empty;
     
@@ -197,23 +198,23 @@ namespace YouTubeDownloadUtil
     {
       var value =  (sender as ToolStripMenuItem).Tag as string;
       var n = Path.GetFileName(DownloadTarget.Default.TargetPath = value);
-      DownloadTarget.Default.TargetPath = (AppSettings.TargetOutputDirectory = value);
+      DownloadTarget.Default.TargetPath = (Conf.TargetOutputDirectory = value);
       Text = $"Dir: {n}";
       UpdateDownloadTargets();
-      AppSettings.Save();
+      Conf.Save();
     }
     
     void UpdateDownloadTargets()
     {
       mDownloadTargets.DropDownItems.Clear();
-      var dt = new List<string>(AppSettings.DownloadTargetsList).ToArray();
+      var dt = new List<string>(Conf.DownloadTargetsList).ToArray();
       Array.Sort(dt);
       foreach (var i in dt)
       {
         var itm = mDownloadTargets.DropDownItems.Add(Path.GetFileName(i)) as ToolStripMenuItem;
         itm.Tag = i;
         itm.ToolTipText = i;
-        itm.Checked = (i == AppSettings.TargetOutputDirectory);
+        itm.Checked = (i == Conf.TargetOutputDirectory);
         itm.Click += DownloadTargetClickHandler;
       }
     }
@@ -224,7 +225,7 @@ namespace YouTubeDownloadUtil
     {
       InitializeComponent();
       
-      FormClosing += (object sender, FormClosingEventArgs e) => AppSettings.Save();
+      FormClosing += (object sender, FormClosingEventArgs e) => Conf.Save();
       
       CreateToolStrip();
       
@@ -246,7 +247,7 @@ namespace YouTubeDownloadUtil
             {
               cm.Show(button1,new Point(button1.Width,button1.Height), ToolStripDropDownDirection.BelowLeft);
               Text = "is directory";
-              AppSettings.AddDirectory(DragDropButtonText);
+              Conf.AddDirectory(DragDropButtonText);
               UpdateDownloadTargets();
               DownloadTarget.Default.TargetPath = DragDropButtonText;
             }
