@@ -15,11 +15,10 @@ namespace YouTubeDownloadUtil
   // else if (DragDropButtonText.Contains("https://mixcloud.com")) ShowButtonMenu(button1);
   public partial class MainForm : Form
   {
+    
     BackgroundWorker worker;
     YoutubeDownloader downloader;
     Thread thread;
-    
-    ConfigModel Conf = ConfigModel.Load();
     
     string DragDropButtonText = string.Empty;
     
@@ -42,8 +41,7 @@ namespace YouTubeDownloadUtil
       {
         obj.KnownTargetFile = text
           .Replace(msgDownloadHeading, "")
-          .Replace(msgAllreadyDownloaded, "")
-          .Trim();
+          .Replace(msgAllreadyDownloaded, "");
         obj.Abort($"[abort] due to EXISITING FILE: {obj.KnownTargetFile}\n");
         Text=$"[EXISTS] {obj.KnownTargetFile}";
       }
@@ -114,7 +112,7 @@ namespace YouTubeDownloadUtil
 
     void Worker_PrepareThread()
     {
-      var downloads = DirectoryHelper.EnsureLocalDirectory("downloads");
+      var downloads = "downloads".RelativeToExe();
       downloader = new YoutubeDownloader(
         textBox1.Text,
         downloads,
@@ -198,23 +196,23 @@ namespace YouTubeDownloadUtil
     {
       var value =  (sender as ToolStripMenuItem).Tag as string;
       var n = Path.GetFileName(DownloadTarget.Default.TargetPath = value);
-      DownloadTarget.Default.TargetPath = (Conf.TargetOutputDirectory = value);
+      DownloadTarget.Default.TargetPath = (ConfigModel.Instance.TargetOutputDirectory = value);
       Text = $"Dir: {n}";
       UpdateDownloadTargets();
-      Conf.Save();
+      ConfigModel.Instance.Save();
     }
     
     void UpdateDownloadTargets()
     {
       mDownloadTargets.DropDownItems.Clear();
-      var dt = new List<string>(Conf.DownloadTargetsList).ToArray();
+      var dt = new List<string>(ConfigModel.Instance.DownloadTargetsList).ToArray();
       Array.Sort(dt);
       foreach (var i in dt)
       {
         var itm = mDownloadTargets.DropDownItems.Add(Path.GetFileName(i)) as ToolStripMenuItem;
         itm.Tag = i;
         itm.ToolTipText = i;
-        itm.Checked = (i == Conf.TargetOutputDirectory);
+        itm.Checked = (i == ConfigModel.Instance.TargetOutputDirectory);
         itm.Click += DownloadTargetClickHandler;
       }
     }
@@ -225,7 +223,9 @@ namespace YouTubeDownloadUtil
     {
       InitializeComponent();
       
-      FormClosing += (object sender, FormClosingEventArgs e) => Conf.Save();
+      System.Environment.SetEnvironmentVariable("PATH",$"{ConfigModel.Instance.PathFFmpeg};{ConfigModel.Instance.PathYoutubeDL};{ConfigModel.OriginalPath}");
+      
+      FormClosing += (object sender, FormClosingEventArgs e) => ConfigModel.Instance.Save();
       
       CreateToolStrip();
       
@@ -247,7 +247,7 @@ namespace YouTubeDownloadUtil
             {
               cm.Show(button1,new Point(button1.Width,button1.Height), ToolStripDropDownDirection.BelowLeft);
               Text = "is directory";
-              Conf.AddDirectory(DragDropButtonText);
+              ConfigModel.Instance.AddDirectory(DragDropButtonText);
               UpdateDownloadTargets();
               DownloadTarget.Default.TargetPath = DragDropButtonText;
             }

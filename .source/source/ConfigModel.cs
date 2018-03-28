@@ -1,61 +1,52 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using DH=System.DirectoryHelper;
 namespace YouTubeDownloadUtil
 {
   class ConfigModel
   {
-    static readonly FileInfo confDotIni = new FileInfo(Path.Combine(DH.ExecutableDirectory,"config.ini"));
+    static readonly FileInfo confDotIni = new FileInfo(Path.Combine(System.DirectoryHelper.ExecutableDirectory,"config.ini"));
     
-    public void Save()
-    {
-      var coll = new IniCollection(this);
-      coll.Write(confDotIni);
-    }
+    static internal ConfigModel Instance = Load();
     
-    static public ConfigModel Load()
+    static public readonly string OriginalPath = System.Environment.GetEnvironmentVariable("PATH");
+    
+    /// <summary>the active download-target directory</summary>
+    [IniKey(Group="global", Alias="target")] public string TargetOutputDirectory { get; set; }
+    
+    /// <summary>This is a collection of strings separated by semi-colon.</summary>
+    [IniKey(Group="global", Alias="target-list")] public string DownloadTargets { get; set; }
+    
+    /// <summary>path containing FFmpeg.exe</summary>
+    [IniKey(Group="global", Alias="FFmpeg_bin")] public string PathFFmpeg { get; set; }
+    
+    /// <summary>Path containing youtube-dl and atomicparsley.</summary>
+    [IniKey(Group="global", Alias="youtube-dl_bin")] public string PathYoutubeDL { get; set; }
+    
+    public event EventHandler Saved;
+    protected virtual void OnSaved() { var handler = Saved; if (handler != null) handler(this, EventArgs.Empty); }
+    
+    public void Save() { var coll = new IniCollection(this); coll.Write(confDotIni); OnSaved(); }
+    
+    static public ConfigModel Load() { return Load(DirectoryHelper.ExecutableDirectory); }
+    static public ConfigModel Load(string confDir)
     {
       var ini = new ConfigModel(){
-        TargetOutputDirectory=Path.Combine(DH.ExecutableDirectory,"downloads"),
-        DownloadTargets=Path.Combine(DH.ExecutableDirectory,"downloads"),
-        PathFFmpeg=Path.Combine(DH.ExecutableDirectory,"bin"),
-        PathYoutubeDL=Path.Combine(DH.ExecutableDirectory,"bin"),
+        TargetOutputDirectory=Path.Combine(confDir,"%USERPROFILE%\\Downloads"),
+        DownloadTargets=Path.Combine(confDir,"%USERPROFILE%\\Downloads"),
+        // not likely.
+        PathFFmpeg=Path.Combine(confDir,"bin"), PathYoutubeDL=Path.Combine(confDir,"bin"),
       };
       if (!confDotIni.Exists) ini.Save();
       var coll = new IniCollection(confDotIni);
       coll.ToInstance(ini);
       return ini;
     }
-    /// <summary>
-    /// the active download-target directory
-    /// </summary>
-    [IniKey(Group="global", Default="downloads")]
-    public string TargetOutputDirectory { get; set; }
     
-    /// <summary>
-    /// path containing FFmpeg.exe
-    /// </summary>
-    [IniKey(Group="global", Default="bin")]
-    public string PathFFmpeg { get; set; }
-    
-    /// <summary>
-    /// Path containing youtube-dl and atomicparsley.
-    /// </summary>
-    [IniKey(Group="global", Default="bin")]
-    public string PathYoutubeDL { get; set; }
-    
-    /// <summary>
-    /// This is a collection of strings separated by semi-colon.
-    /// </summary>
-    [IniKey(Group="global")]
-    public string DownloadTargets { get; set; }
-    
-    [Ignore]
-    public List<string> DownloadTargetsList {
+    [Ignore] public List<string> DownloadTargetsList {
       get {
         var l = new List<string>(DownloadTargets.Split(';'));
-        for (int i = 0; i < l.Count; i++) l[i] = l[i].Trim();
+        for (int i = 0; i < l.Count; i++) l[i] = l[i];
         l.Sort();
         return l;
       }
@@ -66,14 +57,10 @@ namespace YouTubeDownloadUtil
     {
       var tg = new List<string>(DownloadTargetsList);
       if (tg.Contains(Path.GetFullPath(path))) return;
-      if (string.IsNullOrEmpty(DownloadTargets)) {
-        TargetOutputDirectory = path;
-        DownloadTargets = path;
-      }
-      else
-      {
-        tg.Add(path);
-      }
+      
+      if (string.IsNullOrEmpty(DownloadTargets)) { TargetOutputDirectory = path; DownloadTargets = path; }
+      else tg.Add(path);
+      
       tg.Sort();
       DownloadTargetsList = tg;
       Save();
