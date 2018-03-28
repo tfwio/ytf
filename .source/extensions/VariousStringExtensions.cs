@@ -75,7 +75,8 @@ namespace System
     /// Spit and Trim (to list).
     static public List<string> SplitByList(this string input, string strToSplitBy, bool removeEmpties) { return new List<string>(input.SplitBy(strToSplitBy,removeEmpties)); }
     
-    static public string JoinSemiColon(this string[] input) { return input.JoinBy("; "); }
+    static public string JoinSemiColon(this string[] input) { return input.JoinBy(";"); }
+    static public string JoinSemiColonSpace(this string[] input) { return input.JoinBy("; "); }
     static public string JoinBy(this string[] input, string joinBy) { return string.Join(joinBy, input); }
     static public string NullNotEmpty(this string input) { return string.IsNullOrEmpty(input) ? null : input; }
     static public string EmptyNotNull(this string input) { return input ?? string.Empty; }
