@@ -5,7 +5,7 @@ namespace YouTubeDownloadUtil
 {
   class ConfigModel
   {
-    static readonly FileInfo confDotIni = new FileInfo(Path.Combine(System.DirectoryHelper.ExecutableDirectory,"config.ini"));
+    static readonly FileInfo confDotIni = new FileInfo(Path.Combine(System.DirectoryHelper.ExecutableDirectory,KeyStrings.ConfDefault));
     
     static internal ConfigModel Instance = Load();
     
@@ -32,10 +32,10 @@ namespace YouTubeDownloadUtil
     static public ConfigModel Load(string confDir)
     {
       var ini = new ConfigModel(){
-        TargetOutputDirectory=Path.Combine(confDir,"%USERPROFILE%\\Downloads"),
-        DownloadTargets=Path.Combine(confDir,"%USERPROFILE%\\Downloads"),
+        TargetOutputDirectory=Path.Combine(confDir,KeyStrings.UserDownloads),
+        DownloadTargets=Path.Combine(confDir,KeyStrings.UserDownloads),
         // not likely.
-        PathFFmpeg=Path.Combine(confDir,"bin"), PathYoutubeDL=Path.Combine(confDir,"bin"),
+        PathFFmpeg=Path.Combine(confDir,KeyStrings.NotLikely), PathYoutubeDL=Path.Combine(confDir,KeyStrings.NotLikely),
       };
       if (!confDotIni.Exists) ini.Save();
       var coll = new IniCollection(confDotIni);

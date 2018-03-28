@@ -3,7 +3,10 @@ namespace YouTubeDownloadUtil
 {
 	static class KeyStrings
 	{
-    public const string ShowHelp = @"A helper for running youtube-dl!
+    internal const string UserDownloads = "%USERPROFILE%\\Downloads";
+	  internal const string NotLikely     = "bin";
+	  internal const string ShowHelp      = @"A helper for running youtube-dl";
+    internal const string ConfDefault   = "config.ini";
 
 First Steps:
 

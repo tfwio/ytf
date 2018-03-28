@@ -9,19 +9,13 @@ using System.Windows.Forms;
 
 namespace YouTubeDownloadUtil
 {
-  // if (DragDropButtonText.Contains("https://youtu.be")) ShowButtonMenu(button1);
-  // else if (DragDropButtonText.Contains("https://youtube.com")) ShowButtonMenu(button1);
-  // else if (DragDropButtonText.Contains("https://soundcloud.com")) ShowButtonMenu(button1);
-  // else if (DragDropButtonText.Contains("https://mixcloud.com")) ShowButtonMenu(button1);
   public partial class MainForm : Form
   {
-    
     BackgroundWorker worker;
     YoutubeDownloader downloader;
     Thread thread;
     
     string DragDropButtonText = string.Empty;
-    
     string NextTargetType { get; set; } = "m4a";
     
     ContextMenuStrip cm;
