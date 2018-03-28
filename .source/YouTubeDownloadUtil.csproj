@@ -81,37 +81,37 @@
     <Compile Include="cor3\ClipboardWatcher.cs" />
     <Compile Include="cor3\ini.cs" />
     <Compile Include="cor3\ITaskContext.cs" />
-    <Compile Include="cor3\KeyStrings.cs" />
     <Compile Include="cor3\SimpleProgressEventArgs.cs" />
-    <Compile Include="DownloadTarget.cs" />
     <Compile Include="extensions\DirectoryHelper.cs" />
     <Compile Include="extensions\DragDropFormsExtension.cs" />
     <Compile Include="extensions\EnumHelper.cs" />
     <Compile Include="extensions\FileSystemExtensions.cs" />
     <Compile Include="extensions\PropertyInfoHelper.cs" />
     <Compile Include="extensions\VariousStringExtensions.cs" />
-    <Compile Include="MainForm.cs" />
-    <Compile Include="MainForm.Designer.cs">
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="MainSettings.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ThreadedDownloaderWorker.cs" />
-    <Compile Include="YoutubeDlProcess.cs" />
+    <Compile Include="source\DownloadTarget.cs" />
+    <Compile Include="source\keystrings.cs" />
+    <Compile Include="source\MainForm.cs" />
+    <Compile Include="source\MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="source\MainSettings.cs" />
+    <Compile Include="source\ThreadedDownloaderWorker.cs" />
+    <Compile Include="source\YoutubeDlProcess.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="MainForm.resx">
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="cor3" />
     <Folder Include="extensions" />
     <Folder Include="source" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="source\MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
