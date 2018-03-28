@@ -4,7 +4,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # SharpDevelop 5.2
 VisualStudioVersion = 12.0.20827.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YTdl-util", "..\.source\YTdl-util.csproj", "{7E04D516-07D4-4620-910A-0E99C38CF7F1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YouTubeDownloadUtil", "..\.source\YouTubeDownloadUtil.csproj", "{7E04D516-07D4-4620-910A-0E99C38CF7F1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
