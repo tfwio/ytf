@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-namespace YouTubeDownloadUI
+namespace YouTubeDownloadUtil
 {
   class YoutubeDownloader : DownloadTarget
   {
@@ -27,8 +27,10 @@ namespace YouTubeDownloadUI
     
     ProcessStartInfo NewStartInfo {
       get {
-        //          StandardOutputEncoding = Encoding.UTF8,
-        //          StandardErrorEncoding = Encoding.UTF8,
+        // only reason we're not using this is the RTF box
+        // std-out is directed to.
+        // StandardOutputEncoding = Encoding.UTF8,
+        // StandardErrorEncoding = Encoding.UTF8,
         var si = new ProcessStartInfo("youtube-dl",CommandText){
           UseShellExecute = false,
           RedirectStandardError = true,

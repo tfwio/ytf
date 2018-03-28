@@ -1,4 +1,4 @@
-﻿namespace YouTubeDownloadUI
+﻿namespace YouTubeDownloadUtil
 {
   partial class MainForm
   {

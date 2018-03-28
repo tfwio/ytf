@@ -1,28 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 using System.IO;
-using System.Threading;
-using System.Windows.Forms;
-namespace YouTubeDownloadUI
+using DH=System.DirectoryHelper;
+namespace YouTubeDownloadUtil
 {
   class MainSettings
   {
-    static readonly FileInfo confDotIni = new FileInfo(Path.Combine(Program.ExecutableDirectory,"config.ini"));
+    static readonly FileInfo confDotIni = new FileInfo(Path.Combine(DH.ExecutableDirectory,"config.ini"));
     
     public void Save()
     {
       var coll = new IniCollection(this);
       coll.Write(confDotIni);
     }
+    
     static public MainSettings Load()
     {
       var ini = new MainSettings(){
-        TargetOutputDirectory=Path.Combine(Program.ExecutableDirectory,"downloads"),
-        DownloadTargets=Path.Combine(Program.ExecutableDirectory,"downloads"),
-        PathFFmpeg=Path.Combine(Program.ExecutableDirectory,"bin"),
-        PathYoutubeDL=Path.Combine(Program.ExecutableDirectory,"bin"),
+        TargetOutputDirectory=Path.Combine(DH.ExecutableDirectory,"downloads"),
+        DownloadTargets=Path.Combine(DH.ExecutableDirectory,"downloads"),
+        PathFFmpeg=Path.Combine(DH.ExecutableDirectory,"bin"),
+        PathYoutubeDL=Path.Combine(DH.ExecutableDirectory,"bin"),
       };
       if (!confDotIni.Exists) ini.Save();
       var coll = new IniCollection(confDotIni);

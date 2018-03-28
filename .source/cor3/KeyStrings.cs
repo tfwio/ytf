@@ -1,5 +1,5 @@
 ﻿using System;
-namespace YouTubeDownloadUI
+namespace YouTubeDownloadUtil
 {
 	static class KeyStrings
 	{

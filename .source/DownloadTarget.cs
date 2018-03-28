@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.IO;
-using System.Threading;
-using System.Windows.Forms;
-namespace YouTubeDownloadUI
+namespace YouTubeDownloadUtil
 {
 	class DownloadTarget
 	{
