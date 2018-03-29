@@ -40,7 +40,6 @@
     /// </summary>
     private void InitializeComponent()
     {
-      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
       this.richTextBox1 = new System.Windows.Forms.RichTextBox();
       this.panel1 = new System.Windows.Forms.Panel();
       this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
@@ -60,8 +59,10 @@
       // 
       // richTextBox1
       // 
-      this.richTextBox1.BackColor = System.Drawing.SystemColors.ControlLight;
+      this.richTextBox1.BackColor = System.Drawing.Color.White;
       this.richTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+      this.richTextBox1.CausesValidation = false;
+      this.richTextBox1.DetectUrls = false;
       this.richTextBox1.Dock = System.Windows.Forms.DockStyle.Fill;
       this.richTextBox1.Font = new System.Drawing.Font("Roboto", 12F);
       this.richTextBox1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
@@ -71,7 +72,7 @@
       this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedBoth;
       this.richTextBox1.Size = new System.Drawing.Size(579, 238);
       this.richTextBox1.TabIndex = 2;
-      this.richTextBox1.Text = resources.GetString("richTextBox1.Text");
+      this.richTextBox1.Text = "";
       this.richTextBox1.WordWrap = false;
       // 
       // panel1
@@ -231,6 +232,7 @@
       this.ClientSize = new System.Drawing.Size(579, 300);
       this.Controls.Add(this.richTextBox1);
       this.Controls.Add(this.panel1);
+      this.DoubleBuffered = true;
       this.MinimumSize = new System.Drawing.Size(400, 200);
       this.Name = "MainForm";
       this.Text = "YouTubeDownloadUI";

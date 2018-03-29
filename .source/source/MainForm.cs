@@ -11,17 +11,17 @@ namespace YouTubeDownloadUtil
 {
   public partial class MainForm : Form
   {
+    Control[] TogglableControls { get { return new Control[]{lbM4a, lbMp3, lbMp4, lbBest, lbLast}; } }
     BackgroundWorker worker;
     YoutubeDownloader downloader;
     Thread thread;
     
-    string DragDropButtonText = string.Empty;
+    internal List<CommandKeyHandler> CommandHandlers { get; private set; }
+    
     string NextTargetType { get; set; } = "m4a";
     
-    ContextMenuStrip cm;
-    
-    const string msgAllreadyDownloaded = "has already been downloaded";
-    const string msgDownloadHeading = "[download] ";
+    const string msgAllreadyDownloaded  = "has already been downloaded";
+    const string msgDownloadHeading     = "[download] ";
     const string msgDownloadDestination = "[download] Destination: ";
     
     void UI_WorkerThread_DataFilter(string text, YoutubeDownloader obj)
@@ -57,8 +57,6 @@ namespace YouTubeDownloadUtil
       richTextBox1.Focus();
     }
     
-    Control[] TogglableControls { get { return new Control[]{lbM4a, lbMp3, lbMp4, lbBest, lbLast}; } }
-    
     void UI_WorkerProcess_Post(YoutubeDownloader obj)
     {
       if (obj.Aborted)
@@ -92,9 +90,7 @@ namespace YouTubeDownloadUtil
     
     void Worker_Begin()
     {
-      if (worker!=null && worker.IsBusy) {
-        return;
-      }
+      if (worker!=null && worker.IsBusy) return;
       worker = new BackgroundWorker();
       worker.DoWork += WorkerEvent_DoWork;
       worker.Disposed += WorkerEvent_Disposed;
@@ -137,9 +133,7 @@ namespace YouTubeDownloadUtil
     {
       thread = new Thread(Worker_PrepareThread);
       thread.Start();
-      while (thread.IsAlive)
-        Thread.Sleep(500);
-      
+      while (thread.IsAlive) Thread.Sleep(500);
     }
 
     void WorkerEvent_Complete(object sender, RunWorkerCompletedEventArgs e)
@@ -151,41 +145,6 @@ namespace YouTubeDownloadUtil
     
     void WorkerEvent_Disposed(object sender, EventArgs e) { worker = null; }
     
-    ToolStripMenuItem mOptions, mAbortOnDuplicate, mAddMetadata, mContinue, mEmbedSubs, mEmbedThumb, mGetPlaylist, mSep, mIgnoreErrors, mVerbose, mWriteAutoSubs, mWriteSubs, mDownloadTargets;
-    
-    void CreateToolStrip()
-    {
-      cm = new ContextMenuStrip();
-      mOptions = cm.Items.Add("Options: Flags") as ToolStripMenuItem;
-      cm.Items.Add("[add] Download Directory");
-      lbLast.Text = $"[{NextTargetType}]"; // initial target-type is m4a (itunes audio)
-      mAbortOnDuplicate = mOptions.DropDownItems.Add("Abort on Duplicate (File Exists)") as ToolStripMenuItem;
-      mAddMetadata      = mOptions.DropDownItems.Add("Add MetaData") as ToolStripMenuItem;
-      mContinue         = mOptions.DropDownItems.Add("Continue Unfinished Downloads") as ToolStripMenuItem;
-      mEmbedSubs        = mOptions.DropDownItems.Add("Embed Subtitles") as ToolStripMenuItem;
-      mEmbedThumb       = mOptions.DropDownItems.Add("Embed Thumbnail") as ToolStripMenuItem;
-      mGetPlaylist      = mOptions.DropDownItems.Add("Get Playlist") as ToolStripMenuItem;
-      mSep              = mOptions.DropDownItems.Add("-") as ToolStripMenuItem;
-      mIgnoreErrors     = mOptions.DropDownItems.Add("Ignore Errors") as ToolStripMenuItem;
-      mVerbose          = mOptions.DropDownItems.Add("Verbose") as ToolStripMenuItem;
-      mWriteAutoSubs    = mOptions.DropDownItems.Add("Write Auto Subtitles (yt: if present)") as ToolStripMenuItem;
-      mWriteSubs        = mOptions.DropDownItems.Add("Write Subtitles (yt: if present") as ToolStripMenuItem;
-      mDownloadTargets  = cm.Items.Add("Download Targets") as ToolStripMenuItem;
-      foreach (var m in new ToolStripMenuItem[]{ mAbortOnDuplicate,mAddMetadata,mContinue,mEmbedSubs,mEmbedThumb,mGetPlaylist,mIgnoreErrors,mVerbose,mWriteAutoSubs,mWriteSubs}) m.CheckOnClick = true;
-      // load defaults
-      mAbortOnDuplicate.Checked  = DownloadTarget.Default.AbortOnDuplicate;
-      mAddMetadata.Checked       = DownloadTarget.Default.AddMetaData;
-      mContinue.Checked          = DownloadTarget.Default.Continue;
-      mEmbedSubs.Checked         = DownloadTarget.Default.EmbedSubs;
-      mEmbedThumb.Checked        = DownloadTarget.Default.EmbedThumbnail;
-      mGetPlaylist.Checked       = DownloadTarget.Default.GetPlaylist;
-      mIgnoreErrors.Checked      = DownloadTarget.Default.IgnoreErrors;
-      mVerbose.Checked           = DownloadTarget.Default.Verbose;
-      mWriteAutoSubs.Checked     = DownloadTarget.Default.WriteAutoSub;
-      mWriteSubs.Checked         = DownloadTarget.Default.WriteSub;
-      UpdateDownloadTargets();
-    }
-    
     void DownloadTargetClickHandler(object sender, EventArgs e)
     {
       var value =  (sender as ToolStripMenuItem).Tag as string;
@@ -196,26 +155,16 @@ namespace YouTubeDownloadUtil
       ConfigModel.Instance.Save();
     }
     
-    void UpdateDownloadTargets()
-    {
-      mDownloadTargets.DropDownItems.Clear();
-      var dt = new List<string>(ConfigModel.Instance.DownloadTargetsList).ToArray();
-      Array.Sort(dt);
-      foreach (var i in dt)
-      {
-        var itm = mDownloadTargets.DropDownItems.Add(Path.GetFileName(i)) as ToolStripMenuItem;
-        itm.Tag = i;
-        itm.ToolTipText = i;
-        itm.Checked = (i == ConfigModel.Instance.TargetOutputDirectory);
-        itm.Click += DownloadTargetClickHandler;
-      }
-    }
-    
-    void ShowButtonMenu(Control target) { cm.Show(target, new Point(target.Width,target.Height), ToolStripDropDownDirection.BelowLeft); }
-    
     public MainForm()
     {
+      CommandHandlers = new List<CommandKeyHandler>(){
+        new CommandKeyHandler{Keys=Keys.E|Keys.Control, Action = Actions.ExploreTo}
+      };
+      
       InitializeComponent();
+      
+      richTextBox1.Rtf = Actions.RtfHelpText();
+      richTextBox1.PreviewKeyDown += (a,e)=> { System.Windows.Forms.Message i = System.Windows.Forms.Message.Create(IntPtr.Zero,0,System.IntPtr.Zero,IntPtr.Zero); this.ProcessCmdKey(ref i,e.KeyData); };
       
       System.Environment.SetEnvironmentVariable("PATH",$"{ConfigModel.Instance.PathFFmpeg};{ConfigModel.Instance.PathYoutubeDL};{ConfigModel.OriginalPath}");
       
@@ -254,16 +203,17 @@ namespace YouTubeDownloadUtil
         });
     }
     
+    readonly object L= new object();
+    protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+    {
+      lock (L) foreach (var k in CommandHandlers) if (keyData.IsMatch(k.Keys)) k.Action();
+      return base.ProcessCmdKey(ref msg, keyData);
+    }
+    
     void Event_BeginDownloadType(object sender, LinkLabelLinkClickedEventArgs e) { var l = sender as LinkLabel; NextTargetType = l.Text; lbLast.Text = $"[{NextTargetType}]"; Worker_Begin(); }
     void Event_BeginDownload(object sender, LinkLabelLinkClickedEventArgs e) { Worker_Begin(); }
     
     void TextBox1TextChanged(object sender, EventArgs e) { ckHasPlaylist.Checked = textBox1.Text.Contains("&list="); }
-    
-    void Button1MouseDown(object sender, MouseEventArgs e)
-    {
-      cm.Show(button1,new Point(button1.Width,button1.Height), ToolStripDropDownDirection.BelowLeft);
-      cm.Focus();
-    }
     
   }
   
