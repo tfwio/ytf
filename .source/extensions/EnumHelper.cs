@@ -10,7 +10,16 @@ namespace System
     {
       return (Convert.ToUInt64(value) & Convert.ToUInt64(compare)) == Convert.ToUInt64(compare);
     }
+    static public bool IsMatch(this Enum value, Enum compare)
+    {
+      return Convert.ToUInt64(value) == Convert.ToUInt64(compare);
+    }
   }
+  // [Flags to/from string snipit]
+  // 
+  //   string[] v = k.ToString().Split(',').ToList().ConvertAll((ax)=>ax.Trim()).ToArray();
+  //   foreach (var n in v){ Keys kk; l |= n.TryParse<Keys>(out kk) ? kk : 0; }
+  // 
   #endif
   /// <summary>
   /// https://stackoverflow.com/questions/15017151/implementation-of-enum-tryparse-in-net-3-5

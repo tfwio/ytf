@@ -1,8 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 namespace YouTubeDownloadUtil
 {
+  [Flags] enum YoutubeDlFlags {
+    AbortOnDuplicate,
+    AddMetadata,
+    Continue,
+    EmbedSubs,
+    EmbedThumb,
+    GetPlaylist,
+    IgnoreErrors,
+    Verbose,
+    WriteAutoSubs,
+    WriteSubs,
+    DownloadTargets
+  }
   class ConfigModel
   {
     static readonly FileInfo confDotIni = new FileInfo(Path.Combine(System.DirectoryHelper.ExecutableDirectory,KeyStrings.ConfDefault));
@@ -23,6 +37,23 @@ namespace YouTubeDownloadUtil
     /// <summary>Path containing youtube-dl and atomicparsley.</summary>
     [IniKey(Group="global", Alias="youtube-dl_bin")] public string PathYoutubeDL { get; set; }
     
+    /// <summary>Path containing youtube-dl and atomicparsley.</summary>
+    [IniKey(Group="global", Alias="flags")] public string YoutubeDlFlagsStr { get; set; }
+    
+    [Ignore]
+    public YoutubeDlFlags YoutubeDlFlags {
+      get {
+        YoutubeDlFlags l=0;
+        string[] v = YoutubeDlFlagsStr.Split(',').ToList().ConvertAll((ax)=>ax.Trim()).ToArray();
+        foreach (var n in v){
+          YoutubeDlFlags kk;
+          l |= n.TryParse<YoutubeDlFlags>(out kk) ? kk : 0;
+        }
+        return l;
+      }
+      set { YoutubeDlFlagsStr = value.ToString(); }
+    }
+    
     public event EventHandler Saved;
     protected virtual void OnSaved() { var handler = Saved; if (handler != null) handler(this, EventArgs.Empty); }
     
@@ -34,6 +65,7 @@ namespace YouTubeDownloadUtil
       var ini = new ConfigModel(){
         TargetOutputDirectory=Path.Combine(confDir,KeyStrings.UserDownloads),
         DownloadTargets=Path.Combine(confDir,KeyStrings.UserDownloads),
+        YoutubeDlFlagsStr="",
         // not likely.
         PathFFmpeg=Path.Combine(confDir,KeyStrings.NotLikely), PathYoutubeDL=Path.Combine(confDir,KeyStrings.NotLikely),
       };
