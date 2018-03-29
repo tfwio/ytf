@@ -1,21 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Windows.Forms;
 
 namespace YouTubeDownloadUtil
 {
   public partial class MainForm : Form
   {
+    readonly Color colorDark  = Color.FromArgb(64,64,64);
+    readonly Color colorLight = SystemColors.ControlLight;
+    
     Control[] TogglableControls { get { return new Control[]{lbM4a, lbMp3, lbMp4, lbBest, lbLast}; } }
     
     internal List<CommandKeyHandler> CommandHandlers { get; private set; }
-    
-    string NextTargetType { get; set; } = "m4a";
     
     const string msgAllreadyDownloaded  = "has already been downloaded";
     const string msgDownloadHeading     = "[download] ";
@@ -31,6 +30,11 @@ namespace YouTubeDownloadUtil
       ConfigModel.Instance.Save();
     }
     
+    void UpdateEnvironmentPath()
+    {
+      System.Environment.SetEnvironmentVariable("PATH",$"{ConfigModel.Instance.PathFFmpeg};{ConfigModel.Instance.PathYoutubeDL};{ConfigModel.OriginalPath}");
+    }
+    
     public MainForm()
     {
       CommandHandlers = new List<CommandKeyHandler>(){
@@ -39,10 +43,10 @@ namespace YouTubeDownloadUtil
       
       InitializeComponent();
       
+      UpdateEnvironmentPath();
+      
       richTextBox1.Rtf = Actions.RtfHelpText();
       richTextBox1.PreviewKeyDown += (a,e)=> { System.Windows.Forms.Message i = System.Windows.Forms.Message.Create(IntPtr.Zero,0,System.IntPtr.Zero,IntPtr.Zero); this.ProcessCmdKey(ref i,e.KeyData); };
-      
-      System.Environment.SetEnvironmentVariable("PATH",$"{ConfigModel.Instance.PathFFmpeg};{ConfigModel.Instance.PathYoutubeDL};{ConfigModel.OriginalPath}");
       
       FormClosing += (object sender, FormClosingEventArgs e) => ConfigModel.Instance.Save();
       
@@ -72,8 +76,19 @@ namespace YouTubeDownloadUtil
             }
             else if (File.Exists(DragDropButtonText))
             {
-              cm.Show(button1,new Point(button1.Width,button1.Height), ToolStripDropDownDirection.BelowLeft);
-              Text = "is file";
+              // cm.Show(button1,new Point(button1.Width,button1.Height), ToolStripDropDownDirection.BelowLeft);
+              // Text = "is file";
+              var fn = DragDropButtonText.GetFileInfo();
+              if (fn.Name.ToLower() == "youtube-dl.exe")
+              {
+                ConfigModel.Instance.PathYoutubeDL = fn.Directory.FullName;
+                UpdateEnvironmentPath();
+              }
+              else if (fn.Name.ToLower() == "ffmpeg.exe")
+              {
+                ConfigModel.Instance.PathFFmpeg = fn.Directory.FullName;
+                UpdateEnvironmentPath();
+              }
             }
           }
         });
@@ -86,7 +101,7 @@ namespace YouTubeDownloadUtil
       return base.ProcessCmdKey(ref msg, keyData);
     }
     
-    void Event_BeginDownloadType(object sender, LinkLabelLinkClickedEventArgs e) { var l = sender as LinkLabel; NextTargetType = l.Text; lbLast.Text = $"[{NextTargetType}]"; Worker_Begin(); }
+    void Event_BeginDownloadType(object sender, LinkLabelLinkClickedEventArgs e) { var l = sender as LinkLabel; ConfigModel.Instance.TargetType = l.Text; lbLast.Text = $"[{ConfigModel.Instance.TargetType}]"; Worker_Begin(); }
     void Event_BeginDownload(object sender, LinkLabelLinkClickedEventArgs e) { Worker_Begin(); }
     
     void TextBox1TextChanged(object sender, EventArgs e) { ckHasPlaylist.Checked = textBox1.Text.Contains("&list="); }

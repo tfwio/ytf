@@ -14,7 +14,7 @@ namespace YouTubeDownloadUtil
     //common
     string StrAddMetaData { get { return AddMetaData ? $"--add-metadata" : string.Empty; } }
     string StrEmbedThumbnail { get { return EmbedThumbnail ? $"--embed-thumbnail" : string.Empty; } }
-    string StrPlaylist { get { return GetPlaylist ? "--yes-playlist" : string.Empty; } }
+    string StrPlaylist { get { return GetPlaylist ? "--yes-playlist" : "--no-playlist"; } }
     string StrTargetType { get { return HasTargetType ? $"-f {TargetType}" : string.Empty; } }
     string StrVerbose { get { return Verbose ? $"--verbose" : string.Empty; } }
     // subs
@@ -23,7 +23,7 @@ namespace YouTubeDownloadUtil
     string StrWriteAutoSub { get { return WriteAutoSub ? "--write-auto-sub" : string.Empty; } }
     string StrWriteSub { get { return WriteSub ? "--write-sub" : string.Empty; } }
     
-    public string CommandText { get { return $"{StrIgnoreErrors} {StrContinue} {StrTargetType} {StrWriteSub} {StrPlaylist} {StrSubLang} {StrWriteAutoSub} {StrEmbedSubs} {StrEmbedThumbnail} {StrAddMetaData} {StrVerbose} \"{UriFiltered}\""; } }
+    public string CommandText { get { return $"{StrIgnoreErrors} {StrContinue} {StrTargetType} {StrWriteSub} {StrPlaylist} {StrSubLang} {StrWriteAutoSub} {StrEmbedSubs} {StrEmbedThumbnail} {StrAddMetaData} {StrVerbose} \"{TargetUri}\""; } }
     
     ProcessStartInfo NewStartInfo {
       get {
@@ -70,11 +70,31 @@ namespace YouTubeDownloadUtil
       InitEvents(onOutput, onError, onCompleted);
     }
     
+    const int Win32Native_ProgramNotFound = -2147467259;
+    const string msgLauchError = "<APP:LAUNCH_ERROR> youtube-dl isn't configured or found\non your Environment PATH.\n\nRESOLUTION: Find youtube-dl.exe\nin windows exploer and drag-drop the program into this window.\n";
+    
     public void Go(){
       shellProcess.StartInfo = NewStartInfo;
       shellProcess.Exited += WeDone;
       shellProcess.Disposed += WeDisposed;
-      shellProcess.Start();
+      // [generic-debugging-template]
+      // int ncode = w32err.NativeErrorCode;
+      // int ecode = w32err.ErrorCode;
+      // string msg=$"Error: {ncode}/{ecode}";
+      // AbortMessage = $"[Win32 Exception] {msg}\n\n{w32err.Message}";
+      try {
+        shellProcess.Start();
+      }
+      catch (System.ComponentModel.Win32Exception w32err)
+      {
+        if (Win32Native_ProgramNotFound==w32err.ErrorCode)
+        {
+          Aborted = true;
+          AbortMessage = msgLauchError;
+          return;
+        }
+        else throw w32err;
+      }
       shellProcess.BeginOutputReadLine();
       shellProcess.BeginErrorReadLine();
       shellProcess.WaitForExit();

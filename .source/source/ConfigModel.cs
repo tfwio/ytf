@@ -5,17 +5,17 @@ using System.Linq;
 namespace YouTubeDownloadUtil
 {
   [Flags] enum YoutubeDlFlags {
-    AbortOnDuplicate,
-    AddMetadata,
-    Continue,
-    EmbedSubs,
-    EmbedThumb,
-    GetPlaylist,
-    IgnoreErrors,
-    Verbose,
-    WriteAutoSubs,
-    WriteSubs,
-    DownloadTargets
+    None=0,
+    AbortOnDuplicate=1,
+    AddMetadata=2,
+    Continue=4,
+    EmbedSubs=8,
+    EmbedThumb=16,
+    GetPlaylist=32,
+    IgnoreErrors=64,
+    Verbose=128,
+    WriteAutoSubs=256,
+    WriteSubs=512,
   }
   class ConfigModel
   {
@@ -27,6 +27,9 @@ namespace YouTubeDownloadUtil
     
     /// <summary>the active download-target directory</summary>
     [IniKey(Group="global", Alias="target")] public string TargetOutputDirectory { get; set; }
+    
+    /// <summary>the active download-target directory</summary>
+    [IniKey(Group="global", Alias="target-type")] public string TargetType { get; set; }
     
     /// <summary>This is a collection of strings separated by semi-colon.</summary>
     [IniKey(Group="global", Alias="target-list")] public string DownloadTargets { get; set; }
@@ -41,7 +44,7 @@ namespace YouTubeDownloadUtil
     [IniKey(Group="global", Alias="flags")] public string YoutubeDlFlagsStr { get; set; }
     
     [Ignore]
-    public YoutubeDlFlags YoutubeDlFlags {
+    public YoutubeDlFlags AppFlags {
       get {
         YoutubeDlFlags l=0;
         string[] v = YoutubeDlFlagsStr.Split(',').ToList().ConvertAll((ax)=>ax.Trim()).ToArray();

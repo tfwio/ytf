@@ -1,20 +1,82 @@
 ﻿using System;
-using System.Drawing;
+using System.Collections.Generic;
 using System.IO;
 
 namespace YouTubeDownloadUtil
 {
-  /// <summary>
-  /// Description of MainForm_Worker.
-  /// </summary>
-  partial class MainForm
-  {
-    readonly Color colorDark  = Color.FromArgb(64,64,64);
-    readonly Color colorLight = SystemColors.ControlLight;
+  class Downloader {
+    
+    public Action PrepareThread { get; set; }
+    public Action<YoutubeDownloader> PreProcess { get; set; }
+    public Action<YoutubeDownloader> PostProcess { get; set; }
+    
+    readonly System.Windows.Forms.Form Caller;
     
     System.ComponentModel.BackgroundWorker worker;
     YoutubeDownloader downloader;
     System.Threading.Thread thread;
+    List<string> OutputData = new List<string>();
+
+    void ThreadCompleted(object sender, EventArgs e) { worker.CancelAsync(); }
+    
+    void Begin()
+    {
+      if (worker!=null && worker.IsBusy) return;
+      worker = new System.ComponentModel.BackgroundWorker();
+      worker.DoWork += EventDoWork;
+      worker.Disposed += WorkerEvent_Disposed;
+      worker.RunWorkerCompleted += EventComplete;
+      worker.WorkerSupportsCancellation = true;
+      worker.WorkerReportsProgress = false;
+      worker.RunWorkerAsync();
+    }
+    
+    void EventDoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+    {
+      thread = new System.Threading.Thread(PrepareThread.Invoke);
+      thread.Start();
+      while (thread.IsAlive) System.Threading.Thread.Sleep(500);
+    }
+
+    void EventComplete(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
+    {
+      if (Caller.InvokeRequired) Caller.Invoke(new Action(()=>PostProcess(downloader)));
+      else PostProcess(downloader);
+      worker.Dispose();
+    }
+    
+    void WorkerEvent_Disposed(object sender, EventArgs e) { worker = null; }
+  }
+  partial class MainForm {
+    
+    void UI_WorkerProcess_PrepareThread()
+    {
+      var downloads = ConfigModel.Instance.TargetOutputDirectory;
+      downloader = new YoutubeDownloader(
+        textBox1.Text,
+        downloads,
+        WorkerThread_DataReceived,
+        WorkerThread_ErrorReceived,
+        WorkerThread_Completed
+       ){
+        TargetType = ConfigModel.Instance.TargetType,
+        Verbose=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.Verbose),
+        AbortOnDuplicate = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.AbortOnDuplicate),
+        AddMetaData = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.AddMetadata),
+        Continue=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.Continue),
+        EmbedSubs= ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.EmbedSubs),
+        EmbedThumbnail=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.EmbedThumb),
+        GetPlaylist=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.GetPlaylist),
+        IgnoreErrors=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.IgnoreErrors),
+        WriteAutoSub=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.WriteAutoSubs),
+        WriteSub=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.WriteSubs),
+      };
+      
+      if (InvokeRequired) Invoke(new Action(()=>UI_WorkerProcess_Pre(downloader)));
+      else UI_WorkerProcess_Pre(downloader);
+      
+      downloader.Go();
+    }
     
     void UI_WorkerThread_DataFilter(string text, YoutubeDownloader obj)
     {
@@ -36,6 +98,7 @@ namespace YouTubeDownloadUtil
     void UI_WorkerThread_DataHandler(string data, bool isError, YoutubeDownloader obj)
     {
       if (!isError) UI_WorkerThread_DataFilter(data, obj);
+      OutputData.Add(data);
       richTextBox1.AppendText($"{data}\n");
     }
     
@@ -45,13 +108,16 @@ namespace YouTubeDownloadUtil
       richTextBox1.ForeColor = colorLight;
       foreach (var c in TogglableControls) c.Enabled = false;
       richTextBox1.Clear();
-      richTextBox1.AppendText($"<APP>: {obj.CommandText}\n");
+      OutputData.Clear();
+      var content = $"<APP>: {obj.CommandText}";
+      OutputData.Add(content);
+      richTextBox1.AppendText($"{content}\n");
       richTextBox1.Focus();
     }
     
     void UI_WorkerProcess_Post(YoutubeDownloader obj)
     {
-      if (obj.Aborted)
+      if (obj.Aborted && obj.KnownTargetFile!=null)
       {
         var fi = new FileInfo(Path.Combine(obj.TargetPath, obj.KnownTargetFile));
         fi.DerivedFile(".jpg").Clean();
@@ -60,9 +126,22 @@ namespace YouTubeDownloadUtil
       richTextBox1.BackColor = colorLight;
       richTextBox1.ForeColor = colorDark;
       var abort = !string.IsNullOrEmpty(obj.AbortMessage) ? $"\n{obj.AbortMessage}" : string.Empty;
-      richTextBox1.AppendText($"<APP:ERRORSTATUS>: {obj.ExitCode}{abort}\n");
+      var content = $"<APP:ERRORSTATUS>: {obj.ExitCode}{abort}";
+      OutputData.Add($"{content}\n");
+      richTextBox1.AppendText($"{content}\n");
       foreach (var c in TogglableControls) c.Enabled = true;
     }
+
+  }
+  /// <summary>
+  /// Description of MainForm_Worker.
+  /// </summary>
+  partial class MainForm
+  {
+    System.ComponentModel.BackgroundWorker worker;
+    YoutubeDownloader downloader;
+    System.Threading.Thread thread;
+    List<string> OutputData = new List<string>();
 
     void WorkerThread_Completed(object sender, EventArgs e) { worker.CancelAsync(); }
     
@@ -90,38 +169,9 @@ namespace YouTubeDownloadUtil
       worker.RunWorkerAsync();
     }
 
-    void Worker_PrepareThread()
-    {
-      var downloads = "downloads".RelativeToExe();
-      downloader = new YoutubeDownloader(
-        textBox1.Text,
-        downloads,
-        WorkerThread_DataReceived,
-        WorkerThread_ErrorReceived,
-        WorkerThread_Completed
-       ){
-        TargetType = this.NextTargetType,
-        Verbose=mVerbose.Checked,
-        AbortOnDuplicate = mAbortOnDuplicate.Checked,
-        AddMetaData=mAddMetadata.Checked,
-        Continue=mContinue.Checked,
-        EmbedSubs= mEmbedSubs.Checked,
-        EmbedThumbnail=mEmbedThumb.Checked,
-        GetPlaylist=mGetPlaylist.Checked,
-        IgnoreErrors=mIgnoreErrors.Checked,
-        WriteAutoSub=mWriteAutoSubs.Checked,
-        WriteSub=mWriteSubs.Checked,
-      };
-      
-      if (InvokeRequired) Invoke(new Action(()=>UI_WorkerProcess_Pre(downloader)));
-      else UI_WorkerProcess_Pre(downloader);
-      
-      downloader.Go();
-    }
-    
     void WorkerEvent_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
     {
-      thread = new System.Threading.Thread(Worker_PrepareThread);
+      thread = new System.Threading.Thread(UI_WorkerProcess_PrepareThread);
       thread.Start();
       while (thread.IsAlive) System.Threading.Thread.Sleep(500);
     }
