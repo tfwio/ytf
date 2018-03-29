@@ -38,7 +38,9 @@ namespace System
       var prop = type.GetProperty(PropertyName);
       var props = type.GetProperties();
       try { prop.SetValue( TargetClass, value, null); }
-      catch { return false; }
+      catch {
+        return false;
+      }
       return true;
     }
     
