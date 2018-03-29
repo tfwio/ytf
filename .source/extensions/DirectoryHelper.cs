@@ -21,8 +21,14 @@ namespace System
       string result = input;
       var vars = Environment.GetEnvironmentVariables();
       foreach (var v in vars.Keys) {
-        var key = v.ToString();
-        result = result.Replace($"%{key}$", vars[key].ToString());
+        var ukey = v.ToString().ToUpper();
+        var lkey = v.ToString().ToLower();
+        var value = vars[v];
+        result = result
+          .Replace($"%{ukey}%", value.ToString())
+          .Replace($"%{lkey}%", value.ToString())
+          .Replace($"%{v}%", value.ToString())
+          ;
         if (!result.Contains("%")) break;
       }
       return result;
