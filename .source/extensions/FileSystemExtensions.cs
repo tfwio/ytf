@@ -10,8 +10,8 @@ using System.Linq;
 namespace System
 {
   #if CSSHELL
-using w32;
-using w32.shell;
+  using w32;
+  using w32.shell;
 
   static class ShellExtensions
   {
@@ -61,6 +61,16 @@ using w32.shell;
   }
   static class FileSystemExtensions
   {
+    internal static string DerivedFile(this FileInfo file, string newExtension)
+    {
+      return file.FullName.Replace(file.Extension,newExtension);
+    }
+    internal static void Clean(this string stringPath, Func<string,bool> confirmAction=null){
+      bool exists = File.Exists(stringPath);
+      if (confirmAction==null && exists) File.Delete(stringPath);
+      else if (exists && confirmAction(stringPath)) File.Delete(stringPath);
+    }
+    
     static public bool HasFlag2(this uint enumValue, uint compare)
     {
       return (enumValue & compare) == compare;
