@@ -52,8 +52,8 @@
       this.lbM4a = new System.Windows.Forms.ToolStripMenuItem();
       this.lbMp4 = new System.Windows.Forms.ToolStripMenuItem();
       this.lbMp3 = new System.Windows.Forms.ToolStripMenuItem();
-      this.lbBest = new System.Windows.Forms.ToolStripMenuItem();
       this.lbLast = new System.Windows.Forms.ToolStripMenuItem();
+      this.lbBest = new System.Windows.Forms.ToolStripMenuItem();
       this.panel1.SuspendLayout();
       this.panel2.SuspendLayout();
       this.splitContainer1.Panel2.SuspendLayout();
@@ -66,7 +66,7 @@
       this.panel1.BackColor = System.Drawing.Color.White;
       this.panel1.Controls.Add(this.panel2);
       this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
-      this.panel1.Location = new System.Drawing.Point(0, 24);
+      this.panel1.Location = new System.Drawing.Point(0, 0);
       this.panel1.Name = "panel1";
       this.panel1.Size = new System.Drawing.Size(521, 29);
       this.panel1.TabIndex = 5;
@@ -144,9 +144,9 @@
       this.lbMp3,
       this.lbLast,
       this.lbBest});
-      this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+      this.menuStrip1.Location = new System.Drawing.Point(0, 29);
       this.menuStrip1.Name = "menuStrip1";
-      this.menuStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
+      this.menuStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
       this.menuStrip1.Size = new System.Drawing.Size(521, 24);
       this.menuStrip1.TabIndex = 11;
       this.menuStrip1.Text = "menuStrip1";
@@ -178,13 +178,6 @@
       this.lbMp3.Text = "mp3";
       this.lbMp3.Click += new System.EventHandler(this.Event_BeginDownloadType);
       // 
-      // lbBest
-      // 
-      this.lbBest.Name = "lbBest";
-      this.lbBest.Size = new System.Drawing.Size(41, 20);
-      this.lbBest.Text = "best";
-      this.lbBest.Click += new System.EventHandler(this.Event_BeginDownloadType);
-      // 
       // lbLast
       // 
       this.lbLast.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
@@ -193,14 +186,21 @@
       this.lbLast.Text = "[last]";
       this.lbLast.Click += new System.EventHandler(this.Event_BeginDownload);
       // 
+      // lbBest
+      // 
+      this.lbBest.Name = "lbBest";
+      this.lbBest.Size = new System.Drawing.Size(41, 20);
+      this.lbBest.Text = "best";
+      this.lbBest.Click += new System.EventHandler(this.Event_BeginDownloadType);
+      // 
       // MainForm
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.ClientSize = new System.Drawing.Size(521, 162);
       this.Controls.Add(this.splitContainer1);
-      this.Controls.Add(this.panel1);
       this.Controls.Add(this.menuStrip1);
+      this.Controls.Add(this.panel1);
       this.DoubleBuffered = true;
       this.MinimumSize = new System.Drawing.Size(400, 200);
       this.Name = "MainForm";
