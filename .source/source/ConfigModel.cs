@@ -25,6 +25,9 @@ namespace YouTubeDownloadUtil
     
     static public readonly string OriginalPath = System.Environment.GetEnvironmentVariable("PATH");
     
+    /// <summary>Whats shown in the text box will go here for access from the worker.</summary>
+    internal static string TargetURI { get; set; }
+    
     /// <summary>the active download-target directory</summary>
     [IniKey(Group="global", Alias="target")] public string TargetOutputDirectory { get; set; }
     
@@ -66,8 +69,8 @@ namespace YouTubeDownloadUtil
     static public ConfigModel Load(string confDir)
     {
       var ini = new ConfigModel(){
-        TargetOutputDirectory=Path.Combine(confDir,KeyStrings.UserDownloads),
-        DownloadTargets=Path.Combine(confDir,KeyStrings.UserDownloads),
+        TargetOutputDirectory=KeyStrings.UserDownloads,
+        DownloadTargets=KeyStrings.UserDownloads,
         YoutubeDlFlagsStr="",
         // not likely.
         PathFFmpeg=Path.Combine(confDir,KeyStrings.NotLikely), PathYoutubeDL=Path.Combine(confDir,KeyStrings.NotLikely),
