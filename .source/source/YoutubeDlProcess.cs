@@ -70,31 +70,35 @@ namespace YouTubeDownloadUtil
       InitEvents(onOutput, onError, onCompleted);
     }
     
-    const int Win32Native_ProgramNotFound = -2147467259;
-    const string msgLauchError = "<APP:LAUNCH_ERROR> youtube-dl isn't configured or found\non your Environment PATH.\nRESOLUTION: Find youtube-dl.exe\nin windows exploer and drag-drop the program into this window.\n";
+    const int Win32_ErrorCode = -2147467259;
+    const int Win32Native_NoExecutable = 2;
+    const string Win32Native_NoExecutable_Msg = "youtube-dl (or target executable) wasn't found.\n<to-fix> Drag-Drop youtube-dl.exe back onto the app for it to be configured properly.";
+    const int Win32Native_NoWorkingDirectory = 267;
+    const string Win32Native_NoWorkingDirectory_Msg = "The target-directory (WorkPath) wasn't found.\n<to-fix> Select another target (output) path.";
+    const string msgLauchError = "<app> There was a Win32Exception (error)...\n";
     
     public void Go(){
       shellProcess.StartInfo = NewStartInfo;
       shellProcess.Exited += WeDone;
       shellProcess.Disposed += WeDisposed;
-      // [generic-debugging-template]
-      // int ncode = w32err.NativeErrorCode;
-      // int ecode = w32err.ErrorCode;
-      // string msg=$"Error: {ncode}/{ecode}";
-      // AbortMessage = $"[Win32 Exception] {msg}\n\n{w32err.Message}";
       try {
         shellProcess.Start();
       }
       catch (System.ComponentModel.Win32Exception w32err)
       {
-        if (Win32Native_ProgramNotFound==w32err.ErrorCode)
+        switch (w32err.NativeErrorCode)
         {
-          Aborted = true;
-          AbortMessage = $"{msgLauchError}<ErrorCode> {w32err.ErrorCode}, <NativeErrorCode> {w32err.NativeErrorCode}\n<DOTNET/Exception>{w32err.Message}";
-          return;
+          case Win32Native_NoExecutable:
+            Aborted = true;
+            AbortMessage = $"{msgLauchError}<ErrorCode> {w32err.ErrorCode}, <NativeErrorCode> {w32err.NativeErrorCode}\n<DOTNET/Exception>{w32err.Message}\n{Win32Native_NoExecutable_Msg}\n";
+            return;
+          case Win32Native_NoWorkingDirectory:
+            Aborted = true;
+            AbortMessage = $"{msgLauchError}<ErrorCode> {w32err.ErrorCode}, <NativeErrorCode> {w32err.NativeErrorCode}\n<DOTNET/Exception>{w32err.Message}\n{Win32Native_NoWorkingDirectory_Msg}\n";
+            return;
+          default:
+            throw w32err;
         }
-        else
-        throw w32err;
       }
       shellProcess.BeginOutputReadLine();
       shellProcess.BeginErrorReadLine();
