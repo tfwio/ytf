@@ -7,14 +7,13 @@ using System.Windows.Forms;
 
 namespace YouTubeDownloadUtil
 {
-  public partial class MainForm : Form
+  public partial class MainForm : Form, IUI
   {
     readonly Color colorDark  = Color.FromArgb(64,64,64);
     readonly Color colorLight = SystemColors.ControlLight;
     
     ToolStripMenuItem[] TogglableControls { get { return new ToolStripMenuItem[]{lbM4a, lbMp3, lbMp4, lbLast, lbBest}; } }
     
-    internal List<CommandKeyHandler> CommandHandlers { get; private set; }
     
     const string msgAllreadyDownloaded  = "has already been downloaded";
     const string msgDownloadHeading     = "[download] ";
@@ -37,13 +36,6 @@ namespace YouTubeDownloadUtil
     
     public MainForm()
     {
-      CommandHandlers = new List<CommandKeyHandler>(){
-        new CommandKeyHandler{Keys=Keys.C|Keys.Alt, Action =()=> richTextBox1.Clear() },
-        new CommandKeyHandler{Keys=Keys.R|Keys.Alt, Action =()=> richTextBox1.Rtf = Actions.RtfHelpText() },
-        new CommandKeyHandler{Keys=Keys.E|Keys.Control, Action = Actions.ExploreToPath},
-        new CommandKeyHandler{Keys=Keys.Z|Keys.Alt, Action =()=> richTextBox1.WordWrap = !richTextBox1.WordWrap },
-        new CommandKeyHandler{Keys=Keys.D|Keys.Control, Action =()=> richTextBox1.AppendText(ConfigModel.Instance.TargetOutputDirectory.EnvironmentPathFilter()+"\n") },
-      };
       
       InitializeComponent();
       
@@ -81,8 +73,6 @@ namespace YouTubeDownloadUtil
             }
             else if (File.Exists(DragDropButtonText))
             {
-              // cm.Show(button1,new Point(button1.Width,button1.Height), ToolStripDropDownDirection.BelowLeft);
-              // Text = "is file";
               var fn = DragDropButtonText.GetFileInfo();
               if (fn.Name.ToLower() == "youtube-dl.exe")
               {
@@ -102,7 +92,7 @@ namespace YouTubeDownloadUtil
     readonly object L= new object();
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
     {
-      lock (L) foreach (var k in CommandHandlers) if (keyData.IsMatch(k.Keys)) k.Action();
+      lock (L) foreach (var k in CommandHandlers) if (keyData.IsMatch(k.Keys)) k.Action(this);
       return base.ProcessCmdKey(ref msg, keyData);
     }
     
@@ -114,6 +104,13 @@ namespace YouTubeDownloadUtil
       ConfigModel.TargetURI = textBox1.Text;
     }
     
+    RichTextBox IUI.OutputRTF { get { return richTextBox1; } }
+    static internal List<CommandKeyHandler<IUI>> CommandHandlers /* { get; private set; }*/ = new List<CommandKeyHandler<IUI>>(){
+      new CommandKeyHandler<IUI>{Name="Output: Clear Output Text",Keys=Keys.C|Keys.Alt, Action = Actions.COutputClear },
+      new CommandKeyHandler<IUI>{Name="Output: Show Splash Document",Keys=Keys.R|Keys.Alt, Action = Actions.COutputSplash },
+      new CommandKeyHandler<IUI>{Name="Output: Toggle Word-Wrap",Keys=Keys.Z|Keys.Alt, Action = Actions.COutputWordWrap },
+      new CommandKeyHandler<IUI>{Name="Output: Show Target WorkPath (Output-Dir)",Keys=Keys.D|Keys.Control, Action = Actions.COutputWorkPath },
+      new CommandKeyHandler<IUI>{Name="Explore to Path",Keys=Keys.E|Keys.Control, Action =(f)=> Actions.ExploreToPath()},
+    };
   }
-  
 }
