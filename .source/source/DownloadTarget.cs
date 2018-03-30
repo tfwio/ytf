@@ -23,8 +23,7 @@ namespace YouTubeDownloadUtil
 		public bool WriteAutoSub { get; set; }
 		public bool WriteSub { get; set; }
 
-		public string UriFiltered { get { return TargetUri.Replace("&", "^&"); } }
-		public bool HasPlaylist { get { return this.TargetUri.Contains("&list"); } }
+		public bool HasPlaylist { get { return TargetUri.Contains("&list=") || TargetUri.Contains("?list="); } } // only youtube.
 		public bool HasTargetType { get { return !string.IsNullOrEmpty(TargetType); } }
 		
 		static public readonly DownloadTarget Default = GenerateDefault;
