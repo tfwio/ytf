@@ -12,7 +12,7 @@ namespace YouTubeDownloadUtil
     readonly Color colorDark  = Color.FromArgb(64,64,64);
     readonly Color colorLight = SystemColors.ControlLight;
     
-    Control[] TogglableControls { get { return new Control[]{lbM4a, lbMp3, lbMp4, lbBest, lbLast}; } }
+    ToolStripMenuItem[] TogglableControls { get { return new ToolStripMenuItem[]{lbM4a, lbMp3, lbMp4, lbLast, lbBest}; } }
     
     internal List<CommandKeyHandler> CommandHandlers { get; private set; }
     
@@ -38,15 +38,20 @@ namespace YouTubeDownloadUtil
     public MainForm()
     {
       CommandHandlers = new List<CommandKeyHandler>(){
-        new CommandKeyHandler{Keys=Keys.E|Keys.Control, Action = Actions.ExploreTo}
+        new CommandKeyHandler{Keys=Keys.C|Keys.Alt, Action =()=> richTextBox1.Clear() },
+        new CommandKeyHandler{Keys=Keys.R|Keys.Alt, Action =()=> richTextBox1.Rtf = Actions.RtfHelpText() },
+        new CommandKeyHandler{Keys=Keys.E|Keys.Control, Action = Actions.ExploreToPath},
+        new CommandKeyHandler{Keys=Keys.Z|Keys.Alt, Action =()=> richTextBox1.WordWrap = !richTextBox1.WordWrap },
+        new CommandKeyHandler{Keys=Keys.D|Keys.Control, Action =()=> richTextBox1.AppendText(ConfigModel.Instance.TargetOutputDirectory.EnvironmentPathFilter()+"\n") },
       };
       
       InitializeComponent();
       
+      textBox1.TextChanged += TextBox1TextChanged;
+      
       UpdateEnvironmentPath();
       
       richTextBox1.Rtf = Actions.RtfHelpText();
-      richTextBox1.PreviewKeyDown += (a,e)=> { System.Windows.Forms.Message i = System.Windows.Forms.Message.Create(IntPtr.Zero,0,System.IntPtr.Zero,IntPtr.Zero); this.ProcessCmdKey(ref i,e.KeyData); };
       
       FormClosing += (object sender, FormClosingEventArgs e) => ConfigModel.Instance.Save();
       
@@ -101,10 +106,13 @@ namespace YouTubeDownloadUtil
       return base.ProcessCmdKey(ref msg, keyData);
     }
     
-    void Event_BeginDownloadType(object sender, LinkLabelLinkClickedEventArgs e) { var l = sender as LinkLabel; ConfigModel.Instance.TargetType = l.Text; lbLast.Text = $"[{ConfigModel.Instance.TargetType}]"; Worker_Begin(); }
-    void Event_BeginDownload(object sender, LinkLabelLinkClickedEventArgs e) { Worker_Begin(); }
+    void Event_BeginDownloadType(object sender, EventArgs e) { var l = sender as ToolStripMenuItem; ConfigModel.Instance.TargetType = l.Text; lbBest.Text = $"[{ConfigModel.Instance.TargetType}]"; Worker_Begin(); }
+    void Event_BeginDownload(object sender, EventArgs e) { Worker_Begin(); }
     
-    void TextBox1TextChanged(object sender, EventArgs e) { ckHasPlaylist.Checked = textBox1.Text.Contains("&list="); }
+    void TextBox1TextChanged(object sender, EventArgs e) {
+      ckHasPlaylist.Checked = textBox1.Text.Contains("&list=") || textBox1.Text.Contains("?list=");
+      ConfigModel.TargetURI = textBox1.Text;
+    }
     
   }
   

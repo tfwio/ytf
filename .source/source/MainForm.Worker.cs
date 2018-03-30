@@ -4,6 +4,7 @@ using System.IO;
 
 namespace YouTubeDownloadUtil
 {
+  // mvc component (not implemented yet)
   class Downloader {
     
     public Action PrepareThread { get; set; }
@@ -47,36 +48,9 @@ namespace YouTubeDownloadUtil
     
     void WorkerEvent_Disposed(object sender, EventArgs e) { worker = null; }
   }
+
+  // a mvc view
   partial class MainForm {
-    
-    void UI_WorkerProcess_PrepareThread()
-    {
-      var downloads = ConfigModel.Instance.TargetOutputDirectory;
-      downloader = new YoutubeDownloader(
-        textBox1.Text,
-        downloads,
-        WorkerThread_DataReceived,
-        WorkerThread_ErrorReceived,
-        WorkerThread_Completed
-       ){
-        TargetType = ConfigModel.Instance.TargetType,
-        Verbose=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.Verbose),
-        AbortOnDuplicate = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.AbortOnDuplicate),
-        AddMetaData = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.AddMetadata),
-        Continue=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.Continue),
-        EmbedSubs= ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.EmbedSubs),
-        EmbedThumbnail=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.EmbedThumb),
-        GetPlaylist=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.GetPlaylist),
-        IgnoreErrors=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.IgnoreErrors),
-        WriteAutoSub=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.WriteAutoSubs),
-        WriteSub=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.WriteSubs),
-      };
-      
-      if (InvokeRequired) Invoke(new Action(()=>UI_WorkerProcess_Pre(downloader)));
-      else UI_WorkerProcess_Pre(downloader);
-      
-      downloader.Go();
-    }
     
     void UI_WorkerThread_DataFilter(string text, YoutubeDownloader obj)
     {
@@ -133,16 +107,45 @@ namespace YouTubeDownloadUtil
     }
 
   }
-  /// <summary>
-  /// Description of MainForm_Worker.
-  /// </summary>
+  
+  // a mvc component - containing the worker->thread->downloader.
   partial class MainForm
   {
     System.ComponentModel.BackgroundWorker worker;
     YoutubeDownloader downloader;
     System.Threading.Thread thread;
     List<string> OutputData = new List<string>();
+    
+    void UI_WorkerProcess_PrepareThread()
+    {
+      var downloads = ConfigModel.Instance.TargetOutputDirectory.EnvironmentPathFilter();
+      downloader = new YoutubeDownloader(
+        ConfigModel.TargetURI,
+        downloads,
+        WorkerThread_DataReceived,
+        WorkerThread_ErrorReceived,
+        WorkerThread_Completed
+       ){
+        TargetType = ConfigModel.Instance.TargetType,
+        Verbose=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.Verbose),
+        AbortOnDuplicate = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.AbortOnDuplicate),
+        AddMetaData = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.AddMetadata),
+        Continue=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.Continue),
+        EmbedSubs= ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.EmbedSubs),
+        EmbedThumbnail=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.EmbedThumb),
+        GetPlaylist=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.GetPlaylist),
+        IgnoreErrors=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.IgnoreErrors),
+        WriteAutoSub=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.WriteAutoSubs),
+        WriteSub=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.WriteSubs),
+      };
+      
+      if (InvokeRequired) Invoke(new Action(()=>UI_WorkerProcess_Pre(downloader)));
+      else UI_WorkerProcess_Pre(downloader);
+      
+      downloader.Go();
+    }
 
+    
     void WorkerThread_Completed(object sender, EventArgs e) { worker.CancelAsync(); }
     
     void WorkerThread_DataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)

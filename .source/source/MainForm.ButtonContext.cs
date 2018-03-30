@@ -40,7 +40,7 @@ namespace YouTubeDownloadUtil
       mOptions          = cm.Items.Add("youtube-dl flags") as ToolStripMenuItem;
       mExplore          = cm.Items.Add("Explore to Target Directory") as ToolStripMenuItem;
       mExplore.Click   += (object sender,EventArgs e)=>Actions.ExploreToPath();
-      lbLast.Text       = $"[{ConfigModel.Instance.TargetType}]"; // initial target-type is m4a (itunes audio)
+      lbBest.Text       = $"[{ConfigModel.Instance.TargetType}]"; // initial target-type is m4a (itunes audio)
       // Flags
       mAbortOnDuplicate = mOptions.DropDownItems.Add("Abort on Duplicate (File Exists)") as ToolStripMenuItem;
       mAddMetadata      = mOptions.DropDownItems.Add("Add MetaData") as ToolStripMenuItem;
