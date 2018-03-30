@@ -36,7 +36,7 @@ namespace YouTubeDownloadUtil
           RedirectStandardError = true,
           RedirectStandardOutput = true,
           CreateNoWindow = true,
-          WorkingDirectory = TargetPath
+          WorkingDirectory = TargetPath.EnvironmentPathFilter()
         };
         // si.RedirectStandardInput = false;
         return si;
@@ -71,7 +71,7 @@ namespace YouTubeDownloadUtil
     }
     
     const int Win32Native_ProgramNotFound = -2147467259;
-    const string msgLauchError = "<APP:LAUNCH_ERROR> youtube-dl isn't configured or found\non your Environment PATH.\n\nRESOLUTION: Find youtube-dl.exe\nin windows exploer and drag-drop the program into this window.\n";
+    const string msgLauchError = "<APP:LAUNCH_ERROR> youtube-dl isn't configured or found\non your Environment PATH.\nRESOLUTION: Find youtube-dl.exe\nin windows exploer and drag-drop the program into this window.\n";
     
     public void Go(){
       shellProcess.StartInfo = NewStartInfo;
@@ -90,10 +90,11 @@ namespace YouTubeDownloadUtil
         if (Win32Native_ProgramNotFound==w32err.ErrorCode)
         {
           Aborted = true;
-          AbortMessage = msgLauchError;
+          AbortMessage = $"{msgLauchError}<ErrorCode> {w32err.ErrorCode}, <NativeErrorCode> {w32err.NativeErrorCode}\n<DOTNET/Exception>{w32err.Message}";
           return;
         }
-        else throw w32err;
+        else
+        throw w32err;
       }
       shellProcess.BeginOutputReadLine();
       shellProcess.BeginErrorReadLine();
