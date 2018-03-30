@@ -39,7 +39,7 @@ namespace YouTubeDownloadUtil
       cm = new ContextMenuStrip();
       mOptions          = cm.Items.Add("youtube-dl flags") as ToolStripMenuItem;
       mExplore          = cm.Items.Add("Explore to Target Directory") as ToolStripMenuItem;
-      mExplore.Click   += (object sender,EventArgs e)=>Actions.ExploreTo();
+      mExplore.Click   += (object sender,EventArgs e)=>Actions.ExploreToPath();
       lbLast.Text       = $"[{ConfigModel.Instance.TargetType}]"; // initial target-type is m4a (itunes audio)
       // Flags
       mAbortOnDuplicate = mOptions.DropDownItems.Add("Abort on Duplicate (File Exists)") as ToolStripMenuItem;
@@ -59,9 +59,32 @@ namespace YouTubeDownloadUtil
         m.CheckOnClick = true;
         m.Click += (e,x)=>FlagsFromMenu();
       }
+      
+      var shf = cm.Items.Add("Target: Shell-Folder") as ToolStripMenuItem;
+      ShellFolderItem(shf, "%USERPROFILE%\\Desktop");
+      ShellFolderItem(shf, "%USERPROFILE%\\Documents");
+      ShellFolderItem(shf, "%USERPROFILE%\\Downloads");
+      ShellFolderItem(shf, "%USERPROFILE%\\Music");
+      ShellFolderItem(shf, "%USERPROFILE%\\Videos");
+      
       // load defaults
       UpdateDownloadTargets();
       FlagsToMenu();
+    }
+    
+    ToolStripMenuItem ShellFolderItem(ToolStripMenuItem parent, string key)
+    {
+      var fi = key.EnvironmentPathFilter().GetDirectoryInfo();
+      var shItem = parent.DropDownItems.Add(fi.Name);
+      shItem.Tag = fi.FullName;
+      shItem.Click += ClickFolderItem;
+      Text = fi.Name;
+      return shItem as ToolStripMenuItem;
+    }
+    
+    void ClickFolderItem(object sender, EventArgs e){
+      DownloadTarget.Default.TargetPath = (sender as ToolStripMenuItem).Tag.ToString();
+      ConfigModel.Instance.Save();
     }
     
     void FlagsToMenu(){
