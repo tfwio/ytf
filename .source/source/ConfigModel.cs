@@ -77,9 +77,9 @@ namespace YouTubeDownloadUtil
       var ini = new ConfigModel(){
         TargetOutputDirectory=KeyStrings.UserDownloads,
         DownloadTargets=KeyStrings.UserDownloads,
-        YoutubeDlFlagsStr="",
-        // not likely.
-        //PathFFmpeg=Path.Combine(confDir,KeyStrings.NotLikely), PathYoutubeDL=Path.Combine(confDir,KeyStrings.NotLikely),
+        YoutubeDlFlagsStr=string.Empty,
+        PathFFmpeg=string.Empty,
+        PathAVConv=string.Empty,
       };
       if (!confDotIni.Exists) ini.Save();
       var coll = new IniCollection(confDotIni);
