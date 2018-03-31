@@ -59,7 +59,9 @@ namespace YouTubeDownloadUtil
         obj.KnownTargetFile = text.Replace(msgDownloadDestination, "").Trim();
         Text = obj.KnownTargetFile;
       }
-      else if (!string.IsNullOrEmpty(text) && text.Contains(msgAllreadyDownloaded))
+      else if (!string.IsNullOrEmpty(text)
+               && text.Contains(msgAllreadyDownloaded)
+               && obj.Flags.HasFlag(YoutubeDlFlags.AbortOnDuplicate))
       {
         obj.KnownTargetFile = text
           .Replace(msgDownloadHeading, "")
@@ -82,6 +84,7 @@ namespace YouTubeDownloadUtil
       richTextBox1.ForeColor = colorLight;
       foreach (var c in TogglableControls) c.Enabled = false;
       richTextBox1.Clear();
+      richTextBox1.WordWrap = false;
       OutputData.Clear();
       var content = $"<APP>: {obj.CommandText}";
       OutputData.Add(content);
@@ -126,17 +129,8 @@ namespace YouTubeDownloadUtil
         WorkerThread_ErrorReceived,
         WorkerThread_Completed
        ){
+        Flags = ConfigModel.Instance.AppFlags,
         TargetType = ConfigModel.Instance.TargetType,
-        Verbose=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.Verbose),
-        AbortOnDuplicate = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.AbortOnDuplicate),
-        AddMetaData = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.AddMetadata),
-        Continue=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.Continue),
-        EmbedSubs= ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.EmbedSubs),
-        EmbedThumbnail=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.EmbedThumb),
-        GetPlaylist=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.GetPlaylist),
-        IgnoreErrors=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.IgnoreErrors),
-        WriteAutoSub=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.WriteAutoSubs),
-        WriteSub=ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.WriteSubs),
       };
       
       if (InvokeRequired) Invoke(new Action(()=>UI_WorkerProcess_Pre(downloader)));
