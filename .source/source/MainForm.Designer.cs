@@ -41,6 +41,7 @@
     /// </summary>
     private void InitializeComponent()
     {
+      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
       this.panel1 = new System.Windows.Forms.Panel();
       this.panel2 = new System.Windows.Forms.Panel();
       this.textBox1 = new System.Windows.Forms.TextBox();
@@ -68,7 +69,7 @@
       this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
       this.panel1.Location = new System.Drawing.Point(0, 0);
       this.panel1.Name = "panel1";
-      this.panel1.Size = new System.Drawing.Size(521, 29);
+      this.panel1.Size = new System.Drawing.Size(384, 29);
       this.panel1.TabIndex = 5;
       // 
       // panel2
@@ -78,7 +79,7 @@
       this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
       this.panel2.Location = new System.Drawing.Point(0, 0);
       this.panel2.Name = "panel2";
-      this.panel2.Size = new System.Drawing.Size(521, 27);
+      this.panel2.Size = new System.Drawing.Size(384, 27);
       this.panel2.TabIndex = 7;
       // 
       // textBox1
@@ -87,7 +88,7 @@
       this.textBox1.Font = new System.Drawing.Font("Roboto", 12F, System.Drawing.FontStyle.Bold);
       this.textBox1.Location = new System.Drawing.Point(0, 0);
       this.textBox1.Name = "textBox1";
-      this.textBox1.Size = new System.Drawing.Size(474, 27);
+      this.textBox1.Size = new System.Drawing.Size(337, 27);
       this.textBox1.TabIndex = 8;
       // 
       // button1
@@ -95,7 +96,7 @@
       this.button1.Dock = System.Windows.Forms.DockStyle.Right;
       this.button1.FlatStyle = System.Windows.Forms.FlatStyle.System;
       this.button1.Font = new System.Drawing.Font("Marlett", 14.25F);
-      this.button1.Location = new System.Drawing.Point(474, 0);
+      this.button1.Location = new System.Drawing.Point(337, 0);
       this.button1.Name = "button1";
       this.button1.Size = new System.Drawing.Size(47, 27);
       this.button1.TabIndex = 9;
@@ -113,7 +114,7 @@
       // splitContainer1.Panel2
       // 
       this.splitContainer1.Panel2.Controls.Add(this.richTextBox1);
-      this.splitContainer1.Size = new System.Drawing.Size(521, 109);
+      this.splitContainer1.Size = new System.Drawing.Size(384, 111);
       this.splitContainer1.SplitterDistance = 166;
       this.splitContainer1.TabIndex = 6;
       // 
@@ -130,7 +131,7 @@
       this.richTextBox1.Name = "richTextBox1";
       this.richTextBox1.ReadOnly = true;
       this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedBoth;
-      this.richTextBox1.Size = new System.Drawing.Size(521, 109);
+      this.richTextBox1.Size = new System.Drawing.Size(384, 111);
       this.richTextBox1.TabIndex = 3;
       this.richTextBox1.Text = "";
       this.richTextBox1.WordWrap = false;
@@ -138,16 +139,16 @@
       // menuStrip1
       // 
       this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-      this.ckHasPlaylist,
-      this.lbM4a,
-      this.lbMp4,
-      this.lbMp3,
-      this.lbLast,
-      this.lbBest});
+            this.ckHasPlaylist,
+            this.lbM4a,
+            this.lbMp4,
+            this.lbMp3,
+            this.lbLast,
+            this.lbBest});
       this.menuStrip1.Location = new System.Drawing.Point(0, 29);
       this.menuStrip1.Name = "menuStrip1";
       this.menuStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-      this.menuStrip1.Size = new System.Drawing.Size(521, 24);
+      this.menuStrip1.Size = new System.Drawing.Size(384, 24);
       this.menuStrip1.TabIndex = 11;
       this.menuStrip1.Text = "menuStrip1";
       // 
@@ -197,11 +198,11 @@
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(521, 162);
+      this.ClientSize = new System.Drawing.Size(384, 162);
       this.Controls.Add(this.splitContainer1);
       this.Controls.Add(this.menuStrip1);
       this.Controls.Add(this.panel1);
-      this.DoubleBuffered = true;
+      this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
       this.MinimumSize = new System.Drawing.Size(400, 200);
       this.Name = "MainForm";
       this.Text = "YouTubeDownloadUI";

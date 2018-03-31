@@ -97,15 +97,15 @@
     <Compile Include="source\DownloadTarget.cs" />
     <Compile Include="source\keystrings.cs" />
     <Compile Include="source\MainForm.ButtonContext.cs">
-      <DependentUpon>MainForm.cs</DependentUpon>
+      <SubType>Form</SubType>
     </Compile>
-    <Compile Include="source\MainForm.cs" />
+    <Compile Include="source\MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="source\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="source\MainForm.Worker.cs">
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </Compile>
+    <Compile Include="source\MainForm.Worker.cs" />
     <Compile Include="source\DownloadTargetFile.cs" />
     <Compile Include="source\ThreadedDownloaderWorker.cs" />
     <Compile Include="source\YoutubeDlProcess.cs" />
