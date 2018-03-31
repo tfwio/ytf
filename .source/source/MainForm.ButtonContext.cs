@@ -9,7 +9,7 @@ namespace YouTubeDownloadUtil
   partial class MainForm
   {
     ContextMenuStrip cm;
-    ToolStripMenuItem mExplore, mOptions, mAbortOnDuplicate, mAddMetadata, mContinue, mEmbedSubs, mEmbedThumb, mGetPlaylist, mIgnoreErrors, mVerbose, mWriteAutoSubs, mWriteSubs, mDownloadTargets;
+    ToolStripMenuItem mExplore, mRemovePath, mOptions, mAbortOnDuplicate, mAddMetadata, mContinue, mEmbedSubs, mEmbedThumb, mGetPlaylist, mIgnoreErrors, mVerbose, mWriteAutoSubs, mWriteSubs, mDownloadTargets;
     
     string DragDropButtonText = string.Empty; // used for temporary storage on drag-enter/drop.
     
@@ -40,6 +40,18 @@ namespace YouTubeDownloadUtil
       mOptions          = cm.Items.Add("youtube-dl flags") as ToolStripMenuItem;
       mExplore          = cm.Items.Add("Explore to Target Directory") as ToolStripMenuItem;
       mExplore.Click   += (object sender,EventArgs e)=>Actions.ExploreToPath();
+      mRemovePath       = cm.Items.Add("Remove Selected Target Directory") as ToolStripMenuItem;
+      mRemovePath.Click += (s,e)=>
+      {
+        var dir = ConfigModel.Instance.TargetOutputDirectory;
+        if (ConfigModel.Instance.RemoveDirectory(dir))
+        {
+          MessageBox.Show($"Successully removed {dir} from your collection.", "Success",MessageBoxButtons.OK,MessageBoxIcon.Asterisk);
+          UpdateDownloadTargets();
+        }
+        else
+          MessageBox.Show("The current target path was not stored to your set", "nothing to remove", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+      };
       lbLast.Text       = $"[{ConfigModel.Instance.TargetType}]"; // initial target-type is m4a (itunes audio)
       // Flags
       mAbortOnDuplicate = mOptions.DropDownItems.Add("Abort on Duplicate (File Exists)") as ToolStripMenuItem;
@@ -84,6 +96,7 @@ namespace YouTubeDownloadUtil
     
     void ClickFolderItem(object sender, EventArgs e){
       DownloadTarget.Default.TargetPath = (sender as ToolStripMenuItem).Tag.ToString();
+      ConfigModel.Instance.TargetOutputDirectory = DownloadTarget.Default.TargetPath;
       ConfigModel.Instance.Save();
     }
     

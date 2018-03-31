@@ -97,6 +97,19 @@ namespace YouTubeDownloadUtil
       set { DownloadTargets = value.ToArray().JoinSemiColon(); }
     }
     
+    public bool RemoveDirectory(string path)
+    {
+      var p = Path.GetFullPath(path);
+      var tg = new List<string>(DownloadTargetsList);
+      if (tg.Contains(p))
+      {
+        tg.Remove(path);
+        DownloadTargetsList = tg;
+        Save();
+        return true;
+      }
+      return false;
+    }
     public void AddDirectory(string path)
     {
       var tg = new List<string>(DownloadTargetsList);
@@ -111,5 +124,4 @@ namespace YouTubeDownloadUtil
     }
   }
 }
-
 
