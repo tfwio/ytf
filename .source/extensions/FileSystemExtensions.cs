@@ -105,6 +105,14 @@ namespace System
     /// If input path is a file, we return the Directory containing it, otherwise we simply make sure that we're returning a directory.
     /// </summary>
     static public string EnsureDirectory(this string path) { return path.IsDirectory() ? new DirectoryInfo(path).FullName : new FileInfo(path).Directory.FullName; }
+    /// <summary>
+    /// creates a directory if it doesn't exists and returns the full path or null.
+    /// </summary>
+    static public string MkDirIfNotExist(this string path) {
+      if (string.IsNullOrEmpty(path)) return null;
+      if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+      return Path.GetFullPath(path);
+    }
   }
 }
 
