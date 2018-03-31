@@ -61,6 +61,11 @@ namespace System
   }
   static class FileSystemExtensions
   {
+    internal static bool DirectoryExistsAndNonempty(this string path)
+    {
+      if (string.IsNullOrEmpty(path)) return false;
+      return Directory.Exists(path);
+    }
     internal static string DerivedFile(this FileInfo file, string newExtension)
     {
       return file.FullName.Replace(file.Extension,newExtension);

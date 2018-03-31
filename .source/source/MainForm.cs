@@ -14,7 +14,6 @@ namespace YouTubeDownloadUtil
     
     ToolStripMenuItem[] TogglableControls { get { return new ToolStripMenuItem[]{lbM4a, lbMp3, lbMp4, lbLast, lbBest}; } }
     
-    
     const string msgAllreadyDownloaded  = "has already been downloaded";
     const string msgDownloadHeading     = "[download] ";
     const string msgDownloadDestination = "[download] Destination: ";
@@ -31,12 +30,16 @@ namespace YouTubeDownloadUtil
     
     void UpdateEnvironmentPath()
     {
-      System.Environment.SetEnvironmentVariable("PATH",$"{ConfigModel.Instance.PathFFmpeg};{ConfigModel.Instance.PathYoutubeDL};{ConfigModel.OriginalPath}");
+      var pathVars = new List<string>();
+      if (ConfigModel.Instance.PathAVConv.DirectoryExistsAndNonempty()) pathVars.Add(ConfigModel.Instance.PathAVConv);
+      if (ConfigModel.Instance.PathFFmpeg.DirectoryExistsAndNonempty()) pathVars.Add(ConfigModel.Instance.PathFFmpeg);
+      if (ConfigModel.Instance.PathYoutubeDL.DirectoryExistsAndNonempty()) pathVars.Add(ConfigModel.Instance.PathYoutubeDL);
+      var newPath = string.Join(";", pathVars.ToArray());
+      System.Environment.SetEnvironmentVariable("PATH",$"{newPath};{ConfigModel.OriginalPath}");
     }
     
     public MainForm()
     {
-      
       InitializeComponent();
       
       textBox1.TextChanged += TextBox1TextChanged;
@@ -77,12 +80,17 @@ namespace YouTubeDownloadUtil
               if (fn.Name.ToLower() == "youtube-dl.exe")
               {
                 ConfigModel.Instance.PathYoutubeDL = fn.Directory.FullName;
-                UpdateEnvironmentPath();
+                UpdateEnvironmentPath(); ConfigModel.Instance.Save();
+              }
+              else if (fn.Name.ToLower() == "avconv.exe")
+              {
+                ConfigModel.Instance.PathAVConv = fn.Directory.FullName;
+                UpdateEnvironmentPath(); ConfigModel.Instance.Save();
               }
               else if (fn.Name.ToLower() == "ffmpeg.exe")
               {
                 ConfigModel.Instance.PathFFmpeg = fn.Directory.FullName;
-                UpdateEnvironmentPath();
+                UpdateEnvironmentPath(); ConfigModel.Instance.Save();
               }
             }
           }
@@ -96,21 +104,29 @@ namespace YouTubeDownloadUtil
       return base.ProcessCmdKey(ref msg, keyData);
     }
     
-    void Event_BeginDownloadType(object sender, EventArgs e) { var l = sender as ToolStripMenuItem; ConfigModel.Instance.TargetType = l.Text; lbBest.Text = $"[{ConfigModel.Instance.TargetType}]"; Worker_Begin(); }
+    void Event_BeginDownloadType(object sender, EventArgs e) { var l = sender as ToolStripMenuItem; ConfigModel.Instance.TargetType = l.Text; lbLast.Text = $"[{ConfigModel.Instance.TargetType}]"; Worker_Begin(); }
     void Event_BeginDownload(object sender, EventArgs e) { Worker_Begin(); }
-    
     void TextBox1TextChanged(object sender, EventArgs e) {
       ckHasPlaylist.Checked = textBox1.Text.Contains("&list=") || textBox1.Text.Contains("?list=");
       ConfigModel.TargetURI = textBox1.Text;
     }
     
+    // interface: IUI
+    
+    TextBox IUI.TextInput { get { return textBox1; } }
     RichTextBox IUI.OutputRTF { get { return richTextBox1; } }
+    void IUI.Worker_Begin() => Worker_Begin();
+    
     static internal List<CommandKeyHandler<IUI>> CommandHandlers /* { get; private set; }*/ = new List<CommandKeyHandler<IUI>>(){
       new CommandKeyHandler<IUI>{Name="Output: Clear Output Text",Keys=Keys.C|Keys.Alt, Action = Actions.COutputClear },
       new CommandKeyHandler<IUI>{Name="Output: Show Splash Document",Keys=Keys.R|Keys.Alt, Action = Actions.COutputSplash },
       new CommandKeyHandler<IUI>{Name="Output: Toggle Word-Wrap",Keys=Keys.Z|Keys.Alt, Action = Actions.COutputWordWrap },
       new CommandKeyHandler<IUI>{Name="Output: Show Target WorkPath (Output-Dir)",Keys=Keys.D|Keys.Control, Action = Actions.COutputWorkPath },
-      new CommandKeyHandler<IUI>{Name="Explore to Path",Keys=Keys.E|Keys.Control, Action =(f)=> Actions.ExploreToPath()},
+      new CommandKeyHandler<IUI>{Name="Output: Focus", Keys=Keys.F1, Action = (f)=> f.TextInput.Focus() },
+      new CommandKeyHandler<IUI>{Name="Outout: Short-Cut Keys", Keys=Keys.F5, Action = Actions.COutputShortcuts },
+      new CommandKeyHandler<IUI>{Name="Outout: Reset Zoom Factor", Keys=Keys.NumPad0|Keys.Control, Action = Actions.COutputZoomReset },
+      new CommandKeyHandler<IUI>{Name="Shel: Explore to Path",Keys=Keys.E|Keys.Control, Action =(IUI f)=>Actions.ExploreToPath()},
+      new CommandKeyHandler<IUI>{Name="Run Using Last Taret-Type", Keys=Keys.Control|Keys.Enter, Action=Actions.CRunLastType},
     };
   }
 }
