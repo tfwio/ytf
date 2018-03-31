@@ -33,14 +33,23 @@ namespace System
       }
       return result;
     }
-    
+
     /// <summary>
     /// Create directory if not exist relative to the calling application.
     /// </summary>
     /// <param name="dirName">directory-name</param>
     /// <returns>A full path to the target Directory.</returns>
     static public string RelativeToExe(this string dirName) { var dirTarget = Path.Combine(ExecutableDirectory, dirName); if (!Directory.Exists(dirTarget)) Directory.CreateDirectory(dirTarget); return dirTarget; }
-    
+    /// <summary>
+    /// Gets a file-path relative to (owning application's) executable-directory.
+    /// </summary>
+    /// <param name="fileName">directory-name</param>
+    /// <returns>A full path to the target Directory.</returns>
+    static public string FileRelativeToExe(this string fileName) {
+      var dirTarget = Path.Combine(ExecutableDirectory, fileName);
+      return dirTarget;
+    }
+
   }
 }
 
