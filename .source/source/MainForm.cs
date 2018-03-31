@@ -45,8 +45,8 @@ namespace YouTubeDownloadUtil
       textBox1.TextChanged += TextBox1TextChanged;
       
       UpdateEnvironmentPath();
-      
-      richTextBox1.Rtf = Actions.RtfHelpText();
+
+      Actions.COutputSplash(this);
       
       FormClosing += (object sender, FormClosingEventArgs e) => ConfigModel.Instance.Save();
       
