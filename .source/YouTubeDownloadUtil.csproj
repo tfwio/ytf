@@ -106,19 +106,15 @@
     <Compile Include="source\MainForm.Worker.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="source\DownloadTargetFile.cs" />
     <Compile Include="source\ThreadedDownloaderWorker.cs" />
     <Compile Include="source\YoutubeDlProcess.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <EmbeddedResource Include="readme.rtf" />
     <None Include="ico.ico" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="cor3" />
-    <Folder Include="extensions" />
-    <Folder Include="source" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <EmbeddedResource Include="source\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
