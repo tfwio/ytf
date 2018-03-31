@@ -4,18 +4,21 @@ using System.IO;
 using System.Linq;
 namespace YouTubeDownloadUtil
 {
-  [Flags] enum YoutubeDlFlags {
-    None=0,
-    AbortOnDuplicate=1,
-    AddMetadata=2,
-    Continue=4,
-    EmbedSubs=8,
-    EmbedThumb=16,
-    GetPlaylist=32,
-    IgnoreErrors=64,
-    Verbose=128,
-    WriteAutoSubs=256,
-    WriteSubs=512,
+  // want: --flat-playlist
+  [Flags] enum YoutubeDlFlags
+  {
+    None = 0,
+    AbortOnDuplicate = 1,
+    AddMetadata = 2,
+    Continue = 4,
+    EmbedSubs = 8,
+    EmbedThumb = 1 << 8,
+    FlatPlaylist = 2 << 8,
+    GetPlaylist = 4 << 8,
+    IgnoreErrors = 8 << 8,
+    Verbose = 1 << 16,
+    WriteAutoSubs = 2 << 16,
+    WriteSubs = 4 << 16,
   }
   class ConfigModel
   {
@@ -36,10 +39,13 @@ namespace YouTubeDownloadUtil
     
     /// <summary>This is a collection of strings separated by semi-colon.</summary>
     [IniKey(Group="global", Alias="target-list")] public string DownloadTargets { get; set; }
-    
+
+    /// <summary>path containing aconv.exe</summary>
+    [IniKey(Group = "global", Alias = "AVConv_bin")] public string PathAVConv { get; set; }
+
     /// <summary>path containing FFmpeg.exe</summary>
-    [IniKey(Group="global", Alias="FFmpeg_bin")] public string PathFFmpeg { get; set; }
-    
+    [IniKey(Group = "global", Alias = "FFmpeg_bin")] public string PathFFmpeg { get; set; }
+
     /// <summary>Path containing youtube-dl and atomicparsley.</summary>
     [IniKey(Group="global", Alias="youtube-dl_bin")] public string PathYoutubeDL { get; set; }
     
@@ -73,7 +79,7 @@ namespace YouTubeDownloadUtil
         DownloadTargets=KeyStrings.UserDownloads,
         YoutubeDlFlagsStr="",
         // not likely.
-        PathFFmpeg=Path.Combine(confDir,KeyStrings.NotLikely), PathYoutubeDL=Path.Combine(confDir,KeyStrings.NotLikely),
+        //PathFFmpeg=Path.Combine(confDir,KeyStrings.NotLikely), PathYoutubeDL=Path.Combine(confDir,KeyStrings.NotLikely),
       };
       if (!confDotIni.Exists) ini.Save();
       var coll = new IniCollection(confDotIni);
