@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using YtFlag=YouTubeDownloadUtil.YoutubeDlFlags;
 namespace YouTubeDownloadUtil
 {
   class YoutubeDownloader : DownloadTarget
@@ -9,19 +10,19 @@ namespace YouTubeDownloadUtil
     public bool Aborted { get; private set; }
     
     //short
-    string StrIgnoreErrors { get { return IgnoreErrors ? $"-i" : string.Empty; } }
-    string StrContinue { get { return Continue ? $"-c" : string.Empty; } }
+    string StrIgnoreErrors { get { return Flags.HasFlag(YtFlag.IgnoreErrors) ? $"-i" : string.Empty; } }
+    string StrContinue { get { return Flags.HasFlag(YtFlag.Continue) ? $"-c" : string.Empty; } }
     //common
-    string StrAddMetaData { get { return AddMetaData ? $"--add-metadata" : string.Empty; } }
-    string StrEmbedThumbnail { get { return EmbedThumbnail ? $"--embed-thumbnail" : string.Empty; } }
-    string StrPlaylist { get { return GetPlaylist ? "--yes-playlist" : "--no-playlist"; } }
+    string StrAddMetaData { get { return Flags.HasFlag(YtFlag.AddMetadata) ? $"--add-metadata" : string.Empty; } }
+    string StrEmbedThumbnail { get { return Flags.HasFlag(YtFlag.EmbedThumb) ? $"--embed-thumbnail" : string.Empty; } }
+    string StrPlaylist { get { return Flags.HasFlag(YtFlag.GetPlaylist) ? "--yes-playlist" : "--no-playlist"; } }
     string StrTargetType { get { return HasTargetType ? $"-f {TargetType}" : string.Empty; } }
-    string StrVerbose { get { return Verbose ? $"--verbose" : string.Empty; } }
+    string StrVerbose { get { return Flags.HasFlag(YtFlag.Verbose) ? $"--verbose" : string.Empty; } }
     // subs
-    string StrEmbedSubs { get { return EmbedSubs ? "--embed-subs" : string.Empty; } }
+    string StrEmbedSubs { get { return Flags.HasFlag(YtFlag.EmbedSubs) ? "--embed-subs" : string.Empty; } }
     string StrSubLang { get { return !string.IsNullOrEmpty(SubLang) ? " --sub-lang {SubLang}" : string.Empty; } }
-    string StrWriteAutoSub { get { return WriteAutoSub ? "--write-auto-sub" : string.Empty; } }
-    string StrWriteSub { get { return WriteSub ? "--write-sub" : string.Empty; } }
+    string StrWriteAutoSub { get { return Flags.HasFlag(YtFlag.WriteAutoSubs) ? "--write-auto-sub" : string.Empty; } }
+    string StrWriteSub { get { return Flags.HasFlag(YtFlag.WriteSubs) ? "--write-sub" : string.Empty; } }
     
     public string CommandText { get { return $"{StrIgnoreErrors} {StrContinue} {StrTargetType} {StrWriteSub} {StrPlaylist} {StrSubLang} {StrWriteAutoSub} {StrEmbedSubs} {StrEmbedThumbnail} {StrAddMetaData} {StrVerbose} \"{TargetUri}\""; } }
     
