@@ -26,7 +26,7 @@ namespace YouTubeDownloadUtil
       {
         UseDefaultCredentials = true,
       };
-      client.Headers["user-agent"] = @"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)";
+      client.Headers["user-agent"] = @"Mozilla/5.0 (X11; Linux x86_64; rv:59.0) Gecko/20100101 Firefox/59.0 (Chrome)";
       client.DownloadFile(new Uri(targetUri),destFile.FileRelativeToExe());
       // note the lack of error handling.
       client.DownloadFileCompleted += (e, a) => client.Dispose();
