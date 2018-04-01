@@ -9,22 +9,24 @@ namespace YouTubeDownloadUtil
     
     public bool Aborted { get; private set; }
     
-    //short
+    // short
     string StrIgnoreErrors { get { return Flags.HasFlag(YtFlag.IgnoreErrors) ? $"-i" : string.Empty; } }
     string StrContinue { get { return Flags.HasFlag(YtFlag.Continue) ? $"-c" : string.Empty; } }
-    //common
-    string StrAddMetaData { get { return Flags.HasFlag(YtFlag.AddMetadata) ? $"--add-metadata" : string.Empty; } }
-    string StrEmbedThumbnail { get { return Flags.HasFlag(YtFlag.EmbedThumb) ? $"--embed-thumbnail" : string.Empty; } }
-    string StrPlaylist { get { return Flags.HasFlag(YtFlag.GetPlaylist) ? "--yes-playlist" : "--no-playlist"; } }
     string StrTargetType { get { return HasTargetType ? $"-f {TargetType}" : string.Empty; } }
     string StrVerbose { get { return Flags.HasFlag(YtFlag.Verbose) ? $"--verbose" : string.Empty; } }
+    // meta
+    string StrAddMetaData { get { return Flags.HasFlag(YtFlag.AddMetadata) ? $"--add-metadata" : string.Empty; } }
+    string StrEmbedThumbnail { get { return Flags.HasFlag(YtFlag.EmbedThumb) ? $"--embed-thumbnail" : string.Empty; } }
+    // playlist
+    string StrPlaylist { get { return Flags.HasFlag(YtFlag.GetPlaylist) ? "--yes-playlist" : "--no-playlist"; } }
+    string StrFlatPlaylist { get { return Flags.HasFlag(YtFlag.FlatPlaylist) ? $"--flat-playlist" : string.Empty; } }
     // subs
     string StrEmbedSubs { get { return Flags.HasFlag(YtFlag.EmbedSubs) ? "--embed-subs" : string.Empty; } }
-    string StrSubLang { get { return !string.IsNullOrEmpty(SubLang) ? " --sub-lang {SubLang}" : string.Empty; } }
+    string StrSubLang { get { return !string.IsNullOrEmpty(SubLang) ? $"--sub-lang {SubLang}" : string.Empty; } }
     string StrWriteAutoSub { get { return Flags.HasFlag(YtFlag.WriteAutoSubs) ? "--write-auto-sub" : string.Empty; } }
     string StrWriteSub { get { return Flags.HasFlag(YtFlag.WriteSubs) ? "--write-sub" : string.Empty; } }
     
-    public string CommandText { get { return $"{StrIgnoreErrors} {StrContinue} {StrTargetType} {StrWriteSub} {StrPlaylist} {StrSubLang} {StrWriteAutoSub} {StrEmbedSubs} {StrEmbedThumbnail} {StrAddMetaData} {StrVerbose} \"{TargetUri}\""; } }
+    public string CommandText { get { return $"{StrIgnoreErrors} {StrContinue} {StrTargetType} {StrWriteSub} {StrPlaylist} {StrFlatPlaylist} {StrSubLang} {StrWriteAutoSub} {StrEmbedSubs} {StrEmbedThumbnail} {StrAddMetaData} {StrVerbose} \"{TargetUri}\""; } }
     
     ProcessStartInfo NewStartInfo {
       get {
