@@ -93,11 +93,6 @@ namespace YouTubeDownloadUtil
       btnAbort.Visible = true;
     }
 
-    private void UI_WorkerProcess_Abort(object sender, EventArgs e)
-    {
-      downloader.Abort("User canceled\n<WARNING> Incomplete files likely remain\n");
-    }
-
     void UI_WorkerProcess_Post(YoutubeDownloader obj)
     {
       if (obj.Aborted && obj.KnownTargetFile!=null)

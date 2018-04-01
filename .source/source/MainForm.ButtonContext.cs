@@ -35,8 +35,22 @@ namespace YouTubeDownloadUtil
     
     void ShowButtonMenu(Control target) { cm.Show(target, new Point(target.Width,target.Height), DropDownDirection); }
     
-    void Button1MouseDown(object sender, MouseEventArgs e) { cm.Show(button1,new Point(button1.Width,button1.Height), DropDownDirection); cm.Focus(); }
-    
+    void Button1MouseDown(object sender, MouseEventArgs e) { cm.Show(btnAbortProcess,new Point(btnAbortProcess.Width,btnAbortProcess.Height), DropDownDirection); cm.Focus(); }
+
+    void RemoveTargetPath()
+    {
+      var dir = ConfigModel.Instance.TargetOutputDirectory;
+      var msg = $"You are about to remove:\n\"{dir}\"\nfrom your selectable target paths!\nAre your sure?";
+      if (MessageBox.Show(msg, "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+      {
+        if (ConfigModel.Instance.RemoveDirectory(dir))
+        {
+          MessageBox.Show($"Successully removed {dir} from your collection.", ResourceStrings.msgCreateTsSuccessCaption, MessageBoxButtons.OK, MessageBoxIcon.Asterisk); UpdateDownloadTargets();
+        }
+        else MessageBox.Show(ResourceStrings.msgCreateTsFail, ResourceStrings.msgCreateTsFailCaption, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+      }
+    }
+
     void UpdateDownloadTargets()
     {
       mDownloadTargets.DropDownItems.Clear();
@@ -56,19 +70,13 @@ namespace YouTubeDownloadUtil
     {
       cm = new ContextMenuStrip();
       mOptions          = cm.Items.Add(ResourceStrings.mOptions) as ToolStripMenuItem;
+      cm.Items.Add("-");
       mExplore          = cm.Items.Add(ResourceStrings.mExplore, null, (s,e)=> Actions.ExploreToPath()) as ToolStripMenuItem;
-      mRemovePath       = cm.Items.Add(ResourceStrings.mRemovePath, null, (s,e) =>
-      {
-        var dir = ConfigModel.Instance.TargetOutputDirectory;
-        var msg = $"You are about to remove:\n\"{dir}\"\nfrom your selectable target paths!\nAre your sure?";
-        if (MessageBox.Show(msg, "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-        {
-          if (ConfigModel.Instance.RemoveDirectory(dir)) { MessageBox.Show($"Successully removed {dir} from your collection.", ResourceStrings.msgCreateTsSuccessCaption, MessageBoxButtons.OK, MessageBoxIcon.Asterisk); UpdateDownloadTargets(); }
-          else MessageBox.Show(ResourceStrings.msgCreateTsFail, ResourceStrings.msgCreateTsFailCaption, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-        }
-      }) as ToolStripMenuItem;
-      lbLast.Text       = $"[{ConfigModel.Instance.TargetType}]"; // initial target-type is m4a (itunes audio)
+      mRemovePath       = cm.Items.Add(ResourceStrings.mRemovePath, null, (s,e)=> RemoveTargetPath()) as ToolStripMenuItem;
+      cm.Items.Add("-");
+
       // AppFlags
+
       mAbortOnDuplicate = mOptions.AddCheckItem(ResourceStrings.mAbortOnDuplicate, FlagsFromMenu);
       // YtFlags
       mAddMetadata      = mOptions.AddCheckItem(ResourceStrings.mAddMetadata, FlagsFromMenu);
@@ -82,7 +90,9 @@ namespace YouTubeDownloadUtil
       mVerbose          = mOptions.AddCheckItem(ResourceStrings.mVerbose, FlagsFromMenu);
       mWriteAutoSubs    = mOptions.AddCheckItem(ResourceStrings.mWriteAutoSubs, FlagsFromMenu);
       mWriteSubs        = mOptions.AddCheckItem(ResourceStrings.mWriteSubs, FlagsFromMenu);
+      
       // Targets
+
       mDownloadTargets  = cm.Items.Add(ResourceStrings.mDownloadTargets) as ToolStripMenuItem;
       
       var shf = cm.Items.Add(ResourceStrings.mShellFolders) as ToolStripMenuItem;
@@ -92,8 +102,11 @@ namespace YouTubeDownloadUtil
       ShellFolderItem(shf, "%USERPROFILE%\\Music");
       ShellFolderItem(shf, "%USERPROFILE%\\Videos");
       
+      lbLast.Text = $"[{ConfigModel.Instance.TargetType}]"; // initial target-type is m4a (itunes audio)
+      
       // load defaults
-      UpdateDownloadTargets();
+
+     UpdateDownloadTargets();
       FlagsToMenu();
     }
     

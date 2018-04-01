@@ -8,17 +8,18 @@ namespace YouTubeDownloadUtil
   [Flags] enum YoutubeDlFlags
   {
     None = 0,
-    AbortOnDuplicate = 1,
-    AddMetadata = 2,
-    Continue = 4,
-    EmbedSubs = 8,
-    EmbedThumb = 1 << 8,
-    FlatPlaylist = 2 << 8,
-    GetPlaylist = 4 << 8,
-    IgnoreErrors = 8 << 8,
-    Verbose = 1 << 16,
-    WriteAutoSubs = 2 << 16,
-    WriteSubs = 4 << 16,
+    AbortOnDuplicate  = 1,
+    AddMetadata       = 2,
+    Continue          = 4,
+    EmbedSubs         = 8,
+    EmbedThumb        = 1 << 8,
+    AutoNumber        = 2 << 8,
+    FlatPlaylist      = 4 << 8,
+    GetPlaylist       = 8 << 8,
+    IgnoreErrors      = 1 << 16,
+    Verbose           = 2 << 16,
+    WriteAutoSubs     = 4 << 16,
+    WriteSubs         = 8 << 16,
   }
   class ConfigModel
   {

@@ -33,11 +33,17 @@ namespace YouTubeDownloadUtil
       var newPath = string.Join(";", pathVars.ToArray());
       System.Environment.SetEnvironmentVariable("PATH",$"{newPath};{ConfigModel.OriginalPath}");
     }
-    
+
+    private void UI_WorkerProcess_Abort(object sender, EventArgs e)
+    {
+      downloader.Abort("User canceled\n<WARNING> Incomplete files likely remain\n");
+    }
+
     public MainForm()
     {
       InitializeComponent();
-      
+
+      btnAbortProcess.MouseDown += Button1MouseDown;
       textBox1.TextChanged += TextBox1TextChanged;
       
       UpdateEnvironmentPath();
@@ -64,7 +70,7 @@ namespace YouTubeDownloadUtil
             DragDropButtonText = (e.Data.GetData(DataFormats.FileDrop) as string[]).FirstOrDefault();
             if (Directory.Exists(DragDropButtonText))
             {
-              cm.Show(button1,new Point(button1.Width,button1.Height), ToolStripDropDownDirection.BelowLeft);
+              cm.Show(btnAbortProcess,new Point(btnAbortProcess.Width,btnAbortProcess.Height), ToolStripDropDownDirection.BelowLeft);
               Text = "is directory";
               ConfigModel.Instance.AddDirectory(DragDropButtonText);
               UpdateDownloadTargets();
@@ -103,7 +109,7 @@ namespace YouTubeDownloadUtil
     void Event_BeginDownloadType(object sender, EventArgs e) { var l = sender as ToolStripMenuItem; ConfigModel.Instance.TargetType = l.Text; lbLast.Text = $"[{ConfigModel.Instance.TargetType}]"; Worker_Begin(); }
     void Event_BeginDownload(object sender, EventArgs e) { Worker_Begin(); }
     void TextBox1TextChanged(object sender, EventArgs e) {
-      ckHasPlaylist.Checked = textBox1.Text.Contains("&list=") || textBox1.Text.Contains("?list=");
+      ckHasPlaylist.Visible = textBox1.Text.Contains("&list=") || textBox1.Text.Contains("?list=");
       ConfigModel.TargetURI = textBox1.Text;
     }
     
@@ -125,5 +131,6 @@ namespace YouTubeDownloadUtil
       new CommandKeyHandler<IUI>{Name="Run Using Last Taret-Type", Keys=Keys.Control|Keys.Enter, Action=Actions.CRunLastType},
       new CommandKeyHandler<IUI>{Name="Test Download (Atomic Parsley)", Keys=Keys.Control|Keys.Shift|Keys.D, Action=DownloadTargetFile.TestDownloadAtomicParsley},
     };
+
   }
 }
