@@ -96,9 +96,7 @@
     <Compile Include="source\ConfigModel.cs" />
     <Compile Include="source\DownloadTarget.cs" />
     <Compile Include="source\keystrings.cs" />
-    <Compile Include="source\MainForm.ButtonContext.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="source\MainForm.ButtonContext.cs" />
     <Compile Include="source\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -107,11 +105,21 @@
     </Compile>
     <Compile Include="source\MainForm.Worker.cs" />
     <Compile Include="source\DownloadTargetFile.cs" />
+    <Compile Include="source\ResourceStrings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ResourceStrings.resx</DependentUpon>
+    </Compile>
     <Compile Include="source\ThreadedDownloaderWorker.cs" />
     <Compile Include="source\YoutubeDlProcess.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="readme.rtf" />
+    <EmbeddedResource Include="source\ResourceStrings.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ResourceStrings.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>YouTubeDownloadUtil</CustomToolNamespace>
+    </EmbeddedResource>
     <None Include="ico.ico" />
   </ItemGroup>
   <ItemGroup />

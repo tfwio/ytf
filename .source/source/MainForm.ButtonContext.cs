@@ -6,10 +6,28 @@ using System.Windows.Forms;
 
 namespace YouTubeDownloadUtil
 {
+  static class TSItemHelper
+  {
+    static public ToolStripMenuItem AddCheckItem(this ToolStripMenuItem parent, string text, string tooltip, Action action)
+    {
+      var item = parent.DropDownItems.Add(text) as ToolStripMenuItem;
+      item.ToolTipText = tooltip;
+      if (action != null)
+      {
+        item.CheckOnClick = true;
+        item.Click += (e, x) => action();
+      }
+      return item;
+    }
+    static public ToolStripMenuItem AddCheckItem(this ToolStripMenuItem parent, string text, Action action)
+    {
+      return parent.AddCheckItem(text,null,action);
+    }
+  }
   partial class MainForm
   {
     ContextMenuStrip cm;
-    ToolStripMenuItem mExplore, mRemovePath, mOptions, mAbortOnDuplicate, mAddMetadata, mContinue, mEmbedSubs, mEmbedThumb, mGetPlaylist, mIgnoreErrors, mVerbose, mWriteAutoSubs, mWriteSubs, mDownloadTargets;
+    ToolStripMenuItem mExplore, mRemovePath, mOptions, mAbortOnDuplicate, mAddMetadata, mContinue, mEmbedSubs, mEmbedThumb, mFlatPlaylist, mGetPlaylist, mIgnoreErrors, mVerbose, mWriteAutoSubs, mWriteSubs, mDownloadTargets;
     
     string DragDropButtonText = string.Empty; // used for temporary storage on drag-enter/drop.
     
@@ -37,42 +55,37 @@ namespace YouTubeDownloadUtil
     void CreateToolStrip()
     {
       cm = new ContextMenuStrip();
-      mOptions          = cm.Items.Add("youtube-dl flags") as ToolStripMenuItem;
-      mExplore          = cm.Items.Add("Explore to Target Directory") as ToolStripMenuItem;
-      mExplore.Click   += (object sender,EventArgs e)=>Actions.ExploreToPath();
-      mRemovePath       = cm.Items.Add("Remove Selected Target Directory") as ToolStripMenuItem;
-      mRemovePath.Click += (s,e)=>
+      mOptions          = cm.Items.Add(ResourceStrings.mOptions) as ToolStripMenuItem;
+      mExplore          = cm.Items.Add(ResourceStrings.mExplore, null, (s,e)=> Actions.ExploreToPath()) as ToolStripMenuItem;
+      mRemovePath       = cm.Items.Add(ResourceStrings.mRemovePath, null, (s,e) =>
       {
         var dir = ConfigModel.Instance.TargetOutputDirectory;
-        if (ConfigModel.Instance.RemoveDirectory(dir))
+        var msg = $"You are about to remove:\n\"{dir}\"\nfrom your selectable target paths!\nAre your sure?";
+        if (MessageBox.Show(msg, "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
         {
-          MessageBox.Show($"Successully removed {dir} from your collection.", "Success",MessageBoxButtons.OK,MessageBoxIcon.Asterisk);
-          UpdateDownloadTargets();
+          if (ConfigModel.Instance.RemoveDirectory(dir)) { MessageBox.Show($"Successully removed {dir} from your collection.", ResourceStrings.msgCreateTsSuccessCaption, MessageBoxButtons.OK, MessageBoxIcon.Asterisk); UpdateDownloadTargets(); }
+          else MessageBox.Show(ResourceStrings.msgCreateTsFail, ResourceStrings.msgCreateTsFailCaption, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
         }
-        else
-          MessageBox.Show("The current target path was not stored to your set", "nothing to remove", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-      };
+      }) as ToolStripMenuItem;
       lbLast.Text       = $"[{ConfigModel.Instance.TargetType}]"; // initial target-type is m4a (itunes audio)
-      // Flags
-      mAbortOnDuplicate = mOptions.DropDownItems.Add("Abort on Duplicate (File Exists)") as ToolStripMenuItem;
-      mAddMetadata      = mOptions.DropDownItems.Add("Add MetaData") as ToolStripMenuItem;
-      mContinue         = mOptions.DropDownItems.Add("Continue Unfinished Downloads") as ToolStripMenuItem;
-      mEmbedSubs        = mOptions.DropDownItems.Add("Embed Subtitles") as ToolStripMenuItem;
-      mEmbedThumb       = mOptions.DropDownItems.Add("Embed Thumbnail") as ToolStripMenuItem;
-      mGetPlaylist      = mOptions.DropDownItems.Add("Get Playlist") as ToolStripMenuItem;
+      // AppFlags
+      mAbortOnDuplicate = mOptions.AddCheckItem(ResourceStrings.mAbortOnDuplicate, FlagsFromMenu);
+      // YtFlags
+      mAddMetadata      = mOptions.AddCheckItem(ResourceStrings.mAddMetadata, FlagsFromMenu);
+      mContinue         = mOptions.AddCheckItem(ResourceStrings.mContinue, FlagsFromMenu);
+      mEmbedSubs        = mOptions.AddCheckItem(ResourceStrings.mEmbedSubs, FlagsFromMenu);
+      mEmbedThumb       = mOptions.AddCheckItem(ResourceStrings.mEmbedThumb, FlagsFromMenu);
+      mGetPlaylist      = mOptions.AddCheckItem(ResourceStrings.mGetPlaylist, FlagsFromMenu);
+      mFlatPlaylist     = mOptions.AddCheckItem(ResourceStrings.mFlatPlaylist, ResourceStrings.FlatPlaylist, FlagsFromMenu);
       mOptions.DropDownItems.Add("-");
-      mIgnoreErrors     = mOptions.DropDownItems.Add("Ignore Errors") as ToolStripMenuItem;
-      mVerbose          = mOptions.DropDownItems.Add("Verbose") as ToolStripMenuItem;
-      mWriteAutoSubs    = mOptions.DropDownItems.Add("Write Auto Subtitles (yt: if present)") as ToolStripMenuItem;
-      mWriteSubs        = mOptions.DropDownItems.Add("Write Subtitles (yt: if present") as ToolStripMenuItem;
+      mIgnoreErrors     = mOptions.AddCheckItem(ResourceStrings.mIgnoreErrors, FlagsFromMenu);
+      mVerbose          = mOptions.AddCheckItem(ResourceStrings.mVerbose, FlagsFromMenu);
+      mWriteAutoSubs    = mOptions.AddCheckItem(ResourceStrings.mWriteAutoSubs, FlagsFromMenu);
+      mWriteSubs        = mOptions.AddCheckItem(ResourceStrings.mWriteSubs, FlagsFromMenu);
       // Targets
-      mDownloadTargets  = cm.Items.Add("Download Targets") as ToolStripMenuItem;
-      foreach (var m in new ToolStripMenuItem[] {mAbortOnDuplicate,mAddMetadata,mContinue,mEmbedSubs,mEmbedThumb,mGetPlaylist,mIgnoreErrors,mVerbose,mWriteAutoSubs,mWriteSubs}){
-        m.CheckOnClick = true;
-        m.Click += (e,x)=>FlagsFromMenu();
-      }
+      mDownloadTargets  = cm.Items.Add(ResourceStrings.mDownloadTargets) as ToolStripMenuItem;
       
-      var shf = cm.Items.Add("Target: Shell-Folder") as ToolStripMenuItem;
+      var shf = cm.Items.Add(ResourceStrings.mShellFolders) as ToolStripMenuItem;
       ShellFolderItem(shf, "%USERPROFILE%\\Desktop");
       ShellFolderItem(shf, "%USERPROFILE%\\Documents");
       ShellFolderItem(shf, "%USERPROFILE%\\Downloads");
@@ -107,6 +120,7 @@ namespace YouTubeDownloadUtil
       mEmbedSubs.Checked          = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.EmbedSubs);
       mEmbedThumb.Checked         = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.EmbedThumb);
       mGetPlaylist.Checked        = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.GetPlaylist);
+      mFlatPlaylist.Checked       = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.FlatPlaylist);
       mIgnoreErrors.Checked       = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.IgnoreErrors);
       mVerbose.Checked            = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.Verbose);
       mWriteAutoSubs.Checked      = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.WriteAutoSubs);
@@ -121,6 +135,7 @@ namespace YouTubeDownloadUtil
       if (mEmbedSubs.Checked)        F = F | YoutubeDlFlags.EmbedSubs;
       if (mEmbedThumb.Checked)       F = F | YoutubeDlFlags.EmbedThumb;
       if (mGetPlaylist.Checked)      F = F | YoutubeDlFlags.GetPlaylist;
+      if (mFlatPlaylist.Checked)     F = F | YoutubeDlFlags.FlatPlaylist;
       if (mIgnoreErrors.Checked)     F = F | YoutubeDlFlags.IgnoreErrors;
       if (mVerbose.Checked)          F = F | YoutubeDlFlags.Verbose;
       if (mWriteAutoSubs.Checked)    F = F | YoutubeDlFlags.WriteAutoSubs;

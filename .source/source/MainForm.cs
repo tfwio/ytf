@@ -12,11 +12,7 @@ namespace YouTubeDownloadUtil
     readonly Color colorDark  = Color.FromArgb(64,64,64);
     readonly Color colorLight = SystemColors.ControlLight;
     
-    ToolStripMenuItem[] TogglableControls { get { return new ToolStripMenuItem[]{lbM4a, lbMp3, lbMp4, lbLast, lbBest}; } }
-    
-    const string msgAllreadyDownloaded  = "has already been downloaded";
-    const string msgDownloadHeading     = "[download] ";
-    const string msgDownloadDestination = "[download] Destination: ";
+    ToolStripItem[] TogglableControls { get { return new ToolStripItem[]{lbLast}; } }
     
     void DownloadTargetClickHandler(object sender, EventArgs e)
     {
@@ -127,7 +123,7 @@ namespace YouTubeDownloadUtil
       new CommandKeyHandler<IUI>{Name="Outout: Reset Zoom Factor", Keys=Keys.NumPad0|Keys.Control, Action = Actions.COutputZoomReset },
       new CommandKeyHandler<IUI>{Name="Shel: Explore to Path",Keys=Keys.E|Keys.Control, Action =(IUI f)=>Actions.ExploreToPath()},
       new CommandKeyHandler<IUI>{Name="Run Using Last Taret-Type", Keys=Keys.Control|Keys.Enter, Action=Actions.CRunLastType},
-      new CommandKeyHandler<IUI>{Name="Test Download", Keys=Keys.Control|Keys.Shift|Keys.D, Action=DownloadTargetFile.TestDownloadAtomicParsley},
+      new CommandKeyHandler<IUI>{Name="Test Download (Atomic Parsley)", Keys=Keys.Control|Keys.Shift|Keys.D, Action=DownloadTargetFile.TestDownloadAtomicParsley},
     };
   }
 }

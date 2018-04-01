@@ -54,18 +54,18 @@ namespace YouTubeDownloadUtil
     
     void UI_WorkerThread_DataFilter(string text, YoutubeDownloader obj)
     {
-      if (!string.IsNullOrEmpty(text) && text.Contains(msgDownloadDestination))
+      if (!string.IsNullOrEmpty(text) && text.Contains(ResourceStrings.msgDownloadDestination))
       {
-        obj.KnownTargetFile = text.Replace(msgDownloadDestination, "").Trim();
+        obj.KnownTargetFile = text.Replace(ResourceStrings.msgDownloadDestination, "").Trim();
         Text = obj.KnownTargetFile;
       }
       else if (!string.IsNullOrEmpty(text)
-               && text.Contains(msgAllreadyDownloaded)
+               && text.Contains(ResourceStrings.msgAllreadyDownloaded)
                && obj.Flags.HasFlag(YoutubeDlFlags.AbortOnDuplicate))
       {
         obj.KnownTargetFile = text
-          .Replace(msgDownloadHeading, "")
-          .Replace(msgAllreadyDownloaded, "");
+          .Replace(ResourceStrings.msgDownloadHeading, "")
+          .Replace(ResourceStrings.msgAllreadyDownloaded, "");
         obj.Abort($"[abort] due to EXISITING FILE: {obj.KnownTargetFile}\n");
         Text=$"[EXISTS] {obj.KnownTargetFile}";
       }
@@ -90,8 +90,14 @@ namespace YouTubeDownloadUtil
       OutputData.Add(content);
       richTextBox1.AppendText($"{content}\n");
       richTextBox1.Focus();
+      btnAbort.Visible = true;
     }
-    
+
+    private void UI_WorkerProcess_Abort(object sender, EventArgs e)
+    {
+      downloader.Abort("User canceled\n<WARNING> Incomplete files likely remain\n");
+    }
+
     void UI_WorkerProcess_Post(YoutubeDownloader obj)
     {
       if (obj.Aborted && obj.KnownTargetFile!=null)
@@ -107,6 +113,7 @@ namespace YouTubeDownloadUtil
       OutputData.Add($"{content}\n");
       richTextBox1.AppendText($"{content}\n");
       foreach (var c in TogglableControls) c.Enabled = true;
+      btnAbort.Visible = false;
     }
 
   }
@@ -138,7 +145,6 @@ namespace YouTubeDownloadUtil
       
       downloader.Go();
     }
-
     
     void WorkerThread_Completed(object sender, EventArgs e) { worker.CancelAsync(); }
     
