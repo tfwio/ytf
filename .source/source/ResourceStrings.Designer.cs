@@ -88,11 +88,32 @@ namespace YouTubeDownloadUtil {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Write metadata to the video file.
+        /// </summary>
+        internal static string mAddMetaDataTip {
+            get {
+                return ResourceManager.GetString("mAddMetaDataTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Continue Unfinished Downloads.
         /// </summary>
         internal static string mContinue {
             get {
                 return ResourceManager.GetString("mContinue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;Note&gt; Here, if this is not enabled, we will use the --no-continue Flag.
+        ///
+        ///Force resume of partially downloaded files.
+        ///By default, youtube-dl will resume downloads if possible..
+        /// </summary>
+        internal static string mContinueTip {
+            get {
+                return ResourceManager.GetString("mContinueTip", resourceCulture);
             }
         }
         
@@ -115,11 +136,29 @@ namespace YouTubeDownloadUtil {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Embed subtitles in the video (only for mp4, webm and mkv videos).
+        /// </summary>
+        internal static string mEmbedSubsTip {
+            get {
+                return ResourceManager.GetString("mEmbedSubsTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Embed Thumbnail.
         /// </summary>
         internal static string mEmbedThumb {
             get {
                 return ResourceManager.GetString("mEmbedThumb", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Embed thumbnail in the audio as cover art.
+        /// </summary>
+        internal static string mEmbedThumbTip {
+            get {
+                return ResourceManager.GetString("mEmbedThumbTip", resourceCulture);
             }
         }
         
@@ -151,6 +190,15 @@ namespace YouTubeDownloadUtil {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Download the playlist, if the URL refers to a video and a playlist..
+        /// </summary>
+        internal static string mGetPlaylistTip {
+            get {
+                return ResourceManager.GetString("mGetPlaylistTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ignore Errors.
         /// </summary>
         internal static string mIgnoreErrors {
@@ -160,11 +208,38 @@ namespace YouTubeDownloadUtil {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Continue on download errors, for example to skip unavailable videos in a playlist.
+        /// </summary>
+        internal static string mIgnoreErrorsTip {
+            get {
+                return ResourceManager.GetString("mIgnoreErrorsTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to youtube-dl flags.
         /// </summary>
         internal static string mOptions {
             get {
                 return ResourceManager.GetString("mOptions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Prefer FFmpeg.
+        /// </summary>
+        internal static string mPreferFFmpeg {
+            get {
+                return ResourceManager.GetString("mPreferFFmpeg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Prefer ffmpeg over avconv for running the postprocessors.
+        /// </summary>
+        internal static string mPreferFFmpegTip {
+            get {
+                return ResourceManager.GetString("mPreferFFmpegTip", resourceCulture);
             }
         }
         
@@ -250,20 +325,67 @@ namespace YouTubeDownloadUtil {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Write Auto Subtitles (yt: if present).
+        ///   Looks up a localized string similar to Print various debugging information.
         /// </summary>
-        internal static string mWriteAutoSubs {
+        internal static string mVerboseTip {
             get {
-                return ResourceManager.GetString("mWriteAutoSubs", resourceCulture);
+                return ResourceManager.GetString("mVerboseTip", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Write Subtitles (yt: if present).
+        ///   Looks up a localized string similar to Write: Annotations.
+        /// </summary>
+        internal static string mWriteAnnotations {
+            get {
+                return ResourceManager.GetString("mWriteAnnotations", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Write: video annotations to a .annotations.xml file
+        ///[youtube].
+        /// </summary>
+        internal static string mWriteAnnotationsTip {
+            get {
+                return ResourceManager.GetString("mWriteAnnotationsTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Write: Auto Subtitles.
+        /// </summary>
+        internal static string mWriteAutoSub {
+            get {
+                return ResourceManager.GetString("mWriteAutoSub", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Write: automatically generated subtitle file
+        ///[youtube].
+        /// </summary>
+        internal static string mWriteAutoSubTip {
+            get {
+                return ResourceManager.GetString("mWriteAutoSubTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Write: Subtitles.
         /// </summary>
         internal static string mWriteSubs {
             get {
                 return ResourceManager.GetString("mWriteSubs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Write subtitle file.
+        /// </summary>
+        internal static string mWriteSubsTip {
+            get {
+                return ResourceManager.GetString("mWriteSubsTip", resourceCulture);
             }
         }
         
@@ -273,6 +395,25 @@ namespace YouTubeDownloadUtil {
         internal static string uriYoutubeDlHelp {
             get {
                 return ResourceManager.GetString("uriYoutubeDlHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to youtube-dl (or target executable) wasn&apos;t found.
+        ///&lt;to-fix&gt; Drag-Drop youtube-dl.exe back onto the app for it to be configured properly..
+        /// </summary>
+        internal static string Win32Native_NoExecutable_Msg {
+            get {
+                return ResourceManager.GetString("Win32Native_NoExecutable_Msg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The target-directory (WorkPath) wasn&apos;t found.\n&lt;to-fix&gt; Select another target (output) path..
+        /// </summary>
+        internal static string Win32Native_NoWorkingDirectory_Msg {
+            get {
+                return ResourceManager.GetString("Win32Native_NoWorkingDirectory_Msg", resourceCulture);
             }
         }
     }

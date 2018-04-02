@@ -43,7 +43,7 @@ namespace YouTubeDownloadUtil
     {
       InitializeComponent();
 
-      btnAbortProcess.MouseDown += Button1MouseDown;
+      btnAbortProcess.MouseDown += Event_ButtonShowContext;
       textBox1.TextChanged += TextBox1TextChanged;
       
       UpdateEnvironmentPath();

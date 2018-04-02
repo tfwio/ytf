@@ -15,7 +15,7 @@ namespace YouTubeDownloadUtil
       if (action != null)
       {
         item.CheckOnClick = true;
-        item.Click += (e, x) => action();
+        item.Click += (s, e) => action();
       }
       return item;
     }
@@ -26,8 +26,8 @@ namespace YouTubeDownloadUtil
   }
   partial class MainForm
   {
-    ContextMenuStrip cm;
-    ToolStripMenuItem mExplore, mRemovePath, mOptions, mAbortOnDuplicate, mAddMetadata, mContinue, mEmbedSubs, mEmbedThumb, mFlatPlaylist, mGetPlaylist, mIgnoreErrors, mVerbose, mWriteAutoSubs, mWriteSubs, mDownloadTargets;
+    internal ContextMenuStrip cm = new ContextMenuStrip();
+    internal ToolStripMenuItem mExplore, mRemovePath, mOptions, mAbortOnDuplicate, mAddMetadata, mContinue, mEmbedSubs, mEmbedThumb, mFlatPlaylist, mGetPlaylist, mIgnoreErrors, mVerbose, mWriteAutoSub, mWriteSubs, mDownloadTargets, mWriteAnnotations, mPreferFFmpeg;
     
     string DragDropButtonText = string.Empty; // used for temporary storage on drag-enter/drop.
     
@@ -35,7 +35,7 @@ namespace YouTubeDownloadUtil
     
     void ShowButtonMenu(Control target) { cm.Show(target, new Point(target.Width,target.Height), DropDownDirection); }
     
-    void Button1MouseDown(object sender, MouseEventArgs e) { cm.Show(btnAbortProcess,new Point(btnAbortProcess.Width,btnAbortProcess.Height), DropDownDirection); cm.Focus(); }
+    internal void Event_ButtonShowContext(object sender, MouseEventArgs e) { cm.Show(btnAbortProcess,new Point(btnAbortProcess.Width,btnAbortProcess.Height), DropDownDirection); cm.Focus(); }
 
     void RemoveTargetPath()
     {
@@ -68,32 +68,38 @@ namespace YouTubeDownloadUtil
     
     void CreateToolStrip()
     {
-      cm = new ContextMenuStrip();
+      cm.Items.Clear();
+
       mOptions          = cm.Items.Add(ResourceStrings.mOptions) as ToolStripMenuItem;
       cm.Items.Add("-");
       mExplore          = cm.Items.Add(ResourceStrings.mExplore, null, (s,e)=> Actions.ExploreToPath()) as ToolStripMenuItem;
       mRemovePath       = cm.Items.Add(ResourceStrings.mRemovePath, null, (s,e)=> RemoveTargetPath()) as ToolStripMenuItem;
       cm.Items.Add("-");
 
-      // AppFlags
+      // Flags
 
       mAbortOnDuplicate = mOptions.AddCheckItem(ResourceStrings.mAbortOnDuplicate, FlagsFromMenu);
-      // YtFlags
-      mAddMetadata      = mOptions.AddCheckItem(ResourceStrings.mAddMetadata, FlagsFromMenu);
-      mContinue         = mOptions.AddCheckItem(ResourceStrings.mContinue, FlagsFromMenu);
-      mEmbedSubs        = mOptions.AddCheckItem(ResourceStrings.mEmbedSubs, FlagsFromMenu);
-      mEmbedThumb       = mOptions.AddCheckItem(ResourceStrings.mEmbedThumb, FlagsFromMenu);
-      mGetPlaylist      = mOptions.AddCheckItem(ResourceStrings.mGetPlaylist, FlagsFromMenu);
-      mFlatPlaylist     = mOptions.AddCheckItem(ResourceStrings.mFlatPlaylist, ResourceStrings.FlatPlaylist, FlagsFromMenu);
       mOptions.DropDownItems.Add("-");
-      mIgnoreErrors     = mOptions.AddCheckItem(ResourceStrings.mIgnoreErrors, FlagsFromMenu);
-      mVerbose          = mOptions.AddCheckItem(ResourceStrings.mVerbose, FlagsFromMenu);
-      mWriteAutoSubs    = mOptions.AddCheckItem(ResourceStrings.mWriteAutoSubs, FlagsFromMenu);
-      mWriteSubs        = mOptions.AddCheckItem(ResourceStrings.mWriteSubs, FlagsFromMenu);
-      
+      mContinue         = mOptions.AddCheckItem(ResourceStrings.mContinue,         ResourceStrings.mContinueTip, FlagsFromMenu);
+      mIgnoreErrors     = mOptions.AddCheckItem(ResourceStrings.mIgnoreErrors,     ResourceStrings.mIgnoreErrors, FlagsFromMenu);
+      mVerbose          = mOptions.AddCheckItem(ResourceStrings.mVerbose,          ResourceStrings.mVerbose, FlagsFromMenu);
+      mOptions.DropDownItems.Add("-");
+      mAddMetadata      = mOptions.AddCheckItem(ResourceStrings.mAddMetadata,      ResourceStrings.mAddMetaDataTip, FlagsFromMenu);
+      mEmbedSubs        = mOptions.AddCheckItem(ResourceStrings.mEmbedSubs,        ResourceStrings.mEmbedSubsTip,   FlagsFromMenu);
+      mEmbedThumb       = mOptions.AddCheckItem(ResourceStrings.mEmbedThumb,       ResourceStrings.mEmbedThumbTip,  FlagsFromMenu);
+      mOptions.DropDownItems.Add("-");
+      mGetPlaylist      = mOptions.AddCheckItem(ResourceStrings.mGetPlaylist,      ResourceStrings.mGetPlaylistTip, FlagsFromMenu);
+      mFlatPlaylist     = mOptions.AddCheckItem(ResourceStrings.mFlatPlaylist,     ResourceStrings.FlatPlaylist,    FlagsFromMenu);
+      mOptions.DropDownItems.Add("-");
+      mWriteAutoSub     = mOptions.AddCheckItem(ResourceStrings.mWriteAutoSub,     ResourceStrings.mWriteAutoSubTip, FlagsFromMenu);
+      mWriteAnnotations = mOptions.AddCheckItem(ResourceStrings.mWriteAnnotations, ResourceStrings.mWriteAnnotationsTip, FlagsFromMenu);
+      mWriteSubs        = mOptions.AddCheckItem(ResourceStrings.mWriteSubs,        ResourceStrings.mWriteSubsTip,    FlagsFromMenu);
+      mOptions.DropDownItems.Add("-");
+      mPreferFFmpeg     = mOptions.AddCheckItem(ResourceStrings.mPreferFFmpeg,     ResourceStrings.mPreferFFmpegTip, FlagsFromMenu);
+
       // Targets
 
-      mDownloadTargets  = cm.Items.Add(ResourceStrings.mDownloadTargets) as ToolStripMenuItem;
+      mDownloadTargets = cm.Items.Add(ResourceStrings.mDownloadTargets) as ToolStripMenuItem;
       
       var shf = cm.Items.Add(ResourceStrings.mShellFolders) as ToolStripMenuItem;
       ShellFolderItem(shf, "%USERPROFILE%\\Desktop");
@@ -128,31 +134,39 @@ namespace YouTubeDownloadUtil
     
     void FlagsToMenu(){
       mAbortOnDuplicate.Checked   = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.AbortOnDuplicate);
-      mAddMetadata.Checked        = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.AddMetadata);
       mContinue.Checked           = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.Continue);
+      mIgnoreErrors.Checked       = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.IgnoreErrors);
+      mVerbose.Checked            = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.Verbose);
+      mAddMetadata.Checked        = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.AddMetadata);
       mEmbedSubs.Checked          = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.EmbedSubs);
       mEmbedThumb.Checked         = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.EmbedThumb);
       mGetPlaylist.Checked        = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.GetPlaylist);
       mFlatPlaylist.Checked       = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.FlatPlaylist);
-      mIgnoreErrors.Checked       = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.IgnoreErrors);
-      mVerbose.Checked            = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.Verbose);
-      mWriteAutoSubs.Checked      = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.WriteAutoSubs);
+      mWriteAutoSub.Checked       = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.WriteAutoSubs);
+      mWriteAnnotations.Checked   = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.WriteAnnotations);
       mWriteSubs.Checked          = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.WriteSubs);
+      mPreferFFmpeg.Checked       = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.PreferFFmpeg);
     }
     void FlagsFromMenu()
     {
       YoutubeDlFlags F=0;
       if (mAbortOnDuplicate.Checked) F = F | YoutubeDlFlags.AbortOnDuplicate;
-      if (mAddMetadata.Checked)      F = F | YoutubeDlFlags.AddMetadata;
       if (mContinue.Checked)         F = F | YoutubeDlFlags.Continue;
+      if (mIgnoreErrors.Checked)     F = F | YoutubeDlFlags.IgnoreErrors;
+      if (mVerbose.Checked)          F = F | YoutubeDlFlags.Verbose;
+      if (mAddMetadata.Checked)      F = F | YoutubeDlFlags.AddMetadata;
       if (mEmbedSubs.Checked)        F = F | YoutubeDlFlags.EmbedSubs;
       if (mEmbedThumb.Checked)       F = F | YoutubeDlFlags.EmbedThumb;
       if (mGetPlaylist.Checked)      F = F | YoutubeDlFlags.GetPlaylist;
       if (mFlatPlaylist.Checked)     F = F | YoutubeDlFlags.FlatPlaylist;
-      if (mIgnoreErrors.Checked)     F = F | YoutubeDlFlags.IgnoreErrors;
-      if (mVerbose.Checked)          F = F | YoutubeDlFlags.Verbose;
-      if (mWriteAutoSubs.Checked)    F = F | YoutubeDlFlags.WriteAutoSubs;
+      if (mWriteAutoSub.Checked)     F = F | YoutubeDlFlags.WriteAutoSubs;
+      if (mWriteAnnotations.Checked) F = F | YoutubeDlFlags.WriteAnnotations;
       if (mWriteSubs.Checked)        F = F | YoutubeDlFlags.WriteSubs;
+      if (mPreferFFmpeg.Checked)     F = F | YoutubeDlFlags.PreferFFmpeg;
+
+      Event_ButtonShowContext(null, null);
+      mOptions.PerformClick();
+
       ConfigModel.Instance.AppFlags = F;
       ConfigModel.Instance.Save();
     }

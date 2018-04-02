@@ -5,22 +5,32 @@ using System.Linq;
 namespace YouTubeDownloadUtil
 {
   // want: --flat-playlist
-  [Flags] enum YoutubeDlFlags
+  [Flags] enum YoutubeDlFlags : ulong
   {
     None = 0,
     AbortOnDuplicate  = 1,
     AddMetadata       = 2,
     Continue          = 4,
     EmbedSubs         = 8,
-    EmbedThumb        = 1 << 8,
-    AutoNumber        = 2 << 8,
-    FlatPlaylist      = 4 << 8,
-    GetPlaylist       = 8 << 8,
-    IgnoreErrors      = 1 << 16,
-    Verbose           = 2 << 16,
-    WriteAutoSubs     = 4 << 16,
-    WriteSubs         = 8 << 16,
+    EmbedThumb        = 1 * 0x10,
+    AutoNumber        = 2 * 0x10,
+    FlatPlaylist      = 4 * 0x10,
+    GetPlaylist       = 8 * 0x10,
+    IgnoreErrors      = 1 * 0x100,
+    Verbose           = 2 * 0x100,
+    WriteAnnotations  = 4 * 0x100,
+    WriteAutoSubs     = 8 * 0x100,
+    WriteSubs         = 1 * 0x1000,
+    ExtractAudio      = 2 * 0x1000,
+    PreferFFmpeg      = 4 * 0x1000,
   }
+  
+  /// <summary>Specify audio format: "best", "aac", "flac", "mp3", "m4a", "opus", "vorbis", or "wav"; "best" by default; No effect without -x.</summary>
+  enum ExtractAudioTypes { best, aac, flac, mp3, m4a, opus, vorbis, wav }
+  
+  /// <summary>see: --convert-subs flag</summary>
+  enum ConvertSubTypes { srt, ass, vtt, lrc }
+
   class ConfigModel
   {
     static readonly FileInfo confDotIni = new FileInfo(Path.Combine(System.DirectoryHelper.ExecutableDirectory,KeyStrings.ConfDefault));

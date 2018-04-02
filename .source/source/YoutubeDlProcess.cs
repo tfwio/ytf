@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using YtFlag=YouTubeDownloadUtil.YoutubeDlFlags;
+using YtFlag = YouTubeDownloadUtil.YoutubeDlFlags;
 namespace YouTubeDownloadUtil
 {
   class YoutubeDownloader : DownloadTarget
@@ -9,24 +9,26 @@ namespace YouTubeDownloadUtil
     
     public bool Aborted { get; private set; }
     
-    // short
-    string StrIgnoreErrors { get { return Flags.HasFlag(YtFlag.IgnoreErrors) ? $"-i" : string.Empty; } }
-    string StrContinue { get { return Flags.HasFlag(YtFlag.Continue) ? $"-c" : string.Empty; } }
-    string StrTargetType { get { return HasTargetType ? $"-f {TargetType}" : string.Empty; } }
-    string StrVerbose { get { return Flags.HasFlag(YtFlag.Verbose) ? $"--verbose" : string.Empty; } }
+    // general
+    string StrIgnoreErrors { get { return Flags.HasFlag(YtFlag.IgnoreErrors) ? " -i" : string.Empty; } }
+    string StrContinueUnfinished { get { return Flags.HasFlag(YtFlag.Continue) ? " -c" : " --no-continue"; } }
+    string StrTargetType { get { return HasTargetType ? $" -f {TargetType}" : string.Empty; } }
+    string StrVerbose { get { return Flags.HasFlag(YtFlag.Verbose) ? " -v" : string.Empty; } }
+    string StrPreferFFmpeg { get { return Flags.HasFlag(YtFlag.PreferFFmpeg) ? " --prefer-ffmpeg" : string.Empty; } }
     // meta
-    string StrAddMetaData { get { return Flags.HasFlag(YtFlag.AddMetadata) ? $"--add-metadata" : string.Empty; } }
-    string StrEmbedThumbnail { get { return Flags.HasFlag(YtFlag.EmbedThumb) ? $"--embed-thumbnail" : string.Empty; } }
+    string StrAddMetaData { get { return Flags.HasFlag(YtFlag.AddMetadata) ? " --add-metadata" : string.Empty; } }
+    string StrEmbedThumbnail { get { return Flags.HasFlag(YtFlag.EmbedThumb) ? " --embed-thumbnail" : string.Empty; } }
+    string StrWriteAnnotations {  get { return Flags.HasFlag(YtFlag.WriteAnnotations) ? $" --write-annotations" : string.Empty; } }
     // playlist
-    string StrPlaylist { get { return Flags.HasFlag(YtFlag.GetPlaylist) ? "--yes-playlist" : "--no-playlist"; } }
-    string StrFlatPlaylist { get { return Flags.HasFlag(YtFlag.FlatPlaylist) ? $"--flat-playlist" : string.Empty; } }
+    string StrPlaylist { get { return Flags.HasFlag(YtFlag.GetPlaylist) ? " --yes-playlist" : " --no-playlist"; } }
+    string StrFlatPlaylist { get { return Flags.HasFlag(YtFlag.FlatPlaylist) ? " --flat-playlist" : string.Empty; } }
     // subs
-    string StrEmbedSubs { get { return Flags.HasFlag(YtFlag.EmbedSubs) ? "--embed-subs" : string.Empty; } }
-    string StrSubLang { get { return !string.IsNullOrEmpty(SubLang) ? $"--sub-lang {SubLang}" : string.Empty; } }
-    string StrWriteAutoSub { get { return Flags.HasFlag(YtFlag.WriteAutoSubs) ? "--write-auto-sub" : string.Empty; } }
-    string StrWriteSub { get { return Flags.HasFlag(YtFlag.WriteSubs) ? "--write-sub" : string.Empty; } }
+    string StrEmbedSubs { get { return Flags.HasFlag(YtFlag.EmbedSubs) ? " --embed-subs" : string.Empty; } }
+    string StrSubLang { get { return !string.IsNullOrEmpty(SubLang) ? $" --sub-lang {SubLang}" : string.Empty; } }
+    string StrWriteAutoSub { get { return Flags.HasFlag(YtFlag.WriteAutoSubs) ? " --write-auto-sub" : string.Empty; } }
+    string StrWriteSub { get { return Flags.HasFlag(YtFlag.WriteSubs) ? " --write-sub" : string.Empty; } }
     
-    public string CommandText { get { return $"{StrIgnoreErrors} {StrContinue} {StrTargetType} {StrWriteSub} {StrPlaylist} {StrFlatPlaylist} {StrSubLang} {StrWriteAutoSub} {StrEmbedSubs} {StrEmbedThumbnail} {StrAddMetaData} {StrVerbose} \"{TargetUri}\""; } }
+    public string CommandText { get { return $"{StrIgnoreErrors}{StrContinueUnfinished}{StrVerbose}{StrTargetType}{StrWriteSub}{StrWriteAnnotations}{StrPlaylist}{StrFlatPlaylist}{StrSubLang}{StrWriteAutoSub}{StrEmbedSubs}{StrEmbedThumbnail}{StrAddMetaData} \"{TargetUri}\""; } }
     
     ProcessStartInfo NewStartInfo {
       get {
@@ -75,9 +77,7 @@ namespace YouTubeDownloadUtil
     
     const int Win32_ErrorCode = -2147467259;
     const int Win32Native_NoExecutable = 2;
-    const string Win32Native_NoExecutable_Msg = "youtube-dl (or target executable) wasn't found.\n<to-fix> Drag-Drop youtube-dl.exe back onto the app for it to be configured properly.";
     const int Win32Native_NoWorkingDirectory = 267;
-    const string Win32Native_NoWorkingDirectory_Msg = "The target-directory (WorkPath) wasn't found.\n<to-fix> Select another target (output) path.";
     const string msgLauchError = "<app> There was a Win32Exception (error)...\n";
     
     public void Go(){
@@ -93,11 +93,11 @@ namespace YouTubeDownloadUtil
         {
           case Win32Native_NoExecutable:
             Aborted = true;
-            AbortMessage = $"{msgLauchError}<ErrorCode> {w32err.ErrorCode}, <NativeErrorCode> {w32err.NativeErrorCode}\n<DOTNET/Exception>{w32err.Message}\n{Win32Native_NoExecutable_Msg}\n";
+            AbortMessage = $"{msgLauchError}<ErrorCode> {w32err.ErrorCode}, <NativeErrorCode> {w32err.NativeErrorCode}\n<DOTNET/Exception>{w32err.Message}\n{ResourceStrings.Win32Native_NoExecutable_Msg}\n";
             return;
           case Win32Native_NoWorkingDirectory:
             Aborted = true;
-            AbortMessage = $"{msgLauchError}<ErrorCode> {w32err.ErrorCode}, <NativeErrorCode> {w32err.NativeErrorCode}\n<DOTNET/Exception>{w32err.Message}\n{Win32Native_NoWorkingDirectory_Msg}\n";
+            AbortMessage = $"{msgLauchError}<ErrorCode> {w32err.ErrorCode}, <NativeErrorCode> {w32err.NativeErrorCode}\n<DOTNET/Exception>{w32err.Message}\n{ResourceStrings.Win32Native_NoWorkingDirectory_Msg}\n";
             return;
           default:
             throw w32err;

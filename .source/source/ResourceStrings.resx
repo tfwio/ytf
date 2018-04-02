@@ -180,13 +180,64 @@
   <data name="mVerbose" xml:space="preserve">
     <value>Verbose</value>
   </data>
-  <data name="mWriteAutoSubs" xml:space="preserve">
-    <value>Write Auto Subtitles (yt: if present)</value>
+  <data name="mWriteAutoSub" xml:space="preserve">
+    <value>Write: Auto Subtitles</value>
   </data>
   <data name="mWriteSubs" xml:space="preserve">
-    <value>Write Subtitles (yt: if present)</value>
+    <value>Write: Subtitles</value>
   </data>
   <data name="uriYoutubeDlHelp" xml:space="preserve">
     <value>https://raw.githubusercontent.com/rg3/youtube-dl/master/README.md</value>
+  </data>
+  <data name="Win32Native_NoExecutable_Msg" xml:space="preserve">
+    <value>youtube-dl (or target executable) wasn't found.
+&lt;to-fix&gt; Drag-Drop youtube-dl.exe back onto the app for it to be configured properly.</value>
+  </data>
+  <data name="Win32Native_NoWorkingDirectory_Msg" xml:space="preserve">
+    <value>The target-directory (WorkPath) wasn't found.\n&lt;to-fix&gt; Select another target (output) path.</value>
+  </data>
+  <data name="mAddMetaDataTip" xml:space="preserve">
+    <value>Write metadata to the video file</value>
+  </data>
+  <data name="mContinueTip" xml:space="preserve">
+    <value>&lt;Note&gt; Here, if this is not enabled, we will use the --no-continue Flag.
+
+Force resume of partially downloaded files.
+By default, youtube-dl will resume downloads if possible.</value>
+  </data>
+  <data name="mEmbedSubsTip" xml:space="preserve">
+    <value>Embed subtitles in the video (only for mp4, webm and mkv videos)</value>
+  </data>
+  <data name="mEmbedThumbTip" xml:space="preserve">
+    <value>Embed thumbnail in the audio as cover art</value>
+  </data>
+  <data name="mGetPlaylistTip" xml:space="preserve">
+    <value>Download the playlist, if the URL refers to a video and a playlist.</value>
+  </data>
+  <data name="mIgnoreErrorsTip" xml:space="preserve">
+    <value>Continue on download errors, for example to skip unavailable videos in a playlist</value>
+  </data>
+  <data name="mPreferFFmpeg" xml:space="preserve">
+    <value>Prefer FFmpeg</value>
+  </data>
+  <data name="mPreferFFmpegTip" xml:space="preserve">
+    <value>Prefer ffmpeg over avconv for running the postprocessors</value>
+  </data>
+  <data name="mVerboseTip" xml:space="preserve">
+    <value>Print various debugging information</value>
+  </data>
+  <data name="mWriteAnnotations" xml:space="preserve">
+    <value>Write: Annotations</value>
+  </data>
+  <data name="mWriteAnnotationsTip" xml:space="preserve">
+    <value>Write: video annotations to a .annotations.xml file
+[youtube]</value>
+  </data>
+  <data name="mWriteAutoSubTip" xml:space="preserve">
+    <value>Write: automatically generated subtitle file
+[youtube]</value>
+  </data>
+  <data name="mWriteSubsTip" xml:space="preserve">
+    <value>Write subtitle file</value>
   </data>
 </root>
