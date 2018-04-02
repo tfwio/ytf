@@ -105,7 +105,6 @@
     <Compile Include="source\CommandKeyHandler.cs" />
     <Compile Include="source\ConfigModel.cs" />
     <Compile Include="source\DownloadTarget.cs" />
-    <Compile Include="source\keystrings.cs" />
     <Compile Include="source\MainForm.ButtonContext.cs" />
     <Compile Include="source\MainForm.cs">
       <SubType>Form</SubType>
@@ -121,7 +120,6 @@
       <DependentUpon>ResourceStrings.resx</DependentUpon>
     </Compile>
     <Compile Include="source\SimpleCommand.cs" />
-    <Compile Include="source\ThreadedDownloaderWorker.cs" />
     <Compile Include="source\YoutubeDlProcess.cs" />
   </ItemGroup>
   <ItemGroup>

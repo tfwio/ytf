@@ -12,8 +12,8 @@ namespace YouTubeDownloadUtil
     
     internal static Action ExploreToPath { get; } =()=> {
       lock (L) {
-        if (ConfigModel.Instance.TargetOutputDirectory.Contains("start:")) System.Diagnostics.Process.Start("start",KeyStrings.ExploreToPath.Replace( "$path$", ConfigModel.Instance.TargetOutputDirectory.Replace("start:","") ));
-        else System.Diagnostics.Process.Start("explorer.exe",KeyStrings.ExploreToPath.Replace( "$path$", ConfigModel.Instance.TargetOutputDirectory.EnvironmentPathFilter() ));
+        if (ConfigModel.Instance.TargetOutputDirectory.Contains("start:")) System.Diagnostics.Process.Start("start", ResourceStrings.ExploreToPath.Replace( "$path$", ConfigModel.Instance.TargetOutputDirectory.Replace("start:","") ));
+        else System.Diagnostics.Process.Start("explorer.exe",ResourceStrings.ExploreToPath.Replace( "$path$", ConfigModel.Instance.TargetOutputDirectory.EnvironmentPathFilter() ));
       };
     };
     // internal static Action ExploreTo { get; } =()=> { lock (L) { System.Diagnostics.Process.Start("explorer.exe",KeyStrings.ExploreToPath.Replace( "$path$", ConfigModel.Instance.TargetOutputDirectory.EnvironmentPathFilter() )); }; };

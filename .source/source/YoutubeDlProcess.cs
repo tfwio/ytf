@@ -28,7 +28,7 @@ namespace YouTubeDownloadUtil
     string StrWriteAutoSub { get { return Flags.HasFlag(YtFlag.WriteAutoSubs) ? " --write-auto-sub" : string.Empty; } }
     string StrWriteSub { get { return Flags.HasFlag(YtFlag.WriteSubs) ? " --write-sub" : string.Empty; } }
     
-    public string CommandText { get { return $"{StrIgnoreErrors}{StrContinueUnfinished}{StrVerbose}{StrTargetType}{StrWriteSub}{StrWriteAnnotations}{StrPlaylist}{StrFlatPlaylist}{StrSubLang}{StrWriteAutoSub}{StrEmbedSubs}{StrEmbedThumbnail}{StrAddMetaData} \"{TargetUri}\""; } }
+    public string CommandText { get { return $"{StrIgnoreErrors}{StrContinueUnfinished}{StrVerbose}{StrTargetType}{StrWriteSub}{StrWriteAnnotations}{StrPlaylist}{StrFlatPlaylist}{StrSubLang}{StrWriteAutoSub}{StrEmbedSubs}{StrEmbedThumbnail}{StrAddMetaData}{StrPreferFFmpeg} \"{TargetUri}\""; } }
     
     ProcessStartInfo NewStartInfo {
       get {

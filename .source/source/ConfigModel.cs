@@ -33,7 +33,7 @@ namespace YouTubeDownloadUtil
 
   class ConfigModel
   {
-    static readonly FileInfo confDotIni = new FileInfo(Path.Combine(System.DirectoryHelper.ExecutableDirectory,KeyStrings.ConfDefault));
+    static readonly FileInfo confDotIni = new FileInfo(Path.Combine(System.DirectoryHelper.ExecutableDirectory,ResourceStrings.ConfDefault));
     
     static internal ConfigModel Instance = Load();
     
@@ -86,8 +86,8 @@ namespace YouTubeDownloadUtil
     static public ConfigModel Load(string confDir)
     {
       var ini = new ConfigModel(){
-        TargetOutputDirectory=KeyStrings.UserDownloads,
-        DownloadTargets=KeyStrings.UserDownloads,
+        TargetOutputDirectory=ResourceStrings.UserDownloads,
+        DownloadTargets=ResourceStrings.UserDownloads,
         YoutubeDlFlagsStr=string.Empty,
         PathFFmpeg=string.Empty,
         PathAVConv=string.Empty,

@@ -240,4 +240,23 @@ By default, youtube-dl will resume downloads if possible.</value>
   <data name="mWriteSubsTip" xml:space="preserve">
     <value>Write subtitle file</value>
   </data>
+  <data name="bin" xml:space="preserve">
+    <value>bin</value>
+  </data>
+  <data name="ConfDefault" xml:space="preserve">
+    <value>config.ini</value>
+  </data>
+  <data name="ExploreToFile" xml:space="preserve">
+    <value>/e,/select,"$path$"</value>
+  </data>
+  <data name="ExploreToPath" xml:space="preserve">
+    <value>/e,"$path$"</value>
+    <comment>for CommandKeyHandler Ctrl+E</comment>
+  </data>
+  <data name="ShowHelp" xml:space="preserve">
+    <value>A helper for running youtube-dl</value>
+  </data>
+  <data name="UserDownloads" xml:space="preserve">
+    <value>%USERPROFILE%\Downloads</value>
+  </data>
 </root>

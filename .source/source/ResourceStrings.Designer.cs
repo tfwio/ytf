@@ -61,6 +61,42 @@ namespace YouTubeDownloadUtil {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to bin.
+        /// </summary>
+        internal static string bin {
+            get {
+                return ResourceManager.GetString("bin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to config.ini.
+        /// </summary>
+        internal static string ConfDefault {
+            get {
+                return ResourceManager.GetString("ConfDefault", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /e,/select,&quot;$path$&quot;.
+        /// </summary>
+        internal static string ExploreToFile {
+            get {
+                return ResourceManager.GetString("ExploreToFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /e,&quot;$path$&quot;.
+        /// </summary>
+        internal static string ExploreToPath {
+            get {
+                return ResourceManager.GetString("ExploreToPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Do not extract the videos of a playlist, only list them..
         /// </summary>
         internal static string FlatPlaylist {
@@ -390,11 +426,29 @@ namespace YouTubeDownloadUtil {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A helper for running youtube-dl.
+        /// </summary>
+        internal static string ShowHelp {
+            get {
+                return ResourceManager.GetString("ShowHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://raw.githubusercontent.com/rg3/youtube-dl/master/README.md.
         /// </summary>
         internal static string uriYoutubeDlHelp {
             get {
                 return ResourceManager.GetString("uriYoutubeDlHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to %USERPROFILE%\Downloads.
+        /// </summary>
+        internal static string UserDownloads {
+            get {
+                return ResourceManager.GetString("UserDownloads", resourceCulture);
             }
         }
         
