@@ -67,6 +67,8 @@
       this.toolStripTextBox1 = new System.Windows.Forms.ToolStripTextBox();
       this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
       this.toolStripTextBox2 = new System.Windows.Forms.ToolStripTextBox();
+      this.lbMaxDownloads = new System.Windows.Forms.ToolStripLabel();
+      this.textMaxDownloads = new System.Windows.Forms.ToolStripTextBox();
       this.panel1.SuspendLayout();
       this.panel2.SuspendLayout();
       this.toolStrip1.SuspendLayout();
@@ -79,7 +81,7 @@
       this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
       this.panel1.Location = new System.Drawing.Point(0, 0);
       this.panel1.Name = "panel1";
-      this.panel1.Size = new System.Drawing.Size(384, 29);
+      this.panel1.Size = new System.Drawing.Size(386, 29);
       this.panel1.TabIndex = 5;
       // 
       // panel2
@@ -89,7 +91,7 @@
       this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
       this.panel2.Location = new System.Drawing.Point(0, 0);
       this.panel2.Name = "panel2";
-      this.panel2.Size = new System.Drawing.Size(384, 27);
+      this.panel2.Size = new System.Drawing.Size(386, 27);
       this.panel2.TabIndex = 7;
       // 
       // textBox1
@@ -98,16 +100,16 @@
       this.textBox1.Font = new System.Drawing.Font("Roboto", 12F, System.Drawing.FontStyle.Bold);
       this.textBox1.Location = new System.Drawing.Point(0, 0);
       this.textBox1.Name = "textBox1";
-      this.textBox1.Size = new System.Drawing.Size(353, 27);
+      this.textBox1.Size = new System.Drawing.Size(355, 27);
       this.textBox1.TabIndex = 8;
       // 
-      // button1
+      // btnAbortProcess
       // 
       this.btnAbortProcess.Dock = System.Windows.Forms.DockStyle.Right;
       this.btnAbortProcess.FlatStyle = System.Windows.Forms.FlatStyle.System;
       this.btnAbortProcess.Font = new System.Drawing.Font("Marlett", 14.25F);
-      this.btnAbortProcess.Location = new System.Drawing.Point(353, 0);
-      this.btnAbortProcess.Name = "button1";
+      this.btnAbortProcess.Location = new System.Drawing.Point(355, 0);
+      this.btnAbortProcess.Name = "btnAbortProcess";
       this.btnAbortProcess.Size = new System.Drawing.Size(31, 27);
       this.btnAbortProcess.TabIndex = 9;
       this.btnAbortProcess.Text = "6";
@@ -126,7 +128,7 @@
       this.richTextBox1.Name = "richTextBox1";
       this.richTextBox1.ReadOnly = true;
       this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedBoth;
-      this.richTextBox1.Size = new System.Drawing.Size(384, 400);
+      this.richTextBox1.Size = new System.Drawing.Size(386, 400);
       this.richTextBox1.TabIndex = 3;
       this.richTextBox1.Text = "";
       this.richTextBox1.WordWrap = false;
@@ -135,7 +137,7 @@
       // 
       this.statusStrip1.Location = new System.Drawing.Point(0, 454);
       this.statusStrip1.Name = "statusStrip1";
-      this.statusStrip1.Size = new System.Drawing.Size(384, 22);
+      this.statusStrip1.Size = new System.Drawing.Size(386, 22);
       this.statusStrip1.TabIndex = 13;
       this.statusStrip1.Text = "statusStrip1";
       // 
@@ -143,13 +145,15 @@
       // 
       this.toolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
       this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.lbMaxDownloads,
+            this.textMaxDownloads,
+            this.ckHasPlaylist,
             this.btnAbort,
-            this.lbLast,
-            this.ckHasPlaylist});
+            this.lbLast});
       this.toolStrip1.Location = new System.Drawing.Point(0, 29);
       this.toolStrip1.Name = "toolStrip1";
       this.toolStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-      this.toolStrip1.Size = new System.Drawing.Size(384, 25);
+      this.toolStrip1.Size = new System.Drawing.Size(386, 25);
       this.toolStrip1.TabIndex = 15;
       this.toolStrip1.Text = "toolStrip1";
       // 
@@ -347,11 +351,22 @@
       this.toolStripTextBox2.Size = new System.Drawing.Size(64, 25);
       this.toolStripTextBox2.Text = "1";
       // 
+      // lbMaxDownloads
+      // 
+      this.lbMaxDownloads.Name = "lbMaxDownloads";
+      this.lbMaxDownloads.Size = new System.Drawing.Size(94, 22);
+      this.lbMaxDownloads.Text = "Max Downloads:";
+      // 
+      // textMaxDownloads
+      // 
+      this.textMaxDownloads.Name = "textMaxDownloads";
+      this.textMaxDownloads.Size = new System.Drawing.Size(24, 25);
+      // 
       // MainForm
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(384, 476);
+      this.ClientSize = new System.Drawing.Size(386, 476);
       this.Controls.Add(this.richTextBox1);
       this.Controls.Add(this.toolStrip1);
       this.Controls.Add(this.panel1);
@@ -396,5 +411,7 @@
     private System.Windows.Forms.ToolStripTextBox toolStripTextBox1;
     private System.Windows.Forms.ToolStripLabel toolStripLabel2;
     private System.Windows.Forms.ToolStripTextBox toolStripTextBox2;
+    private System.Windows.Forms.ToolStripLabel lbMaxDownloads;
+    private System.Windows.Forms.ToolStripTextBox textMaxDownloads;
   }
 }
