@@ -12,6 +12,8 @@ namespace System
   
   static class VariousStringExtensions
   {
+    static public string[] StringToArray(this string input) { return input.Split(',').ToList().ConvertAll((ax) => ax.Trim()).ToArray(); }
+
     /// Create Operators (Oprands) --- probably isn't used
     static public string Oprand(this string name, string oprand, string value, string separator="") { return string.Concat(name,oprand,value,separator); }
     
