@@ -104,6 +104,7 @@
     <Compile Include="source\Actions.cs" />
     <Compile Include="source\CommandKeyHandler.cs" />
     <Compile Include="source\ConfigModel.cs" />
+    <Compile Include="source\DownloaderStatus.cs" />
     <Compile Include="source\DownloadTarget.cs" />
     <Compile Include="source\MainForm.ButtonContext.cs" />
     <Compile Include="source\MainForm.cs">
@@ -121,6 +122,12 @@
     </Compile>
     <Compile Include="source\SimpleCommand.cs" />
     <Compile Include="source\YoutubeDlProcess.cs" />
+    <Compile Include="Windows7ProgressBar\Control\AssemblyInfo.cs" />
+    <Compile Include="Windows7ProgressBar\Control\COMTypes.cs" />
+    <Compile Include="Windows7ProgressBar\Control\Windows7ProgressBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Windows7ProgressBar\Control\Windows7Taskbar.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="readme.rtf" />
@@ -131,7 +138,10 @@
     </EmbeddedResource>
     <None Include="ico.ico" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Windows7ProgressBar\Control\bin\Release\Windows7ProgressBar.dll" />
+    <Content Include="Windows7ProgressBar\Control\bin\Release\Windows7ProgressBar.XML" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="source\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>

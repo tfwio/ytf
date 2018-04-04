@@ -48,16 +48,24 @@ namespace YouTubeDownloadUtil
     
     void WorkerEvent_Disposed(object sender, EventArgs e) { worker = null; }
   }
-
   // a mvc view
-  partial class MainForm {
-    
+  partial class MainForm
+  {
+
     void UI_WorkerThread_DataFilter(string text, YoutubeDownloader obj)
     {
       if (!string.IsNullOrEmpty(text) && text.Contains(ResourceStrings.msgDownloadDestination))
       {
         obj.KnownTargetFile = text.Replace(ResourceStrings.msgDownloadDestination, "").Trim();
         Text = obj.KnownTargetFile;
+      }
+      else if (!string.IsNullOrEmpty(text)
+        && text.Contains("[download]")
+        && text.Contains("% of"))
+      {
+        var dat = new DownloaderStatus(text);
+        statCurrent.Value = dat.IntPercent;
+        statText.Text = dat.Percent;
       }
       else if (!string.IsNullOrEmpty(text)
                && text.Contains(ResourceStrings.msgAllreadyDownloaded)
@@ -67,7 +75,7 @@ namespace YouTubeDownloadUtil
           .Replace(ResourceStrings.msgDownloadHeading, "")
           .Replace(ResourceStrings.msgAllreadyDownloaded, "");
         obj.Abort($"[abort] due to EXISITING FILE: {obj.KnownTargetFile}\n");
-        Text=$"[EXISTS] {obj.KnownTargetFile}";
+        Text = $"[EXISTS] {obj.KnownTargetFile}";
       }
     }
     
@@ -92,6 +100,9 @@ namespace YouTubeDownloadUtil
       richTextBox1.AppendText($"{content}\n");
       richTextBox1.Focus();
       btnAbort.Visible = true;
+      statCurrent.Value = 0;
+      statTotal.Value = 0;
+      statusControls.Visible = true;
     }
 
     void UI_WorkerProcess_Post(YoutubeDownloader obj)
@@ -110,6 +121,10 @@ namespace YouTubeDownloadUtil
       richTextBox1.AppendText($"{content}\n");
       foreach (var c in TogglableControls) c.Enabled = true;
       btnAbort.Visible = false;
+      statusControls.Visible = false;
+      statText.Text = "youtube-dl";
+      statCurrent.Value = 0;
+      statTotal.Value = 0;
     }
 
   }

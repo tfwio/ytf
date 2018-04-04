@@ -42,7 +42,15 @@
       this.richTextBox1 = new System.Windows.Forms.RichTextBox();
       this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
       this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+      this.statText = new System.Windows.Forms.ToolStripStatusLabel();
       this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+      this.lbMaxDownloads = new System.Windows.Forms.ToolStripLabel();
+      this.textMaxDownloads = new System.Windows.Forms.ToolStripTextBox();
+      this.ckHasPlaylist = new System.Windows.Forms.ToolStripDropDownButton();
+      this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
+      this.toolStripTextBox1 = new System.Windows.Forms.ToolStripTextBox();
+      this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
+      this.toolStripTextBox2 = new System.Windows.Forms.ToolStripTextBox();
       this.btnAbort = new System.Windows.Forms.ToolStripMenuItem();
       this.lbLast = new System.Windows.Forms.ToolStripSplitButton();
       this.lbBest = new System.Windows.Forms.ToolStripMenuItem();
@@ -62,16 +70,14 @@
       this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
       this.wavToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.flvToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.ckHasPlaylist = new System.Windows.Forms.ToolStripDropDownButton();
-      this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
-      this.toolStripTextBox1 = new System.Windows.Forms.ToolStripTextBox();
-      this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
-      this.toolStripTextBox2 = new System.Windows.Forms.ToolStripTextBox();
-      this.lbMaxDownloads = new System.Windows.Forms.ToolStripLabel();
-      this.textMaxDownloads = new System.Windows.Forms.ToolStripTextBox();
+      this.statusControls = new System.Windows.Forms.TableLayoutPanel();
+      this.statCurrent = new System.Windows.Forms.ProgressBar();
+      this.statTotal = new System.Windows.Forms.ProgressBar();
       this.panel1.SuspendLayout();
       this.panel2.SuspendLayout();
+      this.statusStrip1.SuspendLayout();
       this.toolStrip1.SuspendLayout();
+      this.statusControls.SuspendLayout();
       this.SuspendLayout();
       // 
       // panel1
@@ -81,7 +87,7 @@
       this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
       this.panel1.Location = new System.Drawing.Point(0, 0);
       this.panel1.Name = "panel1";
-      this.panel1.Size = new System.Drawing.Size(386, 29);
+      this.panel1.Size = new System.Drawing.Size(384, 29);
       this.panel1.TabIndex = 5;
       // 
       // panel2
@@ -91,7 +97,7 @@
       this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
       this.panel2.Location = new System.Drawing.Point(0, 0);
       this.panel2.Name = "panel2";
-      this.panel2.Size = new System.Drawing.Size(386, 27);
+      this.panel2.Size = new System.Drawing.Size(384, 27);
       this.panel2.TabIndex = 7;
       // 
       // textBox1
@@ -100,7 +106,7 @@
       this.textBox1.Font = new System.Drawing.Font("Roboto", 12F, System.Drawing.FontStyle.Bold);
       this.textBox1.Location = new System.Drawing.Point(0, 0);
       this.textBox1.Name = "textBox1";
-      this.textBox1.Size = new System.Drawing.Size(355, 27);
+      this.textBox1.Size = new System.Drawing.Size(353, 27);
       this.textBox1.TabIndex = 8;
       // 
       // btnAbortProcess
@@ -108,7 +114,7 @@
       this.btnAbortProcess.Dock = System.Windows.Forms.DockStyle.Right;
       this.btnAbortProcess.FlatStyle = System.Windows.Forms.FlatStyle.System;
       this.btnAbortProcess.Font = new System.Drawing.Font("Marlett", 14.25F);
-      this.btnAbortProcess.Location = new System.Drawing.Point(355, 0);
+      this.btnAbortProcess.Location = new System.Drawing.Point(353, 0);
       this.btnAbortProcess.Name = "btnAbortProcess";
       this.btnAbortProcess.Size = new System.Drawing.Size(31, 27);
       this.btnAbortProcess.TabIndex = 9;
@@ -128,18 +134,26 @@
       this.richTextBox1.Name = "richTextBox1";
       this.richTextBox1.ReadOnly = true;
       this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedBoth;
-      this.richTextBox1.Size = new System.Drawing.Size(386, 400);
+      this.richTextBox1.Size = new System.Drawing.Size(384, 356);
       this.richTextBox1.TabIndex = 3;
       this.richTextBox1.Text = "";
       this.richTextBox1.WordWrap = false;
       // 
       // statusStrip1
       // 
-      this.statusStrip1.Location = new System.Drawing.Point(0, 454);
+      this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.statText});
+      this.statusStrip1.Location = new System.Drawing.Point(0, 436);
       this.statusStrip1.Name = "statusStrip1";
-      this.statusStrip1.Size = new System.Drawing.Size(386, 22);
+      this.statusStrip1.Size = new System.Drawing.Size(384, 22);
       this.statusStrip1.TabIndex = 13;
       this.statusStrip1.Text = "statusStrip1";
+      // 
+      // statText
+      // 
+      this.statText.Name = "statText";
+      this.statText.Size = new System.Drawing.Size(66, 17);
+      this.statText.Text = "youtube-dl";
       // 
       // toolStrip1
       // 
@@ -153,9 +167,63 @@
       this.toolStrip1.Location = new System.Drawing.Point(0, 29);
       this.toolStrip1.Name = "toolStrip1";
       this.toolStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-      this.toolStrip1.Size = new System.Drawing.Size(386, 25);
+      this.toolStrip1.Size = new System.Drawing.Size(384, 25);
       this.toolStrip1.TabIndex = 15;
       this.toolStrip1.Text = "toolStrip1";
+      // 
+      // lbMaxDownloads
+      // 
+      this.lbMaxDownloads.Name = "lbMaxDownloads";
+      this.lbMaxDownloads.Size = new System.Drawing.Size(94, 22);
+      this.lbMaxDownloads.Text = "Max Downloads:";
+      // 
+      // textMaxDownloads
+      // 
+      this.textMaxDownloads.Name = "textMaxDownloads";
+      this.textMaxDownloads.Size = new System.Drawing.Size(24, 25);
+      // 
+      // ckHasPlaylist
+      // 
+      this.ckHasPlaylist.AutoToolTip = false;
+      this.ckHasPlaylist.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripLabel1,
+            this.toolStripTextBox1,
+            this.toolStripLabel2,
+            this.toolStripTextBox2});
+      this.ckHasPlaylist.Font = new System.Drawing.Font("Roboto", 9F);
+      this.ckHasPlaylist.ImageTransparentColor = System.Drawing.Color.Magenta;
+      this.ckHasPlaylist.Name = "ckHasPlaylist";
+      this.ckHasPlaylist.Size = new System.Drawing.Size(105, 22);
+      this.ckHasPlaylist.Text = "Playlist Options";
+      this.ckHasPlaylist.Visible = false;
+      // 
+      // toolStripLabel1
+      // 
+      this.toolStripLabel1.Font = new System.Drawing.Font("Roboto", 11F);
+      this.toolStripLabel1.Name = "toolStripLabel1";
+      this.toolStripLabel1.Size = new System.Drawing.Size(99, 18);
+      this.toolStripLabel1.Text = "Α: (start/first)";
+      // 
+      // toolStripTextBox1
+      // 
+      this.toolStripTextBox1.Font = new System.Drawing.Font("Roboto", 11F);
+      this.toolStripTextBox1.Name = "toolStripTextBox1";
+      this.toolStripTextBox1.Size = new System.Drawing.Size(64, 25);
+      this.toolStripTextBox1.Text = "1";
+      // 
+      // toolStripLabel2
+      // 
+      this.toolStripLabel2.Font = new System.Drawing.Font("Roboto", 11F);
+      this.toolStripLabel2.Name = "toolStripLabel2";
+      this.toolStripLabel2.Size = new System.Drawing.Size(91, 18);
+      this.toolStripLabel2.Text = "Ω: (end/last)";
+      // 
+      // toolStripTextBox2
+      // 
+      this.toolStripTextBox2.Font = new System.Drawing.Font("Roboto", 11F);
+      this.toolStripTextBox2.Name = "toolStripTextBox2";
+      this.toolStripTextBox2.Size = new System.Drawing.Size(64, 25);
+      this.toolStripTextBox2.Text = "1";
       // 
       // btnAbort
       // 
@@ -308,66 +376,44 @@
       this.flvToolStripMenuItem.Text = "flv";
       this.flvToolStripMenuItem.Click += new System.EventHandler(this.Event_BeginDownloadType);
       // 
-      // ckHasPlaylist
+      // statusControls
       // 
-      this.ckHasPlaylist.AutoToolTip = false;
-      this.ckHasPlaylist.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripLabel1,
-            this.toolStripTextBox1,
-            this.toolStripLabel2,
-            this.toolStripTextBox2});
-      this.ckHasPlaylist.Font = new System.Drawing.Font("Roboto", 9F);
-      this.ckHasPlaylist.ImageTransparentColor = System.Drawing.Color.Magenta;
-      this.ckHasPlaylist.Name = "ckHasPlaylist";
-      this.ckHasPlaylist.Size = new System.Drawing.Size(105, 22);
-      this.ckHasPlaylist.Text = "Playlist Options";
-      this.ckHasPlaylist.Visible = false;
+      this.statusControls.ColumnCount = 2;
+      this.statusControls.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+      this.statusControls.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 108F));
+      this.statusControls.Controls.Add(this.statCurrent, 0, 0);
+      this.statusControls.Controls.Add(this.statTotal, 1, 0);
+      this.statusControls.Dock = System.Windows.Forms.DockStyle.Bottom;
+      this.statusControls.Location = new System.Drawing.Point(0, 410);
+      this.statusControls.Name = "statusControls";
+      this.statusControls.RowCount = 1;
+      this.statusControls.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+      this.statusControls.Size = new System.Drawing.Size(384, 26);
+      this.statusControls.TabIndex = 16;
       // 
-      // toolStripLabel1
+      // statCurrent
       // 
-      this.toolStripLabel1.Font = new System.Drawing.Font("Roboto", 11F);
-      this.toolStripLabel1.Name = "toolStripLabel1";
-      this.toolStripLabel1.Size = new System.Drawing.Size(99, 18);
-      this.toolStripLabel1.Text = "Α: (start/first)";
+      this.statCurrent.Dock = System.Windows.Forms.DockStyle.Fill;
+      this.statCurrent.Location = new System.Drawing.Point(3, 3);
+      this.statCurrent.Name = "statCurrent";
+      this.statCurrent.Size = new System.Drawing.Size(270, 20);
+      this.statCurrent.TabIndex = 0;
       // 
-      // toolStripTextBox1
+      // statTotal
       // 
-      this.toolStripTextBox1.Font = new System.Drawing.Font("Roboto", 11F);
-      this.toolStripTextBox1.Name = "toolStripTextBox1";
-      this.toolStripTextBox1.Size = new System.Drawing.Size(64, 25);
-      this.toolStripTextBox1.Text = "1";
-      // 
-      // toolStripLabel2
-      // 
-      this.toolStripLabel2.Font = new System.Drawing.Font("Roboto", 11F);
-      this.toolStripLabel2.Name = "toolStripLabel2";
-      this.toolStripLabel2.Size = new System.Drawing.Size(91, 18);
-      this.toolStripLabel2.Text = "Ω: (end/last)";
-      // 
-      // toolStripTextBox2
-      // 
-      this.toolStripTextBox2.Font = new System.Drawing.Font("Roboto", 11F);
-      this.toolStripTextBox2.Name = "toolStripTextBox2";
-      this.toolStripTextBox2.Size = new System.Drawing.Size(64, 25);
-      this.toolStripTextBox2.Text = "1";
-      // 
-      // lbMaxDownloads
-      // 
-      this.lbMaxDownloads.Name = "lbMaxDownloads";
-      this.lbMaxDownloads.Size = new System.Drawing.Size(94, 22);
-      this.lbMaxDownloads.Text = "Max Downloads:";
-      // 
-      // textMaxDownloads
-      // 
-      this.textMaxDownloads.Name = "textMaxDownloads";
-      this.textMaxDownloads.Size = new System.Drawing.Size(24, 25);
+      this.statTotal.Dock = System.Windows.Forms.DockStyle.Fill;
+      this.statTotal.Location = new System.Drawing.Point(279, 3);
+      this.statTotal.Name = "statTotal";
+      this.statTotal.Size = new System.Drawing.Size(102, 20);
+      this.statTotal.TabIndex = 0;
       // 
       // MainForm
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(386, 476);
+      this.ClientSize = new System.Drawing.Size(384, 458);
       this.Controls.Add(this.richTextBox1);
+      this.Controls.Add(this.statusControls);
       this.Controls.Add(this.toolStrip1);
       this.Controls.Add(this.panel1);
       this.Controls.Add(this.statusStrip1);
@@ -378,8 +424,11 @@
       this.panel1.ResumeLayout(false);
       this.panel2.ResumeLayout(false);
       this.panel2.PerformLayout();
+      this.statusStrip1.ResumeLayout(false);
+      this.statusStrip1.PerformLayout();
       this.toolStrip1.ResumeLayout(false);
       this.toolStrip1.PerformLayout();
+      this.statusControls.ResumeLayout(false);
       this.ResumeLayout(false);
       this.PerformLayout();
 
@@ -413,5 +462,9 @@
     private System.Windows.Forms.ToolStripTextBox toolStripTextBox2;
     private System.Windows.Forms.ToolStripLabel lbMaxDownloads;
     private System.Windows.Forms.ToolStripTextBox textMaxDownloads;
+    private System.Windows.Forms.ToolStripStatusLabel statText;
+    private System.Windows.Forms.TableLayoutPanel statusControls;
+    private System.Windows.Forms.ProgressBar statCurrent;
+    private System.Windows.Forms.ProgressBar statTotal;
   }
 }
