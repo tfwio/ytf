@@ -27,7 +27,7 @@ namespace YouTubeDownloadUtil
   partial class MainForm
   {
     internal ContextMenuStrip cm = new ContextMenuStrip();
-    internal ToolStripMenuItem mExplore, mRemovePath, mOptions, mAbortOnDuplicate, mAddMetadata, mContinue, mEmbedSubs, mEmbedThumb, mFlatPlaylist, mGetPlaylist, mIgnoreErrors, mVerbose, mWriteAutoSub, mWriteSubs, mDownloadTargets, mWriteAnnotations, mPreferFFmpeg;
+    internal ToolStripMenuItem mExplore, mRemovePath, mOptions, mAbortOnDuplicate, mAddMetadata, mContinue, mEmbedSubs, mEmbedThumb, mFlatPlaylist, mGetPlaylist, mIgnoreErrors, mSimulate, mVerbose, mWriteAutoSub, mWriteSubs, mDownloadTargets, mWriteAnnotations, mPreferFFmpeg, mExtractAudio, mMaxDownloads;
     
     string DragDropButtonText = string.Empty; // used for temporary storage on drag-enter/drop.
     
@@ -83,6 +83,7 @@ namespace YouTubeDownloadUtil
       mContinue         = mOptions.AddCheckItem(ResourceStrings.mContinue,         ResourceStrings.mContinueTip, FlagsFromMenu);
       mIgnoreErrors     = mOptions.AddCheckItem(ResourceStrings.mIgnoreErrors,     ResourceStrings.mIgnoreErrors, FlagsFromMenu);
       mVerbose          = mOptions.AddCheckItem(ResourceStrings.mVerbose,          ResourceStrings.mVerbose, FlagsFromMenu);
+      mSimulate         = mOptions.AddCheckItem(ResourceStrings.mSimulate,         ResourceStrings.mSimulate, FlagsFromMenu);
       mOptions.DropDownItems.Add("-");
       mAddMetadata      = mOptions.AddCheckItem(ResourceStrings.mAddMetadata,      ResourceStrings.mAddMetaDataTip, FlagsFromMenu);
       mEmbedSubs        = mOptions.AddCheckItem(ResourceStrings.mEmbedSubs,        ResourceStrings.mEmbedSubsTip,   FlagsFromMenu);
@@ -90,10 +91,13 @@ namespace YouTubeDownloadUtil
       mOptions.DropDownItems.Add("-");
       mGetPlaylist      = mOptions.AddCheckItem(ResourceStrings.mGetPlaylist,      ResourceStrings.mGetPlaylistTip, FlagsFromMenu);
       mFlatPlaylist     = mOptions.AddCheckItem(ResourceStrings.mFlatPlaylist,     ResourceStrings.FlatPlaylist,    FlagsFromMenu);
+      mMaxDownloads     = mOptions.AddCheckItem(ResourceStrings.mMaxDownloads,     ResourceStrings.mMaxDownloadsTip, FlagsFromMenu);
       mOptions.DropDownItems.Add("-");
       mWriteAutoSub     = mOptions.AddCheckItem(ResourceStrings.mWriteAutoSub,     ResourceStrings.mWriteAutoSubTip, FlagsFromMenu);
       mWriteAnnotations = mOptions.AddCheckItem(ResourceStrings.mWriteAnnotations, ResourceStrings.mWriteAnnotationsTip, FlagsFromMenu);
       mWriteSubs        = mOptions.AddCheckItem(ResourceStrings.mWriteSubs,        ResourceStrings.mWriteSubsTip,    FlagsFromMenu);
+      mOptions.DropDownItems.Add("-");
+      mExtractAudio     = mOptions.AddCheckItem(ResourceStrings.mExtractAudio,     ResourceStrings.mExtractAudioTip, FlagsFromMenu);
       mOptions.DropDownItems.Add("-");
       mPreferFFmpeg     = mOptions.AddCheckItem(ResourceStrings.mPreferFFmpeg,     ResourceStrings.mPreferFFmpegTip, FlagsFromMenu);
 
@@ -146,6 +150,10 @@ namespace YouTubeDownloadUtil
       mWriteAnnotations.Checked   = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.WriteAnnotations);
       mWriteSubs.Checked          = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.WriteSubs);
       mPreferFFmpeg.Checked       = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.PreferFFmpeg);
+      mSimulate.Checked           = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.Simulate);
+      mExtractAudio.Checked       = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.ExtractAudio);
+      mMaxDownloads.Checked       = ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.MaxDownloads);
+      lbMaxDownloads.Visible = (textMaxDownloads.Visible = mMaxDownloads.Checked);
     }
     void FlagsFromMenu()
     {
@@ -163,6 +171,10 @@ namespace YouTubeDownloadUtil
       if (mWriteAnnotations.Checked) F = F | YoutubeDlFlags.WriteAnnotations;
       if (mWriteSubs.Checked)        F = F | YoutubeDlFlags.WriteSubs;
       if (mPreferFFmpeg.Checked)     F = F | YoutubeDlFlags.PreferFFmpeg;
+      if (mSimulate.Checked)         F = F | YoutubeDlFlags.Simulate;
+      if (mExtractAudio.Checked)     F = F | YoutubeDlFlags.ExtractAudio;
+      if (mMaxDownloads.Checked)     F = F | YoutubeDlFlags.MaxDownloads;
+      lbMaxDownloads.Visible = (textMaxDownloads.Visible = mMaxDownloads.Checked);
 
       Event_ButtonShowContext(null, null);
       mOptions.PerformClick();

@@ -259,4 +259,28 @@ By default, youtube-dl will resume downloads if possible.</value>
   <data name="UserDownloads" xml:space="preserve">
     <value>%USERPROFILE%\Downloads</value>
   </data>
+  <data name="mExtractAudio" xml:space="preserve">
+    <value>Extract Audio</value>
+  </data>
+  <data name="mExtractAudioTip" xml:space="preserve">
+    <value>Convert video files to audio-only files (requires ffmpeg or avconv and ffprobe or avprobe)</value>
+  </data>
+  <data name="mMaxDownloads" xml:space="preserve">
+    <value>Maximum Number of Downloads</value>
+  </data>
+  <data name="mMaxDownloadsTip" xml:space="preserve">
+    <value>Abort after downloading NUMBER files
+[Where NUMBER is set by changing the value in the tool-strip below the 'address-bar' in the application]</value>
+  </data>
+  <data name="msgUserAbort" xml:space="preserve">
+    <value>User canceled
+&lt;WARNING&gt; Incomplete files likely remain
+</value>
+  </data>
+  <data name="mSimulate" xml:space="preserve">
+    <value>Simulate</value>
+  </data>
+  <data name="mSimulateTip" xml:space="preserve">
+    <value>Do not download the video and do not write anything to disk</value>
+  </data>
 </root>

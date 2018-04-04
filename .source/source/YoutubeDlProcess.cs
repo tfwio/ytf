@@ -10,25 +10,41 @@ namespace YouTubeDownloadUtil
     public bool Aborted { get; private set; }
     
     // general
-    string StrIgnoreErrors { get { return Flags.HasFlag(YtFlag.IgnoreErrors) ? " -i" : string.Empty; } }
+    string StrIgnoreErrors       { get { return Flags.HasFlag(YtFlag.IgnoreErrors) ? " -i" : string.Empty; } }
     string StrContinueUnfinished { get { return Flags.HasFlag(YtFlag.Continue) ? " -c" : " --no-continue"; } }
-    string StrTargetType { get { return HasTargetType ? $" -f {TargetType}" : string.Empty; } }
-    string StrVerbose { get { return Flags.HasFlag(YtFlag.Verbose) ? " -v" : string.Empty; } }
-    string StrPreferFFmpeg { get { return Flags.HasFlag(YtFlag.PreferFFmpeg) ? " --prefer-ffmpeg" : string.Empty; } }
+    string StrSimulate           { get { return Flags.HasFlag(YtFlag.Simulate) ? $" -s" : string.Empty; } }
+    string StrVerbose            { get { return Flags.HasFlag(YtFlag.Verbose) ? " -v" : string.Empty; } }
+    string StrTargetType         { get { return HasTargetType ? $"f {TargetType}" : string.Empty; } }
+    string StrPreferFFmpeg       { get { return Flags.HasFlag(YtFlag.PreferFFmpeg) ? " --prefer-ffmpeg" : string.Empty; } }
+    string StrMaxDownloads       { get { return (Flags.HasFlag(YtFlag.MaxDownloads) && ConfigModel.Instance.MaxDownloadsInt > 0) ? $" --max-downloads {ConfigModel.Instance.MaxDownloadsInt}" : string.Empty; } }
     // meta
-    string StrAddMetaData { get { return Flags.HasFlag(YtFlag.AddMetadata) ? " --add-metadata" : string.Empty; } }
-    string StrEmbedThumbnail { get { return Flags.HasFlag(YtFlag.EmbedThumb) ? " --embed-thumbnail" : string.Empty; } }
-    string StrWriteAnnotations {  get { return Flags.HasFlag(YtFlag.WriteAnnotations) ? $" --write-annotations" : string.Empty; } }
+    string StrAddMetaData        { get { return Flags.HasFlag(YtFlag.AddMetadata) ? " --add-metadata" : string.Empty; } }
+    string StrEmbedThumbnail     { get { return Flags.HasFlag(YtFlag.EmbedThumb) ? " --embed-thumbnail" : string.Empty; } }
+    string StrWriteAnnotations   {  get { return Flags.HasFlag(YtFlag.WriteAnnotations) ? $" --write-annotations" : string.Empty; } }
     // playlist
-    string StrPlaylist { get { return Flags.HasFlag(YtFlag.GetPlaylist) ? " --yes-playlist" : " --no-playlist"; } }
-    string StrFlatPlaylist { get { return Flags.HasFlag(YtFlag.FlatPlaylist) ? " --flat-playlist" : string.Empty; } }
+    string StrPlaylist           { get { return Flags.HasFlag(YtFlag.GetPlaylist) ? " --yes-playlist" : " --no-playlist"; } }
+    string StrFlatPlaylist       { get { return Flags.HasFlag(YtFlag.FlatPlaylist) ? " --flat-playlist" : string.Empty; } }
     // subs
-    string StrEmbedSubs { get { return Flags.HasFlag(YtFlag.EmbedSubs) ? " --embed-subs" : string.Empty; } }
-    string StrSubLang { get { return !string.IsNullOrEmpty(SubLang) ? $" --sub-lang {SubLang}" : string.Empty; } }
-    string StrWriteAutoSub { get { return Flags.HasFlag(YtFlag.WriteAutoSubs) ? " --write-auto-sub" : string.Empty; } }
-    string StrWriteSub { get { return Flags.HasFlag(YtFlag.WriteSubs) ? " --write-sub" : string.Empty; } }
-    
-    public string CommandText { get { return $"{StrIgnoreErrors}{StrContinueUnfinished}{StrVerbose}{StrTargetType}{StrWriteSub}{StrWriteAnnotations}{StrPlaylist}{StrFlatPlaylist}{StrSubLang}{StrWriteAutoSub}{StrEmbedSubs}{StrEmbedThumbnail}{StrAddMetaData}{StrPreferFFmpeg} \"{TargetUri}\""; } }
+    string StrEmbedSubs          { get { return Flags.HasFlag(YtFlag.EmbedSubs) ? " --embed-subs" : string.Empty; } }
+    string StrSubLang            { get { return !string.IsNullOrEmpty(SubLang) ? $" --sub-lang {SubLang}" : string.Empty; } }
+    string StrWriteAutoSub       { get { return Flags.HasFlag(YtFlag.WriteAutoSubs) ? " --write-auto-sub" : string.Empty; } }
+    string StrWriteSub           { get { return Flags.HasFlag(YtFlag.WriteSubs) ? " --write-sub" : string.Empty; } }
+    // extract audio (missing)
+    // string StrMaxDownloads { get { return Flags.HasFlag(YtFlag.WriteSubs) ? " --write-sub" : string.Empty; } }
+    public string CombinedVar    {
+      get {
+        var part1 = string.Empty;
+        if (StrContinueUnfinished.Contains("--no"))
+        {
+          part1 = $"{StrIgnoreErrors}{StrSimulate}{StrVerbose}".Replace("-", string.Empty).Replace(" ", string.Empty);
+          return $"-{part1}{StrTargetType}{StrContinueUnfinished}";
+
+        }
+        part1 = $"{StrIgnoreErrors}{StrContinueUnfinished}{StrSimulate}{StrVerbose}".Replace("-", string.Empty).Replace(" ", string.Empty);
+        return $"-{part1}{StrTargetType}";
+      }
+    }
+    public string CommandText    { get { return $"{CombinedVar}{StrWriteSub}{StrWriteAnnotations}{StrPlaylist}{StrFlatPlaylist}{StrSubLang}{StrWriteAutoSub}{StrEmbedSubs}{StrEmbedThumbnail}{StrAddMetaData}{StrPreferFFmpeg} \"{TargetUri}\""; } }
     
     ProcessStartInfo NewStartInfo {
       get {

@@ -73,9 +73,10 @@ namespace YouTubeDownloadUtil
     
     void UI_WorkerThread_DataHandler(string data, bool isError, YoutubeDownloader obj)
     {
+      var iserrorstr = isError ? "2>" : "1>";
       if (!isError) UI_WorkerThread_DataFilter(data, obj);
       OutputData.Add(data);
-      richTextBox1.AppendText($"{data}\n");
+      richTextBox1.AppendText($"{iserrorstr} {data}\n");
     }
     
     void UI_WorkerProcess_Pre(YoutubeDownloader obj)

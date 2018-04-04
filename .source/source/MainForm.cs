@@ -36,7 +36,7 @@ namespace YouTubeDownloadUtil
 
     private void UI_WorkerProcess_Abort(object sender, EventArgs e)
     {
-      downloader.Abort("User canceled\n<WARNING> Incomplete files likely remain\n");
+      downloader.Abort(ResourceStrings.msgUserAbort);
     }
 
     public MainForm()
@@ -45,13 +45,14 @@ namespace YouTubeDownloadUtil
 
       btnAbortProcess.MouseDown += Event_ButtonShowContext;
       textBox1.TextChanged += TextBox1TextChanged;
-      
+      textMaxDownloads.Text = ConfigModel.Instance.MaxDownloads;
+
       UpdateEnvironmentPath();
 
       Actions.COutputSplash(this);
       
       FormClosing += (object sender, FormClosingEventArgs e) => ConfigModel.Instance.Save();
-      
+      textMaxDownloads.TextChanged += (a,b) => ConfigModel.Instance.MaxDownloads = textMaxDownloads.Text;
       CreateToolStrip();
       
       this.ApplyDragDropMethod(

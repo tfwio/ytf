@@ -208,6 +208,24 @@ namespace YouTubeDownloadUtil {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Extract Audio.
+        /// </summary>
+        internal static string mExtractAudio {
+            get {
+                return ResourceManager.GetString("mExtractAudio", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Convert video files to audio-only files (requires ffmpeg or avconv and ffprobe or avprobe).
+        /// </summary>
+        internal static string mExtractAudioTip {
+            get {
+                return ResourceManager.GetString("mExtractAudioTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Flat Playlist.
         /// </summary>
         internal static string mFlatPlaylist {
@@ -249,6 +267,25 @@ namespace YouTubeDownloadUtil {
         internal static string mIgnoreErrorsTip {
             get {
                 return ResourceManager.GetString("mIgnoreErrorsTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Maximum Number of Downloads.
+        /// </summary>
+        internal static string mMaxDownloads {
+            get {
+                return ResourceManager.GetString("mMaxDownloads", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Abort after downloading NUMBER files
+        ///[Where NUMBER is set by changing the value in the tool-strip below the &apos;address-bar&apos; in the application].
+        /// </summary>
+        internal static string mMaxDownloadsTip {
+            get {
+                return ResourceManager.GetString("mMaxDownloadsTip", resourceCulture);
             }
         }
         
@@ -343,11 +380,40 @@ namespace YouTubeDownloadUtil {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to User canceled
+        ///&lt;WARNING&gt; Incomplete files likely remain
+        ///.
+        /// </summary>
+        internal static string msgUserAbort {
+            get {
+                return ResourceManager.GetString("msgUserAbort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Target: Shell-Folder.
         /// </summary>
         internal static string mShellFolders {
             get {
                 return ResourceManager.GetString("mShellFolders", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Simulate.
+        /// </summary>
+        internal static string mSimulate {
+            get {
+                return ResourceManager.GetString("mSimulate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Do not download the video and do not write anything to disk.
+        /// </summary>
+        internal static string mSimulateTip {
+            get {
+                return ResourceManager.GetString("mSimulateTip", resourceCulture);
             }
         }
         
