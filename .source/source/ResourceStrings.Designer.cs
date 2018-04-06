@@ -79,6 +79,15 @@ namespace YouTubeDownloadUtil {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to YouTubeDownloadUtil.HTML_Renderer.Source.HtmlRenderer.Core.Utils.
+        /// </summary>
+        internal static string EmbeddedResNamespace {
+            get {
+                return ResourceManager.GetString("EmbeddedResNamespace", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to /e,/select,&quot;$path$&quot;.
         /// </summary>
         internal static string ExploreToFile {

@@ -233,8 +233,12 @@
       <LastGenOutput>ResourceStrings.Designer.cs</LastGenOutput>
       <CustomToolNamespace>YouTubeDownloadUtil</CustomToolNamespace>
     </EmbeddedResource>
-    <None Include="HTML-Renderer\Source\HtmlRenderer\Core\Utils\ImageError.png" />
-    <None Include="HTML-Renderer\Source\HtmlRenderer\Core\Utils\ImageLoad.png" />
+    <EmbeddedResource Include="HTML-Renderer\Source\HtmlRenderer\Core\Utils\ImageError.png">
+      <CustomToolNamespace>TheArtOfDev.HtmlRenderer.Core.Utils</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HTML-Renderer\Source\HtmlRenderer\Core\Utils\ImageLoad.png">
+      <CustomToolNamespace>TheArtOfDev.HtmlRenderer.Core.Utils</CustomToolNamespace>
+    </EmbeddedResource>
     <None Include="HTML-Renderer\Source\HtmlRenderer\HtmlRenderer.csproj">
       <SubType>Designer</SubType>
     </None>

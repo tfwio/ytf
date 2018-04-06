@@ -1,6 +1,7 @@
  Source/HtmlRenderer.WinForms/HtmlPanel.cs          | 1564 ++++++++++----------
  .../HtmlRenderer.WinForms.csproj                   |   93 +-
  .../HtmlRenderer.WinForms.snk                      |  Bin 0 -> 596 bytes
+ Source/HtmlRenderer/Adapters/RAdapter.cs           |    4 +-
  Source/HtmlRenderer/Core/Dom/CssBox.cs             |    2 +-
  Source/HtmlRenderer/Core/Dom/CssBoxProperties.cs   |    2 +-
  Source/HtmlRenderer/Core/Dom/CssLineBox.cs         |    2 +-
@@ -13,7 +14,7 @@
  Source/HtmlRenderer/HtmlRenderer.csproj            |   73 +-
  Source/HtmlRenderer/HtmlRenderer.sln               |   18 +
  Source/HtmlRenderer/HtmlRenderer.snk               |  Bin 0 -> 596 bytes
- 15 files changed, 1740 insertions(+), 1587 deletions(-)
+ 16 files changed, 1742 insertions(+), 1589 deletions(-)
 
 diff --git a/Source/HtmlRenderer.WinForms/HtmlPanel.cs b/Source/HtmlRenderer.WinForms/HtmlPanel.cs
 index ce94b0e..ef7c0f5 100644
@@ -1820,6 +1821,28 @@ diff --git a/Source/HtmlRenderer.WinForms/HtmlRenderer.WinForms.snk b/Source/Htm
 new file mode 100644
 index 0000000..9d4b135
 Binary files /dev/null and b/Source/HtmlRenderer.WinForms/HtmlRenderer.WinForms.snk differ
+diff --git a/Source/HtmlRenderer/Adapters/RAdapter.cs b/Source/HtmlRenderer/Adapters/RAdapter.cs
+index 6b13459..ca85827 100644
+--- a/Source/HtmlRenderer/Adapters/RAdapter.cs
++++ b/Source/HtmlRenderer/Adapters/RAdapter.cs
+@@ -213,7 +213,7 @@ public RImage GetLoadingImage()
+         {
+             if (_loadImage == null)
+             {
+-                var stream = typeof(HtmlRendererUtils).Assembly.GetManifestResourceStream("TheArtOfDev.HtmlRenderer.Core.Utils.ImageLoad.png");
++                var stream = typeof(HtmlRendererUtils).Assembly.GetManifestResourceStream($"{YouTubeDownloadUtil.ResourceStrings.EmbeddedResNamespace}.ImageLoad.png");
+                 if (stream != null)
+                     _loadImage = ImageFromStream(stream);
+             }
+@@ -227,7 +227,7 @@ public RImage GetLoadingFailedImage()
+         {
+             if (_errorImage == null)
+             {
+-                var stream = typeof(HtmlRendererUtils).Assembly.GetManifestResourceStream("TheArtOfDev.HtmlRenderer.Core.Utils.ImageError.png");
++                var stream = typeof(HtmlRendererUtils).Assembly.GetManifestResourceStream($"{YouTubeDownloadUtil.ResourceStrings.EmbeddedResNamespace}.ImageError.png");
+                 if (stream != null)
+                     _errorImage = ImageFromStream(stream);
+             }
 diff --git a/Source/HtmlRenderer/Core/Dom/CssBox.cs b/Source/HtmlRenderer/Core/Dom/CssBox.cs
 index b2cd3d9..dee243c 100644
 --- a/Source/HtmlRenderer/Core/Dom/CssBox.cs

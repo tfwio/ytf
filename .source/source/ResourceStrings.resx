@@ -283,4 +283,7 @@ By default, youtube-dl will resume downloads if possible.</value>
   <data name="mSimulateTip" xml:space="preserve">
     <value>Do not download the video and do not write anything to disk</value>
   </data>
+  <data name="EmbeddedResNamespace" xml:space="preserve">
+    <value>YouTubeDownloadUtil.HTML_Renderer.Source.HtmlRenderer.Core.Utils</value>
+  </data>
 </root>
