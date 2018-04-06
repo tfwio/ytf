@@ -1728,14 +1728,16 @@ b6010101b7090909090909090909090909092e0101015409090909090909090909090909090909
 \pard\li720\sa200\b\fs28 LINKS\b0\par
 \fs24 youtube-dl uses a small handful of tools to help when it comes to adding meta-data (title, album, cover-art, etc...) to the media it downloads while also many audio formats from the wild can use some fine-tuning every now and again in which case FFmpeg and/or (libAV) will become quite useful.\fs28\par
 \b\fs24 seven-zip\par
-\pard\li1080\sa200\b0 There are quite a few versions of 7z that you can install if you haven't already.\par
-{\field{\*\fldinst{HYPERLINK "https://www.7-zip.org/download.html"}}{\fldrslt{\ul\cf3 https://www.7-zip.org/download.html}}}\f0\fs24\line\line the version (2018.03.26.1) above was current when \i this\i0  program was authored.\par
-\pard\li720\sa200\b youtube-dl\b0\par
-\pard\li1080\sa200\cf0{\field{\*\fldinst{HYPERLINK "https://github.com/rg3/youtube-dl/releases"}}{\fldrslt{\ul\cf3 https://github.com/rg3/youtube-dl/releases}}}\cf1\f0\fs24\line\cf0 youtube-dl.exe\cf1\line\line the version (2018.03.26.1) above was current when \i this\i0  program was authored.\par
+\pard\li1080\sa200\b0 There are quite a few versions of 7z that you can install if you haven't already, none of which are actually leveraged by this application.  The reason this is here is so that I can eventually automate downloading a zip or 7z archive and extract it with this tool (from the UI, of course).\par
+\cf0{\field{\*\fldinst{HYPERLINK "https://www.7-zip.org/download.html"}}{\fldrslt{\ul\cf3 https://www.7-zip.org/download.html}}}\cf1\f0\fs24\par
+the version (2018.03.26.1) above was current when \i this\i0  program was authored.\par
+\pard\li720\sa200\b youtube-dl\par
+\pard\li1080\sa200\b0 I doubt explanation is needed.\line Please visit the youtube-dl web-page(s) for info.\par
+\cf0{\field{\*\fldinst{HYPERLINK "https://github.com/rg3/youtube-dl/releases"}}{\fldrslt{\ul\cf3 https://github.com/rg3/youtube-dl/releases}}}\cf1\f0\fs24\line\cf0 youtube-dl.exe\cf1\line\line the version (2018.03.26.1) above was current when \i this\i0  program was authored.\par
 \pard\li720\sa200\b libav / avconv\b0\par
-For whatever reason(s) libav, is the reccomended youtube-dl helper that\par
+For whatever reason(s) libav, is the default youtube-dl helper if you have both avconv and FFmpeg on your path.  I've noticed that it breaks down when writing vtt subtitles to mp4 files, so tend to use FFmpeg as the default (with a command-line argument).\par
 \pard\li1080\sa200\cf0{\field{\*\fldinst{HYPERLINK "http://builds.libav.org/windows/release-lgpl/"}}{\fldrslt{\ul\cf3 http://builds.libav.org/windows/release-lgpl/}}}\cf1\f0\fs28\line\fs24\line It may seem daunting when you see the many available builds for libav, though simple enough to just choose the most recent release version.\par
-{\field{\*\fldinst{HYPERLINK "http://builds.libav.org/windows/nightly-lgpl/"}}{\fldrslt{\ul\cf3 http://builds.libav.org/windows/nightly-lgpl/}}}\f0\fs24\par
+\cf0{\field{\*\fldinst{HYPERLINK "http://builds.libav.org/windows/nightly-lgpl/"}}{\fldrslt{\ul\cf3 http://builds.libav.org/windows/nightly-lgpl/}}}\cf1\f0\fs24\par
 Alternatively, you can download a nightly version, as above just find the most recent one on the page.\par
 \pard\li720\sa200\b FFmpeg\b0\par
 \pard\li1080\sa200\cf0{\field{\*\fldinst{HYPERLINK "https://ffmpeg.zeranoe.com/builds/"}}{\fldrslt{\ul\cf3 https://ffmpeg.zeranoe.com/builds/}}}\cf1\f0\fs28\line\fs24\line The version zeranoe.com selects automatically should be the best one for you.\line e.g. the latest version, (auto-selected) 32 or 64 bit, static.\par
@@ -1743,5 +1745,18 @@ Just click the blue "Download Build" button on their site ;)\par
 \pard\li720\sa200\b AtomicParsley\par
 \pard\li1080\sa200\cf0\b0{\field{\*\fldinst{HYPERLINK "https://sourceforge.net/projects/atomicparsley/files/atomicparsley/AtomicParsley%20v0.9.0/"}}{\fldrslt{\ul\cf3 https://sourceforge.net/projects/atomicparsley/files/atomicparsley/AtomicParsley%20v0.9.0/}}}\cf1\f0\fs24\line\line AtomicParsley-win32-0.9.0.zip \emdash  is what we're interested in.\par
 for itunes audio (m4a) and video (mp4).\par
+\pard\li720\sa200\b PhantomJS\par
+\pard\li1080\sa200\b0 If there is a need for PhantomJS, you might want to check your clock and make sure you haven't been drinking too much caffeine.  Nevertheless, PhantomJS might help out when spidering through javascript obfuscated targets, and handy to have on this app's PATH so you don't hit a wall if one of the targets fails due to the dependency.\par
+{\field{\*\fldinst{HYPERLINK "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-windows.zip"}}{\fldrslt{\ul\cf3 https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-windows.zip}}}\f0\fs24\par
+\pard\li720\sa200\b\fs28 OTHER HELPFUL SOFTWARE\par
+\pard\li1080\sa200\fs24 Subtitle Edit\b0  Is a program for windows that may work in other OSs using WINE or such\emdash allows you to edit subtitles and convert between different subtitle file formats with the command-line or via the program's UI.\par
+\b youtube-dl-utility\b0  is released to the public domain with the standard liability disclaimer:\par
+\pard\li720\sa200\b\fs28 COPYRIGHT\par
+\pard\li1080\sa200\fs24 youtube-dl-utility\b0  is released to the public domain with the standard liability disclaimer:\par
+\pard\li1440\sa200 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,\line EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF\line MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.\line IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR\line OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,\line ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR\line OTHER DEALINGS IN THE SOFTWARE.\par
+\pard\li1080\sa200\b youtube-dl\b0  is released to the public domain under \cf0{\field{\*\fldinst{HYPERLINK "https://unlicense.org"}}{\fldrslt{\ul\cf3 https://unlicense.org}}}\cf1\f0\fs24\line with several contributions: \cf0{\field{\*\fldinst{HYPERLINK "https://github.com/rg3/youtube-dl/graphs/contributors"}}{\fldrslt{\ul\cf3 https://github.com/rg3/youtube-dl/graphs/contributors}}}\cf1\f0\fs24\par
+\b Windows7ProgressBar \b0 and Windows7TaskBar control(s) released under a BSD license.\line Copyright \'a9 2005-2009 wyDay\line\cf0{\field{\*\fldinst{HYPERLINK "https://wyday.com/windows-7-progress-bar/"}}{\fldrslt{\ul\cf3 https://wyday.com/windows-7-progress-bar/}}}\cf1\f0\fs24\par
+\pard\li720\sa200\par
+\par
 }
  
