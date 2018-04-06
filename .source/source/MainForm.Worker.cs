@@ -103,6 +103,7 @@ namespace YouTubeDownloadUtil
       statCurrent.Value = 0;
       statTotal.Value = 0;
       statusControls.Visible = true;
+      statCurrent.ShowInTaskbar = true;
     }
 
     void UI_WorkerProcess_Post(YoutubeDownloader obj)
@@ -125,6 +126,7 @@ namespace YouTubeDownloadUtil
       statText.Text = "youtube-dl";
       statCurrent.Value = 0;
       statTotal.Value = 0;
+      statCurrent.ShowInTaskbar = false;
     }
 
   }
