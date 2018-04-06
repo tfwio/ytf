@@ -1,0 +1,3759 @@
+ Source/HtmlRenderer.WinForms/HtmlPanel.cs          | 1564 ++++++++++----------
+ .../HtmlRenderer.WinForms.csproj                   |   93 +-
+ .../HtmlRenderer.WinForms.snk                      |  Bin 0 -> 596 bytes
+ Source/HtmlRenderer/Core/Dom/CssBox.cs             |    2 +-
+ Source/HtmlRenderer/Core/Dom/CssBoxProperties.cs   |    2 +-
+ Source/HtmlRenderer/Core/Dom/CssLineBox.cs         |    2 +-
+ Source/HtmlRenderer/Core/Dom/CssRect.cs            |    2 +-
+ Source/HtmlRenderer/Core/Dom/HtmlTag.cs            |    2 +-
+ .../HtmlRenderer/Core/Handlers/SelectionHandler.cs |    2 +-
+ Source/HtmlRenderer/Core/HtmlContainerInt.cs       |    8 +-
+ Source/HtmlRenderer/Core/Utils/DomUtils.cs         | 1557 +++++++++----------
+ Source/HtmlRenderer/Core/Utils/SubString.cs        |    2 +-
+ Source/HtmlRenderer/HtmlRenderer.csproj            |   73 +-
+ Source/HtmlRenderer/HtmlRenderer.sln               |   18 +
+ Source/HtmlRenderer/HtmlRenderer.snk               |  Bin 0 -> 596 bytes
+ 15 files changed, 1740 insertions(+), 1587 deletions(-)
+
+diff --git a/Source/HtmlRenderer.WinForms/HtmlPanel.cs b/Source/HtmlRenderer.WinForms/HtmlPanel.cs
+index ce94b0e..ef7c0f5 100644
+--- a/Source/HtmlRenderer.WinForms/HtmlPanel.cs
++++ b/Source/HtmlRenderer.WinForms/HtmlPanel.cs
+@@ -23,882 +23,884 @@
+ 
+ namespace TheArtOfDev.HtmlRenderer.WinForms
+ {
++  /// <summary>
++  /// Provides HTML rendering using the text property.<br/>
++  /// WinForms control that will render html content in it's client rectangle.<br/>
++  /// If <see cref="AutoScroll"/> is true and the layout of the html resulted in its content beyond the client bounds
++  /// of the panel it will show scrollbars (horizontal/vertical) allowing to scroll the content.<br/>
++  /// If <see cref="AutoScroll"/> is false html content outside the client bounds will be clipped.<br/>
++  /// The control will handle mouse and keyboard events on it to support html text selection, copy-paste and mouse clicks.<br/>
++  /// <para>
++  /// The major differential to use HtmlPanel or HtmlLabel is size and scrollbars.<br/>
++  /// If the size of the control depends on the html content the HtmlLabel should be used.<br/>
++  /// If the size is set by some kind of layout then HtmlPanel is more suitable, also shows scrollbars if the html contents is larger than the control client rectangle.<br/>
++  /// </para>
++  /// <para>
++  /// <h4>AutoScroll:</h4>
++  /// Allows showing scrollbars if html content is placed outside the visible boundaries of the panel.
++  /// </para>
++  /// <para>
++  /// <h4>LinkClicked event:</h4>
++  /// Raised when the user clicks on a link in the html.<br/>
++  /// Allows canceling the execution of the link.
++  /// </para>
++  /// <para>
++  /// <h4>StylesheetLoad event:</h4>
++  /// Raised when a stylesheet is about to be loaded by file path or URI by link element.<br/>
++  /// This event allows to provide the stylesheet manually or provide new source (file or uri) to load from.<br/>
++  /// If no alternative data is provided the original source will be used.<br/>
++  /// </para>
++  /// <para>
++  /// <h4>ImageLoad event:</h4>
++  /// Raised when an image is about to be loaded by file path or URI.<br/>
++  /// This event allows to provide the image manually, if not handled the image will be loaded from file or download from URI.
++  /// </para>
++  /// <para>
++  /// <h4>RenderError event:</h4>
++  /// Raised when an error occurred during html rendering.<br/>
++  /// </para>
++  /// </summary>
++  public class HtmlPanel : ScrollableControl
++  {
++    #region Fields and Consts
++
++    /// <summary>
++    /// Underline html container instance.
++    /// </summary>
++    protected HtmlContainer _htmlContainer;
++    public TheArtOfDev.HtmlRenderer.Core.Dom.CssBox DOM_ROOT { get { return _htmlContainer.HtmlContainerInt.Root; } }
++    public HtmlContainer DOM { get { return _htmlContainer; } }
++
++    /// <summary>
++    /// The current border style of the control
++    /// </summary>
++    protected BorderStyle _borderStyle;
++
++    /// <summary>
++    /// the raw base stylesheet data used in the control
++    /// </summary>
++    protected string _baseRawCssData;
++
++    /// <summary>
++    /// the base stylesheet data used in the control
++    /// </summary>
++    protected CssData _baseCssData;
++
++    /// <summary>
++    /// the current html text set in the control
++    /// </summary>
++    protected string _text;
++
++    /// <summary>
++    /// If to use cursors defined by the operating system or .NET cursors
++    /// </summary>
++    protected bool _useSystemCursors;
++
++    /// <summary>
++    /// The text rendering hint to be used for text rendering.
++    /// </summary>
++    protected TextRenderingHint _textRenderingHint = TextRenderingHint.SystemDefault;
++
++    /// <summary>
++    /// The last position of the scrollbars to know if it has changed to update mouse
++    /// </summary>
++    protected Point _lastScrollOffset;
++
++    #endregion
++
++
++    /// <summary>
++    /// Creates a new HtmlPanel and sets a basic css for it's styling.
++    /// </summary>
++    public HtmlPanel()
++    {
++      AutoScroll = true;
++      BackColor = SystemColors.Window;
++      DoubleBuffered = true;
++      SetStyle(ControlStyles.ResizeRedraw, true);
++      SetStyle(ControlStyles.SupportsTransparentBackColor, true);
++
++      _htmlContainer = new HtmlContainer();
++      _htmlContainer.LoadComplete += OnLoadComplete;
++      _htmlContainer.LinkClicked += OnLinkClicked;
++      _htmlContainer.RenderError += OnRenderError;
++      _htmlContainer.Refresh += OnRefresh;
++      _htmlContainer.ScrollChange += OnScrollChange;
++      _htmlContainer.StylesheetLoad += OnStylesheetLoad;
++      _htmlContainer.ImageLoad += OnImageLoad;
++    }
++
++    /// <summary>
++    ///   Raised when the BorderStyle property value changes.
++    /// </summary>
++    [Category("Property Changed")]
++    public event EventHandler BorderStyleChanged;
++
++    /// <summary>
++    /// Raised when the set html document has been fully loaded.<br/>
++    /// Allows manipulation of the html dom, scroll position, etc.
++    /// </summary>
++    public event EventHandler LoadComplete;
++
+     /// <summary>
+-    /// Provides HTML rendering using the text property.<br/>
+-    /// WinForms control that will render html content in it's client rectangle.<br/>
+-    /// If <see cref="AutoScroll"/> is true and the layout of the html resulted in its content beyond the client bounds 
+-    /// of the panel it will show scrollbars (horizontal/vertical) allowing to scroll the content.<br/>
+-    /// If <see cref="AutoScroll"/> is false html content outside the client bounds will be clipped.<br/>
+-    /// The control will handle mouse and keyboard events on it to support html text selection, copy-paste and mouse clicks.<br/>
+-    /// <para>
+-    /// The major differential to use HtmlPanel or HtmlLabel is size and scrollbars.<br/>
+-    /// If the size of the control depends on the html content the HtmlLabel should be used.<br/>
+-    /// If the size is set by some kind of layout then HtmlPanel is more suitable, also shows scrollbars if the html contents is larger than the control client rectangle.<br/>
+-    /// </para>
+-    /// <para>
+-    /// <h4>AutoScroll:</h4>
+-    /// Allows showing scrollbars if html content is placed outside the visible boundaries of the panel.
+-    /// </para>
+-    /// <para>
+-    /// <h4>LinkClicked event:</h4>
+     /// Raised when the user clicks on a link in the html.<br/>
+     /// Allows canceling the execution of the link.
+-    /// </para>
+-    /// <para>
+-    /// <h4>StylesheetLoad event:</h4>
++    /// </summary>
++    public event EventHandler<HtmlLinkClickedEventArgs> LinkClicked;
++
++    /// <summary>
++    /// Raised when an error occurred during html rendering.<br/>
++    /// </summary>
++    public event EventHandler<HtmlRenderErrorEventArgs> RenderError;
++
++    /// <summary>
+     /// Raised when a stylesheet is about to be loaded by file path or URI by link element.<br/>
+     /// This event allows to provide the stylesheet manually or provide new source (file or uri) to load from.<br/>
+     /// If no alternative data is provided the original source will be used.<br/>
+-    /// </para>
+-    /// <para>
+-    /// <h4>ImageLoad event:</h4>
++    /// </summary>
++    public event EventHandler<HtmlStylesheetLoadEventArgs> StylesheetLoad;
++
++    /// <summary>
+     /// Raised when an image is about to be loaded by file path or URI.<br/>
+     /// This event allows to provide the image manually, if not handled the image will be loaded from file or download from URI.
+-    /// </para>
+-    /// <para>
+-    /// <h4>RenderError event:</h4>
+-    /// Raised when an error occurred during html rendering.<br/>
+-    /// </para>
+     /// </summary>
+-    public class HtmlPanel : ScrollableControl
++    public event EventHandler<HtmlImageLoadEventArgs> ImageLoad;
++
++    /// <summary>
++    /// Gets or sets a value indicating if anti-aliasing should be avoided for geometry like backgrounds and borders (default - false).
++    /// </summary>
++    [Category("Behavior")]
++    [DefaultValue(false)]
++    [Description("If anti-aliasing should be avoided for geometry like backgrounds and borders")]
++    public virtual bool AvoidGeometryAntialias
+     {
+-        #region Fields and Consts
++      get { return _htmlContainer.AvoidGeometryAntialias; }
++      set { _htmlContainer.AvoidGeometryAntialias = value; }
++    }
+ 
+-        /// <summary>
+-        /// Underline html container instance.
+-        /// </summary>
+-        protected HtmlContainer _htmlContainer;
++    /// <summary>
++    /// Gets or sets a value indicating if image loading only when visible should be avoided (default - false).<br/>
++    /// True - images are loaded as soon as the html is parsed.<br/>
++    /// False - images that are not visible because of scroll location are not loaded until they are scrolled to.
++    /// </summary>
++    /// <remarks>
++    /// Images late loading improve performance if the page contains image outside the visible scroll area, especially if there is large
++    /// amount of images, as all image loading is delayed (downloading and loading into memory).<br/>
++    /// Late image loading may effect the layout and actual size as image without set size will not have actual size until they are loaded
++    /// resulting in layout change during user scroll.<br/>
++    /// Early image loading may also effect the layout if image without known size above the current scroll location are loaded as they
++    /// will push the html elements down.
++    /// </remarks>
++    [Category("Behavior")]
++    [DefaultValue(false)]
++    [Description("If image loading only when visible should be avoided")]
++    public virtual bool AvoidImagesLateLoading
++    {
++      get { return _htmlContainer.AvoidImagesLateLoading; }
++      set { _htmlContainer.AvoidImagesLateLoading = value; }
++    }
+ 
+-        /// <summary>
+-        /// The current border style of the control
+-        /// </summary>
+-        protected BorderStyle _borderStyle;
++    /// <summary>
++    /// Use GDI+ text rendering to measure/draw text.<br/>
++    /// </summary>
++    /// <remarks>
++    /// <para>
++    /// GDI+ text rendering is less smooth than GDI text rendering but it natively supports alpha channel
++    /// thus allows creating transparent images.
++    /// </para>
++    /// <para>
++    /// While using GDI+ text rendering you can control the text rendering using <see cref="Graphics.TextRenderingHint"/>, note that
++    /// using <see cref="System.Drawing.Text.TextRenderingHint.ClearTypeGridFit"/> doesn't work well with transparent background.
++    /// </para>
++    /// </remarks>
++    [Category("Behavior")]
++    [DefaultValue(false)]
++    [EditorBrowsable(EditorBrowsableState.Always)]
++    [Description("If to use GDI+ text rendering to measure/draw text, false - use GDI")]
++    public bool UseGdiPlusTextRendering
++    {
++      get { return _htmlContainer.UseGdiPlusTextRendering; }
++      set { _htmlContainer.UseGdiPlusTextRendering = value; }
++    }
+ 
+-        /// <summary>
+-        /// the raw base stylesheet data used in the control
+-        /// </summary>
+-        protected string _baseRawCssData;
++    /// <summary>
++    /// The text rendering hint to be used for text rendering.
++    /// </summary>
++    [Category("Behavior")]
++    [EditorBrowsable(EditorBrowsableState.Always)]
++    [DefaultValue(TextRenderingHint.SystemDefault)]
++    [Description("The text rendering hint to be used for text rendering.")]
++    public TextRenderingHint TextRenderingHint
++    {
++      get { return _textRenderingHint; }
++      set { _textRenderingHint = value; }
++    }
+ 
+-        /// <summary>
+-        /// the base stylesheet data used in the control
+-        /// </summary>
+-        protected CssData _baseCssData;
++    /// <summary>
++    /// If to use cursors defined by the operating system or .NET cursors
++    /// </summary>
++    [Category("Behavior")]
++    [EditorBrowsable(EditorBrowsableState.Always)]
++    [DefaultValue(false)]
++    [Description("If to use cursors defined by the operating system or .NET cursors")]
++    public bool UseSystemCursors
++    {
++      get { return _useSystemCursors; }
++      set { _useSystemCursors = value; }
++    }
+ 
+-        /// <summary>
+-        /// the current html text set in the control
+-        /// </summary>
+-        protected string _text;
++    /// <summary>
++    /// Gets or sets the border style.
++    /// </summary>
++    /// <value>The border style.</value>
++    [Category("Appearance")]
++    [DefaultValue(typeof(BorderStyle), "None")]
++    public virtual BorderStyle BorderStyle
++    {
++      get { return _borderStyle; }
++      set
++      {
++        if (BorderStyle != value)
++        {
++          _borderStyle = value;
++          OnBorderStyleChanged(EventArgs.Empty);
++        }
++      }
++    }
+ 
+-        /// <summary>
+-        /// If to use cursors defined by the operating system or .NET cursors
+-        /// </summary>
+-        protected bool _useSystemCursors;
++    /// <summary>
++    /// Is content selection is enabled for the rendered html (default - true).<br/>
++    /// If set to 'false' the rendered html will be static only with ability to click on links.
++    /// </summary>
++    [Browsable(true)]
++    [DefaultValue(true)]
++    [Category("Behavior")]
++    [EditorBrowsable(EditorBrowsableState.Always)]
++    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
++    [Description("Is content selection is enabled for the rendered html.")]
++    public virtual bool IsSelectionEnabled
++    {
++      get { return _htmlContainer.IsSelectionEnabled; }
++      set { _htmlContainer.IsSelectionEnabled = value; }
++    }
+ 
+-        /// <summary>
+-        /// The text rendering hint to be used for text rendering.
+-        /// </summary>
+-        protected TextRenderingHint _textRenderingHint = TextRenderingHint.SystemDefault;
++    /// <summary>
++    /// Is the build-in context menu enabled and will be shown on mouse right click (default - true)
++    /// </summary>
++    [Browsable(true)]
++    [DefaultValue(true)]
++    [Category("Behavior")]
++    [EditorBrowsable(EditorBrowsableState.Always)]
++    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
++    [Description("Is the build-in context menu enabled and will be shown on mouse right click.")]
++    public virtual bool IsContextMenuEnabled
++    {
++      get { return _htmlContainer.IsContextMenuEnabled; }
++      set { _htmlContainer.IsContextMenuEnabled = value; }
++    }
+ 
+-        /// <summary>
+-        /// The last position of the scrollbars to know if it has changed to update mouse
+-        /// </summary>
+-        protected Point _lastScrollOffset;
++    /// <summary>
++    /// Set base stylesheet to be used by html rendered in the panel.
++    /// </summary>
++    [Browsable(true)]
++    [Category("Appearance")]
++    [Description("Set base stylesheet to be used by html rendered in the control.")]
++    [Editor("System.ComponentModel.Design.MultilineStringEditor, System.Design, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", "System.Drawing.Design.UITypeEditor, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a")]
++    public virtual string BaseStylesheet
++    {
++      get { return _baseRawCssData; }
++      set
++      {
++        _baseRawCssData = value;
++        _baseCssData = HtmlRender.ParseStyleSheet(value);
++        _htmlContainer.SetHtml(_text, _baseCssData);
++      }
++    }
+ 
+-        #endregion
++    /// <summary>
++    /// Gets or sets a value indicating whether the container enables the user to scroll to any controls placed outside of its visible boundaries.
++    /// </summary>
++    [Browsable(true)]
++    [Description("Sets a value indicating whether the container enables the user to scroll to any controls placed outside of its visible boundaries.")]
++    public override bool AutoScroll
++    {
++      get { return base.AutoScroll; }
++      set { base.AutoScroll = value; }
++    }
+ 
++    /// <summary>
++    /// Gets or sets the text of this panel
++    /// </summary>
++    [Browsable(true)]
++    [Description("Sets the html of this control.")]
++    public override string Text
++    {
++      get { return _text; }
++      set
++      {
++        _text = value;
++        base.Text = value;
++        if (!IsDisposed)
++        {
++          VerticalScroll.Value = VerticalScroll.Minimum;
++          _htmlContainer.SetHtml(_text, _baseCssData);
++          PerformLayout();
++          Invalidate();
++          InvokeMouseMove();
++        }
++      }
++    }
+ 
+-        /// <summary>
+-        /// Creates a new HtmlPanel and sets a basic css for it's styling.
+-        /// </summary>
+-        public HtmlPanel()
+-        {
+-            AutoScroll = true;
+-            BackColor = SystemColors.Window;
+-            DoubleBuffered = true;
+-            SetStyle(ControlStyles.ResizeRedraw, true);
+-            SetStyle(ControlStyles.SupportsTransparentBackColor, true);
+-
+-            _htmlContainer = new HtmlContainer();
+-            _htmlContainer.LoadComplete += OnLoadComplete;
+-            _htmlContainer.LinkClicked += OnLinkClicked;
+-            _htmlContainer.RenderError += OnRenderError;
+-            _htmlContainer.Refresh += OnRefresh;
+-            _htmlContainer.ScrollChange += OnScrollChange;
+-            _htmlContainer.StylesheetLoad += OnStylesheetLoad;
+-            _htmlContainer.ImageLoad += OnImageLoad;
+-        }
++    /// <summary>
++    /// Get the currently selected text segment in the html.
++    /// </summary>
++    [Browsable(false)]
++    public virtual string SelectedText
++    {
++      get { return _htmlContainer.SelectedText; }
++    }
+ 
+-        /// <summary>
+-        ///   Raised when the BorderStyle property value changes.
+-        /// </summary>
+-        [Category("Property Changed")]
+-        public event EventHandler BorderStyleChanged;
+-
+-        /// <summary>
+-        /// Raised when the set html document has been fully loaded.<br/>
+-        /// Allows manipulation of the html dom, scroll position, etc.
+-        /// </summary>
+-        public event EventHandler LoadComplete;
+-
+-        /// <summary>
+-        /// Raised when the user clicks on a link in the html.<br/>
+-        /// Allows canceling the execution of the link.
+-        /// </summary>
+-        public event EventHandler<HtmlLinkClickedEventArgs> LinkClicked;
+-
+-        /// <summary>
+-        /// Raised when an error occurred during html rendering.<br/>
+-        /// </summary>
+-        public event EventHandler<HtmlRenderErrorEventArgs> RenderError;
+-
+-        /// <summary>
+-        /// Raised when a stylesheet is about to be loaded by file path or URI by link element.<br/>
+-        /// This event allows to provide the stylesheet manually or provide new source (file or uri) to load from.<br/>
+-        /// If no alternative data is provided the original source will be used.<br/>
+-        /// </summary>
+-        public event EventHandler<HtmlStylesheetLoadEventArgs> StylesheetLoad;
+-
+-        /// <summary>
+-        /// Raised when an image is about to be loaded by file path or URI.<br/>
+-        /// This event allows to provide the image manually, if not handled the image will be loaded from file or download from URI.
+-        /// </summary>
+-        public event EventHandler<HtmlImageLoadEventArgs> ImageLoad;
+-
+-        /// <summary>
+-        /// Gets or sets a value indicating if anti-aliasing should be avoided for geometry like backgrounds and borders (default - false).
+-        /// </summary>
+-        [Category("Behavior")]
+-        [DefaultValue(false)]
+-        [Description("If anti-aliasing should be avoided for geometry like backgrounds and borders")]
+-        public virtual bool AvoidGeometryAntialias
+-        {
+-            get { return _htmlContainer.AvoidGeometryAntialias; }
+-            set { _htmlContainer.AvoidGeometryAntialias = value; }
+-        }
++    /// <summary>
++    /// Copy the currently selected html segment with style.
++    /// </summary>
++    [Browsable(false)]
++    public virtual string SelectedHtml
++    {
++      get { return _htmlContainer.SelectedHtml; }
++    }
+ 
+-        /// <summary>
+-        /// Gets or sets a value indicating if image loading only when visible should be avoided (default - false).<br/>
+-        /// True - images are loaded as soon as the html is parsed.<br/>
+-        /// False - images that are not visible because of scroll location are not loaded until they are scrolled to.
+-        /// </summary>
+-        /// <remarks>
+-        /// Images late loading improve performance if the page contains image outside the visible scroll area, especially if there is large 
+-        /// amount of images, as all image loading is delayed (downloading and loading into memory).<br/>
+-        /// Late image loading may effect the layout and actual size as image without set size will not have actual size until they are loaded
+-        /// resulting in layout change during user scroll.<br/>
+-        /// Early image loading may also effect the layout if image without known size above the current scroll location are loaded as they
+-        /// will push the html elements down.
+-        /// </remarks>
+-        [Category("Behavior")]
+-        [DefaultValue(false)]
+-        [Description("If image loading only when visible should be avoided")]
+-        public virtual bool AvoidImagesLateLoading
+-        {
+-            get { return _htmlContainer.AvoidImagesLateLoading; }
+-            set { _htmlContainer.AvoidImagesLateLoading = value; }
+-        }
++    /// <summary>
++    /// Get html from the current DOM tree with inline style.
++    /// </summary>
++    /// <returns>generated html</returns>
++    public virtual string GetHtml()
++    {
++      return _htmlContainer != null ? _htmlContainer.GetHtml() : null;
++    }
+ 
+-        /// <summary>
+-        /// Use GDI+ text rendering to measure/draw text.<br/>
+-        /// </summary>
+-        /// <remarks>
+-        /// <para>
+-        /// GDI+ text rendering is less smooth than GDI text rendering but it natively supports alpha channel
+-        /// thus allows creating transparent images.
+-        /// </para>
+-        /// <para>
+-        /// While using GDI+ text rendering you can control the text rendering using <see cref="Graphics.TextRenderingHint"/>, note that
+-        /// using <see cref="System.Drawing.Text.TextRenderingHint.ClearTypeGridFit"/> doesn't work well with transparent background.
+-        /// </para>
+-        /// </remarks>
+-        [Category("Behavior")]
+-        [DefaultValue(false)]
+-        [EditorBrowsable(EditorBrowsableState.Always)]
+-        [Description("If to use GDI+ text rendering to measure/draw text, false - use GDI")]
+-        public bool UseGdiPlusTextRendering
+-        {
+-            get { return _htmlContainer.UseGdiPlusTextRendering; }
+-            set { _htmlContainer.UseGdiPlusTextRendering = value; }
+-        }
++    /// <summary>
++    /// Get the rectangle of html element as calculated by html layout.<br/>
++    /// Element if found by id (id attribute on the html element).<br/>
++    /// Note: to get the screen rectangle you need to adjust by the hosting control.<br/>
++    /// </summary>
++    /// <param name="elementId">the id of the element to get its rectangle</param>
++    /// <returns>the rectangle of the element or null if not found</returns>
++    public virtual RectangleF? GetElementRectangle(string elementId)
++    {
++      return _htmlContainer != null ? _htmlContainer.GetElementRectangle(elementId) : null;
++    }
+ 
+-        /// <summary>
+-        /// The text rendering hint to be used for text rendering.
+-        /// </summary>
+-        [Category("Behavior")]
+-        [EditorBrowsable(EditorBrowsableState.Always)]
+-        [DefaultValue(TextRenderingHint.SystemDefault)]
+-        [Description("The text rendering hint to be used for text rendering.")]
+-        public TextRenderingHint TextRenderingHint
+-        {
+-            get { return _textRenderingHint; }
+-            set { _textRenderingHint = value; }
+-        }
++    /// <summary>
++    /// Adjust the scrollbar of the panel on html element by the given id.<br/>
++    /// The top of the html element rectangle will be at the top of the panel, if there
++    /// is not enough height to scroll to the top the scroll will be at maximum.<br/>
++    /// </summary>
++    /// <param name="elementId">the id of the element to scroll to</param>
++    public virtual void ScrollToElement(string elementId)
++    {
++      ArgChecker.AssertArgNotNullOrEmpty(elementId, "elementId");
+ 
+-        /// <summary>
+-        /// If to use cursors defined by the operating system or .NET cursors
+-        /// </summary>
+-        [Category("Behavior")]
+-        [EditorBrowsable(EditorBrowsableState.Always)]
+-        [DefaultValue(false)]
+-        [Description("If to use cursors defined by the operating system or .NET cursors")]
+-        public bool UseSystemCursors
++      if (_htmlContainer != null)
++      {
++        var rect = _htmlContainer.GetElementRectangle(elementId);
++        if (rect.HasValue)
+         {
+-            get { return _useSystemCursors; }
+-            set { _useSystemCursors = value; }
++          UpdateScroll(Point.Round(rect.Value.Location));
++          _htmlContainer.HandleMouseMove(this, new MouseEventArgs(MouseButtons, 0, MousePosition.X, MousePosition.Y, 0));
+         }
++      }
++    }
+ 
+-        /// <summary>
+-        /// Gets or sets the border style.
+-        /// </summary>
+-        /// <value>The border style.</value>
+-        [Category("Appearance")]
+-        [DefaultValue(typeof(BorderStyle), "None")]
+-        public virtual BorderStyle BorderStyle
+-        {
+-            get { return _borderStyle; }
+-            set
+-            {
+-                if (BorderStyle != value)
+-                {
+-                    _borderStyle = value;
+-                    OnBorderStyleChanged(EventArgs.Empty);
+-                }
+-            }
+-        }
++    /// <summary>
++    /// Clear the current selection.
++    /// </summary>
++    public void ClearSelection()
++    {
++      if (_htmlContainer != null)
++        _htmlContainer.ClearSelection();
++    }
+ 
+-        /// <summary>
+-        /// Is content selection is enabled for the rendered html (default - true).<br/>
+-        /// If set to 'false' the rendered html will be static only with ability to click on links.
+-        /// </summary>
+-        [Browsable(true)]
+-        [DefaultValue(true)]
+-        [Category("Behavior")]
+-        [EditorBrowsable(EditorBrowsableState.Always)]
+-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+-        [Description("Is content selection is enabled for the rendered html.")]
+-        public virtual bool IsSelectionEnabled
+-        {
+-            get { return _htmlContainer.IsSelectionEnabled; }
+-            set { _htmlContainer.IsSelectionEnabled = value; }
+-        }
+ 
+-        /// <summary>
+-        /// Is the build-in context menu enabled and will be shown on mouse right click (default - true)
+-        /// </summary>
+-        [Browsable(true)]
+-        [DefaultValue(true)]
+-        [Category("Behavior")]
+-        [EditorBrowsable(EditorBrowsableState.Always)]
+-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+-        [Description("Is the build-in context menu enabled and will be shown on mouse right click.")]
+-        public virtual bool IsContextMenuEnabled
+-        {
+-            get { return _htmlContainer.IsContextMenuEnabled; }
+-            set { _htmlContainer.IsContextMenuEnabled = value; }
+-        }
++    #region Private methods
+ 
+-        /// <summary>
+-        /// Set base stylesheet to be used by html rendered in the panel.
+-        /// </summary>
+-        [Browsable(true)]
+-        [Category("Appearance")]
+-        [Description("Set base stylesheet to be used by html rendered in the control.")]
+-        [Editor("System.ComponentModel.Design.MultilineStringEditor, System.Design, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", "System.Drawing.Design.UITypeEditor, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a")]
+-        public virtual string BaseStylesheet
+-        {
+-            get { return _baseRawCssData; }
+-            set
+-            {
+-                _baseRawCssData = value;
+-                _baseCssData = HtmlRender.ParseStyleSheet(value);
+-                _htmlContainer.SetHtml(_text, _baseCssData);
+-            }
+-        }
++    #if !MONO
++    /// <summary>
++    /// Override to support border for the control.
++    /// </summary>
++    protected override CreateParams CreateParams
++    {
++      get
++      {
++        CreateParams createParams = base.CreateParams;
+ 
+-        /// <summary>
+-        /// Gets or sets a value indicating whether the container enables the user to scroll to any controls placed outside of its visible boundaries. 
+-        /// </summary>
+-        [Browsable(true)]
+-        [Description("Sets a value indicating whether the container enables the user to scroll to any controls placed outside of its visible boundaries.")]
+-        public override bool AutoScroll
++        switch (_borderStyle)
+         {
+-            get { return base.AutoScroll; }
+-            set { base.AutoScroll = value; }
+-        }
++          case BorderStyle.FixedSingle:
++            createParams.Style |= Win32Utils.WsBorder;
++            break;
+ 
+-        /// <summary>
+-        /// Gets or sets the text of this panel
+-        /// </summary>
+-        [Browsable(true)]
+-        [Description("Sets the html of this control.")]
+-        public override string Text
+-        {
+-            get { return _text; }
+-            set
+-            {
+-                _text = value;
+-                base.Text = value;
+-                if (!IsDisposed)
+-                {
+-                    VerticalScroll.Value = VerticalScroll.Minimum;
+-                    _htmlContainer.SetHtml(_text, _baseCssData);
+-                    PerformLayout();
+-                    Invalidate();
+-                    InvokeMouseMove();
+-                }
+-            }
++          case BorderStyle.Fixed3D:
++            createParams.ExStyle |= Win32Utils.WsExClientEdge;
++            break;
+         }
+ 
+-        /// <summary>
+-        /// Get the currently selected text segment in the html.
+-        /// </summary>
+-        [Browsable(false)]
+-        public virtual string SelectedText
+-        {
+-            get { return _htmlContainer.SelectedText; }
+-        }
++        return createParams;
++      }
++    }
++    #endif
+ 
+-        /// <summary>
+-        /// Copy the currently selected html segment with style.
+-        /// </summary>
+-        [Browsable(false)]
+-        public virtual string SelectedHtml
+-        {
+-            get { return _htmlContainer.SelectedHtml; }
+-        }
++    /// <summary>
++    /// Perform the layout of the html in the control.
++    /// </summary>
++    protected override void OnLayout(LayoutEventArgs levent)
++    {
++      PerformHtmlLayout();
+ 
+-        /// <summary>
+-        /// Get html from the current DOM tree with inline style.
+-        /// </summary>
+-        /// <returns>generated html</returns>
+-        public virtual string GetHtml()
+-        {
+-            return _htmlContainer != null ? _htmlContainer.GetHtml() : null;
+-        }
++      base.OnLayout(levent);
+ 
+-        /// <summary>
+-        /// Get the rectangle of html element as calculated by html layout.<br/>
+-        /// Element if found by id (id attribute on the html element).<br/>
+-        /// Note: to get the screen rectangle you need to adjust by the hosting control.<br/>
+-        /// </summary>
+-        /// <param name="elementId">the id of the element to get its rectangle</param>
+-        /// <returns>the rectangle of the element or null if not found</returns>
+-        public virtual RectangleF? GetElementRectangle(string elementId)
+-        {
+-            return _htmlContainer != null ? _htmlContainer.GetElementRectangle(elementId) : null;
+-        }
++      // to handle if vertical scrollbar is appearing or disappearing
++      if (_htmlContainer != null && Math.Abs(_htmlContainer.MaxSize.Width - ClientSize.Width) > 0.1)
++      {
++        PerformHtmlLayout();
++        base.OnLayout(levent);
++      }
++    }
+ 
+-        /// <summary>
+-        /// Adjust the scrollbar of the panel on html element by the given id.<br/>
+-        /// The top of the html element rectangle will be at the top of the panel, if there
+-        /// is not enough height to scroll to the top the scroll will be at maximum.<br/>
+-        /// </summary>
+-        /// <param name="elementId">the id of the element to scroll to</param>
+-        public virtual void ScrollToElement(string elementId)
+-        {
+-            ArgChecker.AssertArgNotNullOrEmpty(elementId, "elementId");
+-
+-            if (_htmlContainer != null)
+-            {
+-                var rect = _htmlContainer.GetElementRectangle(elementId);
+-                if (rect.HasValue)
+-                {
+-                    UpdateScroll(Point.Round(rect.Value.Location));
+-                    _htmlContainer.HandleMouseMove(this, new MouseEventArgs(MouseButtons, 0, MousePosition.X, MousePosition.Y, 0));
+-                }
+-            }
+-        }
++    /// <summary>
++    /// Perform html container layout by the current panel client size.
++    /// </summary>
++    protected void PerformHtmlLayout()
++    {
++      if (_htmlContainer != null)
++      {
++        _htmlContainer.MaxSize = new SizeF(ClientSize.Width - Padding.Horizontal, 0);
+ 
+-        /// <summary>
+-        /// Clear the current selection.
+-        /// </summary>
+-        public void ClearSelection()
++        Graphics g = Utils.CreateGraphics(this);
++        if (g != null)
+         {
+-            if (_htmlContainer != null)
+-                _htmlContainer.ClearSelection();
++          using (g)
++          {
++            _htmlContainer.PerformLayout(g);
++          }
+         }
+ 
+ 
+-        #region Private methods
+-
+-#if !MONO
+-        /// <summary>
+-        /// Override to support border for the control.
+-        /// </summary>
+-        protected override CreateParams CreateParams
+-        {
+-            get
+-            {
+-                CreateParams createParams = base.CreateParams;
+-
+-                switch (_borderStyle)
+-                {
+-                    case BorderStyle.FixedSingle:
+-                        createParams.Style |= Win32Utils.WsBorder;
+-                        break;
+-
+-                    case BorderStyle.Fixed3D:
+-                        createParams.ExStyle |= Win32Utils.WsExClientEdge;
+-                        break;
+-                }
+-
+-                return createParams;
+-            }
+-        }
+-#endif
+-
+-        /// <summary>
+-        /// Perform the layout of the html in the control.
+-        /// </summary>
+-        protected override void OnLayout(LayoutEventArgs levent)
+-        {
+-            PerformHtmlLayout();
++        AutoScrollMinSize = Size.Round(new SizeF(_htmlContainer.ActualSize.Width + Padding.Horizontal, _htmlContainer.ActualSize.Height));
++      }
++    }
+ 
+-            base.OnLayout(levent);
++    /// <summary>
++    /// Perform paint of the html in the control.
++    /// </summary>
++    protected override void OnPaint(PaintEventArgs e)
++    {
++      base.OnPaint(e);
+ 
+-            // to handle if vertical scrollbar is appearing or disappearing
+-            if (_htmlContainer != null && Math.Abs(_htmlContainer.MaxSize.Width - ClientSize.Width) > 0.1)
+-            {
+-                PerformHtmlLayout();
+-                base.OnLayout(levent);
+-            }
+-        }
++      if (_htmlContainer != null)
++      {
++        e.Graphics.TextRenderingHint = _textRenderingHint;
++        e.Graphics.SetClip(ClientRectangle);
++        _htmlContainer.Location = new PointF(Padding.Left, Padding.Top);
++        _htmlContainer.ScrollOffset = AutoScrollPosition;
++        _htmlContainer.PerformPaint(e.Graphics);
+ 
+-        /// <summary>
+-        /// Perform html container layout by the current panel client size.
+-        /// </summary>
+-        protected void PerformHtmlLayout()
++        if (!_lastScrollOffset.Equals(_htmlContainer.ScrollOffset))
+         {
+-            if (_htmlContainer != null)
+-            {
+-                _htmlContainer.MaxSize = new SizeF(ClientSize.Width - Padding.Horizontal, 0);
+-
+-                Graphics g = Utils.CreateGraphics(this);
+-                if (g != null)
+-                {
+-                    using (g)
+-                    {
+-                        _htmlContainer.PerformLayout(g);
+-                    }
+-                }
+-
+-
+-                AutoScrollMinSize = Size.Round(new SizeF(_htmlContainer.ActualSize.Width + Padding.Horizontal, _htmlContainer.ActualSize.Height));
+-            }
++          _lastScrollOffset = _htmlContainer.ScrollOffset;
++          InvokeMouseMove();
+         }
++      }
++    }
+ 
+-        /// <summary>
+-        /// Perform paint of the html in the control.
+-        /// </summary>
+-        protected override void OnPaint(PaintEventArgs e)
+-        {
+-            base.OnPaint(e);
+-
+-            if (_htmlContainer != null)
+-            {
+-                e.Graphics.TextRenderingHint = _textRenderingHint;
+-                e.Graphics.SetClip(ClientRectangle);
+-                _htmlContainer.Location = new PointF(Padding.Left, Padding.Top);
+-                _htmlContainer.ScrollOffset = AutoScrollPosition;
+-                _htmlContainer.PerformPaint(e.Graphics);
+-
+-                if (!_lastScrollOffset.Equals(_htmlContainer.ScrollOffset))
+-                {
+-                    _lastScrollOffset = _htmlContainer.ScrollOffset;
+-                    InvokeMouseMove();
+-                }
+-            }
+-        }
++    /// <summary>
++    /// Set focus on the control for keyboard scrollbars handling.
++    /// </summary>
++    protected override void OnClick(EventArgs e)
++    {
++      base.OnClick(e);
++      Focus();
++    }
+ 
+-        /// <summary>
+-        /// Set focus on the control for keyboard scrollbars handling.
+-        /// </summary>
+-        protected override void OnClick(EventArgs e)
+-        {
+-            base.OnClick(e);
+-            Focus();
+-        }
++    /// <summary>
++    /// Handle mouse move to handle hover cursor and text selection.
++    /// </summary>
++    protected override void OnMouseMove(MouseEventArgs e)
++    {
++      base.OnMouseMove(e);
++      if (_htmlContainer != null)
++        _htmlContainer.HandleMouseMove(this, e);
++    }
+ 
+-        /// <summary>
+-        /// Handle mouse move to handle hover cursor and text selection. 
+-        /// </summary>
+-        protected override void OnMouseMove(MouseEventArgs e)
+-        {
+-            base.OnMouseMove(e);
+-            if (_htmlContainer != null)
+-                _htmlContainer.HandleMouseMove(this, e);
+-        }
++    /// <summary>
++    /// Handle mouse leave to handle cursor change.
++    /// </summary>
++    protected override void OnMouseLeave(EventArgs e)
++    {
++      base.OnMouseLeave(e);
++      if (_htmlContainer != null)
++        _htmlContainer.HandleMouseLeave(this);
++    }
+ 
+-        /// <summary>
+-        /// Handle mouse leave to handle cursor change.
+-        /// </summary>
+-        protected override void OnMouseLeave(EventArgs e)
+-        {
+-            base.OnMouseLeave(e);
+-            if (_htmlContainer != null)
+-                _htmlContainer.HandleMouseLeave(this);
+-        }
++    /// <summary>
++    /// Handle mouse down to handle selection.
++    /// </summary>
++    protected override void OnMouseDown(MouseEventArgs e)
++    {
++      base.OnMouseDown(e);
++      if (_htmlContainer != null)
++        _htmlContainer.HandleMouseDown(this, e);
++    }
+ 
+-        /// <summary>
+-        /// Handle mouse down to handle selection. 
+-        /// </summary>
+-        protected override void OnMouseDown(MouseEventArgs e)
+-        {
+-            base.OnMouseDown(e);
+-            if (_htmlContainer != null)
+-                _htmlContainer.HandleMouseDown(this, e);
+-        }
++    /// <summary>
++    /// Handle mouse up to handle selection and link click.
++    /// </summary>
++    protected override void OnMouseUp(MouseEventArgs e)
++    {
++      base.OnMouseUp(e);
++      if (_htmlContainer != null)
++        _htmlContainer.HandleMouseUp(this, e);
++    }
+ 
+-        /// <summary>
+-        /// Handle mouse up to handle selection and link click. 
+-        /// </summary>
+-        protected override void OnMouseUp(MouseEventArgs e)
+-        {
+-			base.OnMouseUp(e);
+-            if (_htmlContainer != null)
+-                _htmlContainer.HandleMouseUp(this, e);
+-        }
++    /// <summary>
++    /// Handle mouse double click to select word under the mouse.
++    /// </summary>
++    protected override void OnMouseDoubleClick(MouseEventArgs e)
++    {
++      base.OnMouseDoubleClick(e);
++      if (_htmlContainer != null)
++        _htmlContainer.HandleMouseDoubleClick(this, e);
++    }
+ 
+-        /// <summary>
+-        /// Handle mouse double click to select word under the mouse. 
+-        /// </summary>
+-        protected override void OnMouseDoubleClick(MouseEventArgs e)
+-        {
+-            base.OnMouseDoubleClick(e);
+-            if (_htmlContainer != null)
+-                _htmlContainer.HandleMouseDoubleClick(this, e);
+-        }
++    /// <summary>
++    /// Handle key down event for selection, copy and scrollbars handling.
++    /// </summary>
++    protected override void OnKeyDown(KeyEventArgs e)
++    {
++      base.OnKeyDown(e);
++      if (_htmlContainer != null)
++        _htmlContainer.HandleKeyDown(this, e);
++      if (e.KeyCode == Keys.Up)
++      {
++        VerticalScroll.Value = Math.Max(VerticalScroll.Value - 70, VerticalScroll.Minimum);
++        PerformLayout();
++      }
++      else if (e.KeyCode == Keys.Down)
++      {
++        VerticalScroll.Value = Math.Min(VerticalScroll.Value + 70, VerticalScroll.Maximum);
++        PerformLayout();
++      }
++      else if (e.KeyCode == Keys.PageDown)
++      {
++        VerticalScroll.Value = Math.Min(VerticalScroll.Value + 400, VerticalScroll.Maximum);
++        PerformLayout();
++      }
++      else if (e.KeyCode == Keys.PageUp)
++      {
++        VerticalScroll.Value = Math.Max(VerticalScroll.Value - 400, VerticalScroll.Minimum);
++        PerformLayout();
++      }
++      else if (e.KeyCode == Keys.End)
++      {
++        VerticalScroll.Value = VerticalScroll.Maximum;
++        PerformLayout();
++      }
++      else if (e.KeyCode == Keys.Home)
++      {
++        VerticalScroll.Value = VerticalScroll.Minimum;
++        PerformLayout();
++      }
++    }
+ 
+-        /// <summary>
+-        /// Handle key down event for selection, copy and scrollbars handling.
+-        /// </summary>
+-        protected override void OnKeyDown(KeyEventArgs e)
+-        {
+-            base.OnKeyDown(e);
+-            if (_htmlContainer != null)
+-                _htmlContainer.HandleKeyDown(this, e);
+-            if (e.KeyCode == Keys.Up)
+-            {
+-                VerticalScroll.Value = Math.Max(VerticalScroll.Value - 70, VerticalScroll.Minimum);
+-                PerformLayout();
+-            }
+-            else if (e.KeyCode == Keys.Down)
+-            {
+-                VerticalScroll.Value = Math.Min(VerticalScroll.Value + 70, VerticalScroll.Maximum);
+-                PerformLayout();
+-            }
+-            else if (e.KeyCode == Keys.PageDown)
+-            {
+-                VerticalScroll.Value = Math.Min(VerticalScroll.Value + 400, VerticalScroll.Maximum);
+-                PerformLayout();
+-            }
+-            else if (e.KeyCode == Keys.PageUp)
+-            {
+-                VerticalScroll.Value = Math.Max(VerticalScroll.Value - 400, VerticalScroll.Minimum);
+-                PerformLayout();
+-            }
+-            else if (e.KeyCode == Keys.End)
+-            {
+-                VerticalScroll.Value = VerticalScroll.Maximum;
+-                PerformLayout();
+-            }
+-            else if (e.KeyCode == Keys.Home)
+-            {
+-                VerticalScroll.Value = VerticalScroll.Minimum;
+-                PerformLayout();
+-            }
+-        }
++    /// <summary>
++    ///   Raises the <see cref="BorderStyleChanged" /> event.
++    /// </summary>
++    protected virtual void OnBorderStyleChanged(EventArgs e)
++    {
++      UpdateStyles();
+ 
+-        /// <summary>
+-        ///   Raises the <see cref="BorderStyleChanged" /> event.
+-        /// </summary>
+-        protected virtual void OnBorderStyleChanged(EventArgs e)
+-        {
+-            UpdateStyles();
++      var handler = BorderStyleChanged;
++      if (handler != null)
++      {
++        handler(this, e);
++      }
++    }
+ 
+-            var handler = BorderStyleChanged;
+-            if (handler != null)
+-            {
+-                handler(this, e);
+-            }
+-        }
++    /// <summary>
++    /// Propagate the LoadComplete event from root container.
++    /// </summary>
++    protected virtual void OnLoadComplete(EventArgs e)
++    {
++      var handler = LoadComplete;
++      if (handler != null)
++        handler(this, e);
++    }
+ 
+-        /// <summary>
+-        /// Propagate the LoadComplete event from root container.
+-        /// </summary>
+-        protected virtual void OnLoadComplete(EventArgs e)
+-        {
+-            var handler = LoadComplete;
+-            if (handler != null)
+-                handler(this, e);
+-        }
++    /// <summary>
++    /// Propagate the LinkClicked event from root container.
++    /// </summary>
++    protected virtual void OnLinkClicked(HtmlLinkClickedEventArgs e)
++    {
++      var handler = LinkClicked;
++      if (handler != null)
++        handler(this, e);
++    }
+ 
+-        /// <summary>
+-        /// Propagate the LinkClicked event from root container.
+-        /// </summary>
+-        protected virtual void OnLinkClicked(HtmlLinkClickedEventArgs e)
+-        {
+-            var handler = LinkClicked;
+-            if (handler != null)
+-                handler(this, e);
+-        }
++    /// <summary>
++    /// Propagate the Render Error event from root container.
++    /// </summary>
++    protected virtual void OnRenderError(HtmlRenderErrorEventArgs e)
++    {
++      var handler = RenderError;
++      if (handler != null)
++        handler(this, e);
++    }
+ 
+-        /// <summary>
+-        /// Propagate the Render Error event from root container.
+-        /// </summary>
+-        protected virtual void OnRenderError(HtmlRenderErrorEventArgs e)
+-        {
+-            var handler = RenderError;
+-            if (handler != null)
+-                handler(this, e);
+-        }
++    /// <summary>
++    /// Propagate the stylesheet load event from root container.
++    /// </summary>
++    protected virtual void OnStylesheetLoad(HtmlStylesheetLoadEventArgs e)
++    {
++      var handler = StylesheetLoad;
++      if (handler != null)
++        handler(this, e);
++    }
+ 
+-        /// <summary>
+-        /// Propagate the stylesheet load event from root container.
+-        /// </summary>
+-        protected virtual void OnStylesheetLoad(HtmlStylesheetLoadEventArgs e)
+-        {
+-            var handler = StylesheetLoad;
+-            if (handler != null)
+-                handler(this, e);
+-        }
++    /// <summary>
++    /// Propagate the image load event from root container.
++    /// </summary>
++    protected virtual void OnImageLoad(HtmlImageLoadEventArgs e)
++    {
++      var handler = ImageLoad;
++      if (handler != null)
++        handler(this, e);
++    }
+ 
+-        /// <summary>
+-        /// Propagate the image load event from root container.
+-        /// </summary>
+-        protected virtual void OnImageLoad(HtmlImageLoadEventArgs e)
+-        {
+-            var handler = ImageLoad;
+-            if (handler != null)
+-                handler(this, e);
+-        }
++    /// <summary>
++    /// Handle html renderer invalidate and re-layout as requested.
++    /// </summary>
++    protected virtual void OnRefresh(HtmlRefreshEventArgs e)
++    {
++      if (e.Layout)
++        PerformLayout();
++      Invalidate();
++    }
+ 
+-        /// <summary>
+-        /// Handle html renderer invalidate and re-layout as requested.
+-        /// </summary>
+-        protected virtual void OnRefresh(HtmlRefreshEventArgs e)
+-        {
+-            if (e.Layout)
+-                PerformLayout();
+-            Invalidate();
+-        }
++    /// <summary>
++    /// On html renderer scroll request adjust the scrolling of the panel to the requested location.
++    /// </summary>
++    protected virtual void OnScrollChange(HtmlScrollEventArgs e)
++    {
++      UpdateScroll(new Point((int)e.X, (int)e.Y));
++    }
+ 
+-        /// <summary>
+-        /// On html renderer scroll request adjust the scrolling of the panel to the requested location.
+-        /// </summary>
+-        protected virtual void OnScrollChange(HtmlScrollEventArgs e)
+-        {
+-            UpdateScroll(new Point((int)e.X, (int)e.Y));
+-        }
++    /// <summary>
++    /// Adjust the scrolling of the panel to the requested location.
++    /// </summary>
++    /// <param name="location">the location to adjust the scroll to</param>
++    protected virtual void UpdateScroll(Point location)
++    {
++      AutoScrollPosition = location;
++      _htmlContainer.ScrollOffset = AutoScrollPosition;
++    }
+ 
+-        /// <summary>
+-        /// Adjust the scrolling of the panel to the requested location.
+-        /// </summary>
+-        /// <param name="location">the location to adjust the scroll to</param>
+-        protected virtual void UpdateScroll(Point location)
+-        {
+-            AutoScrollPosition = location;
+-            _htmlContainer.ScrollOffset = AutoScrollPosition;
+-        }
++    /// <summary>
++    /// call mouse move to handle paint after scroll or html change affecting mouse cursor.
++    /// </summary>
++    protected virtual void InvokeMouseMove()
++    {
++      try
++      {
++        // mono has issue throwing exception for no reason
++        var mp = PointToClient(MousePosition);
++        _htmlContainer.HandleMouseMove(this, new MouseEventArgs(MouseButtons.None, 0, mp.X, mp.Y, 0));
++      }
++      catch
++      {
++        #if !MONO
++        throw;
++        #endif
++      }
++    }
+ 
+-        /// <summary>
+-        /// call mouse move to handle paint after scroll or html change affecting mouse cursor.
+-        /// </summary>
+-        protected virtual void InvokeMouseMove()
+-        {
+-            try
+-            {
+-                // mono has issue throwing exception for no reason
+-                var mp = PointToClient(MousePosition);
+-                _htmlContainer.HandleMouseMove(this, new MouseEventArgs(MouseButtons.None, 0, mp.X, mp.Y, 0));
+-            }
+-            catch
+-            {
+-#if !MONO
+-                throw;
+-#endif
+-            }
+-        }
++    /// <summary>
++    /// Used to add arrow keys to the handled keys in <see cref="OnKeyDown"/>.
++    /// </summary>
++    protected override bool IsInputKey(Keys keyData)
++    {
++      switch (keyData)
++      {
++        case Keys.Right:
++        case Keys.Left:
++        case Keys.Up:
++        case Keys.Down:
++          return true;
++        case Keys.Shift | Keys.Right:
++        case Keys.Shift | Keys.Left:
++        case Keys.Shift | Keys.Up:
++        case Keys.Shift | Keys.Down:
++          return true;
++      }
++      return base.IsInputKey(keyData);
++    }
+ 
+-        /// <summary>
+-        /// Used to add arrow keys to the handled keys in <see cref="OnKeyDown"/>.
+-        /// </summary>
+-        protected override bool IsInputKey(Keys keyData)
++    #if !MONO
++    /// <summary>
++    /// Override the proc processing method to set OS specific hand cursor.
++    /// </summary>
++    /// <param name="m">The Windows <see cref="T:System.Windows.Forms.Message"/> to process. </param>
++    [DebuggerStepThrough]
++    protected override void WndProc(ref Message m)
++    {
++      if (_useSystemCursors && m.Msg == Win32Utils.WmSetCursor && Cursor == Cursors.Hand)
++      {
++        try
+         {
+-            switch (keyData)
+-            {
+-                case Keys.Right:
+-                case Keys.Left:
+-                case Keys.Up:
+-                case Keys.Down:
+-                    return true;
+-                case Keys.Shift | Keys.Right:
+-                case Keys.Shift | Keys.Left:
+-                case Keys.Shift | Keys.Up:
+-                case Keys.Shift | Keys.Down:
+-                    return true;
+-            }
+-            return base.IsInputKey(keyData);
++          // Replace .NET's hand cursor with the OS cursor
++          Win32Utils.SetCursor(Win32Utils.LoadCursor(0, Win32Utils.IdcHand));
++          m.Result = IntPtr.Zero;
++          return;
+         }
+-
+-#if !MONO
+-        /// <summary>
+-        /// Override the proc processing method to set OS specific hand cursor.
+-        /// </summary>
+-        /// <param name="m">The Windows <see cref="T:System.Windows.Forms.Message"/> to process. </param>
+-        [DebuggerStepThrough]
+-        protected override void WndProc(ref Message m)
++        catch (Exception ex)
+         {
+-            if (_useSystemCursors && m.Msg == Win32Utils.WmSetCursor && Cursor == Cursors.Hand)
+-            {
+-                try
+-                {
+-                    // Replace .NET's hand cursor with the OS cursor
+-                    Win32Utils.SetCursor(Win32Utils.LoadCursor(0, Win32Utils.IdcHand));
+-                    m.Result = IntPtr.Zero;
+-                    return;
+-                }
+-                catch (Exception ex)
+-                {
+-                    OnRenderError(this, new HtmlRenderErrorEventArgs(HtmlRenderErrorType.General, "Failed to set OS hand cursor", ex));
+-                }
+-            }
+-            base.WndProc(ref m);
++          OnRenderError(this, new HtmlRenderErrorEventArgs(HtmlRenderErrorType.General, "Failed to set OS hand cursor", ex));
+         }
+-#endif
++      }
++      base.WndProc(ref m);
++    }
++    #endif
+ 
+-        /// <summary>
+-        /// Release the html container resources.
+-        /// </summary>
+-        protected override void Dispose(bool disposing)
+-        {
+-            if (_htmlContainer != null)
+-            {
+-                _htmlContainer.LoadComplete -= OnLoadComplete;
+-                _htmlContainer.LinkClicked -= OnLinkClicked;
+-                _htmlContainer.RenderError -= OnRenderError;
+-                _htmlContainer.Refresh -= OnRefresh;
+-                _htmlContainer.ScrollChange -= OnScrollChange;
+-                _htmlContainer.StylesheetLoad -= OnStylesheetLoad;
+-                _htmlContainer.ImageLoad -= OnImageLoad;
+-                _htmlContainer.Dispose();
+-                _htmlContainer = null;
+-            }
+-            base.Dispose(disposing);
+-        }
++    /// <summary>
++    /// Release the html container resources.
++    /// </summary>
++    protected override void Dispose(bool disposing)
++    {
++      if (_htmlContainer != null)
++      {
++        _htmlContainer.LoadComplete -= OnLoadComplete;
++        _htmlContainer.LinkClicked -= OnLinkClicked;
++        _htmlContainer.RenderError -= OnRenderError;
++        _htmlContainer.Refresh -= OnRefresh;
++        _htmlContainer.ScrollChange -= OnScrollChange;
++        _htmlContainer.StylesheetLoad -= OnStylesheetLoad;
++        _htmlContainer.ImageLoad -= OnImageLoad;
++        _htmlContainer.Dispose();
++        _htmlContainer = null;
++      }
++      base.Dispose(disposing);
++    }
+ 
+ 
+-        #region Private event handlers
++    #region Private event handlers
+ 
+-        private void OnLoadComplete(object sender, EventArgs e)
+-        {
+-            OnLoadComplete(e);
+-        }
++    private void OnLoadComplete(object sender, EventArgs e)
++    {
++      OnLoadComplete(e);
++    }
+ 
+-        private void OnLinkClicked(object sender, HtmlLinkClickedEventArgs e)
+-        {
+-            OnLinkClicked(e);
+-        }
++    private void OnLinkClicked(object sender, HtmlLinkClickedEventArgs e)
++    {
++      OnLinkClicked(e);
++    }
+ 
+-        private void OnRenderError(object sender, HtmlRenderErrorEventArgs e)
+-        {
+-            if (InvokeRequired)
+-                Invoke(new MethodInvoker(() => OnRenderError(e)));
+-            else
+-                OnRenderError(e);
+-        }
++    private void OnRenderError(object sender, HtmlRenderErrorEventArgs e)
++    {
++      if (InvokeRequired)
++        Invoke(new MethodInvoker(() => OnRenderError(e)));
++      else
++        OnRenderError(e);
++    }
+ 
+-        private void OnStylesheetLoad(object sender, HtmlStylesheetLoadEventArgs e)
+-        {
+-            OnStylesheetLoad(e);
+-        }
++    private void OnStylesheetLoad(object sender, HtmlStylesheetLoadEventArgs e)
++    {
++      OnStylesheetLoad(e);
++    }
+ 
+-        private void OnImageLoad(object sender, HtmlImageLoadEventArgs e)
+-        {
+-            OnImageLoad(e);
+-        }
++    private void OnImageLoad(object sender, HtmlImageLoadEventArgs e)
++    {
++      OnImageLoad(e);
++    }
+ 
+-        private void OnRefresh(object sender, HtmlRefreshEventArgs e)
+-        {
+-            if (InvokeRequired)
+-                Invoke(new MethodInvoker(() => OnRefresh(e)));
+-            else
+-                OnRefresh(e);
+-        }
++    private void OnRefresh(object sender, HtmlRefreshEventArgs e)
++    {
++      if (InvokeRequired)
++        Invoke(new MethodInvoker(() => OnRefresh(e)));
++      else
++        OnRefresh(e);
++    }
+ 
+-        private void OnScrollChange(object sender, HtmlScrollEventArgs e)
+-        {
+-            OnScrollChange(e);
+-        }
++    private void OnScrollChange(object sender, HtmlScrollEventArgs e)
++    {
++      OnScrollChange(e);
++    }
+ 
+-        #endregion
++    #endregion
+ 
+ 
+-        #region Hide not relevant properties from designer
++    #region Hide not relevant properties from designer
+ 
+-        /// <summary>
+-        /// Not applicable.
+-        /// </summary>
+-        [Browsable(false)]
+-        public override Font Font
+-        {
+-            get { return base.Font; }
+-            set { base.Font = value; }
+-        }
++    /// <summary>
++    /// Not applicable.
++    /// </summary>
++    [Browsable(false)]
++    public override Font Font
++    {
++      get { return base.Font; }
++      set { base.Font = value; }
++    }
+ 
+-        /// <summary>
+-        /// Not applicable.
+-        /// </summary>
+-        [Browsable(false)]
+-        public override Color ForeColor
+-        {
+-            get { return base.ForeColor; }
+-            set { base.ForeColor = value; }
+-        }
++    /// <summary>
++    /// Not applicable.
++    /// </summary>
++    [Browsable(false)]
++    public override Color ForeColor
++    {
++      get { return base.ForeColor; }
++      set { base.ForeColor = value; }
++    }
+ 
+-        /// <summary>
+-        /// Not applicable.
+-        /// </summary>
+-        [Browsable(false)]
+-        public override bool AllowDrop
+-        {
+-            get { return base.AllowDrop; }
+-            set { base.AllowDrop = value; }
+-        }
++    /// <summary>
++    /// Not applicable.
++    /// </summary>
++    [Browsable(false)]
++    public override bool AllowDrop
++    {
++      get { return base.AllowDrop; }
++      set { base.AllowDrop = value; }
++    }
+ 
+-        /// <summary>
+-        /// Not applicable.
+-        /// </summary>
+-        [Browsable(false)]
+-        public override RightToLeft RightToLeft
+-        {
+-            get { return base.RightToLeft; }
+-            set { base.RightToLeft = value; }
+-        }
++    /// <summary>
++    /// Not applicable.
++    /// </summary>
++    [Browsable(false)]
++    public override RightToLeft RightToLeft
++    {
++      get { return base.RightToLeft; }
++      set { base.RightToLeft = value; }
++    }
+ 
+-        /// <summary>
+-        /// Not applicable.
+-        /// </summary>
+-        [Browsable(false)]
+-        public override Cursor Cursor
+-        {
+-            get { return base.Cursor; }
+-            set { base.Cursor = value; }
+-        }
++    /// <summary>
++    /// Not applicable.
++    /// </summary>
++    [Browsable(false)]
++    public override Cursor Cursor
++    {
++      get { return base.Cursor; }
++      set { base.Cursor = value; }
++    }
+ 
+-        /// <summary>
+-        /// Not applicable.
+-        /// </summary>
+-        [Browsable(false)]
+-        public new bool UseWaitCursor
+-        {
+-            get { return base.UseWaitCursor; }
+-            set { base.UseWaitCursor = value; }
+-        }
++    /// <summary>
++    /// Not applicable.
++    /// </summary>
++    [Browsable(false)]
++    public new bool UseWaitCursor
++    {
++      get { return base.UseWaitCursor; }
++      set { base.UseWaitCursor = value; }
++    }
+ 
+-        #endregion
++    #endregion
+ 
+ 
+-        #endregion
+-    }
++    #endregion
++  }
+ }
+\ No newline at end of file
+diff --git a/Source/HtmlRenderer.WinForms/HtmlRenderer.WinForms.csproj b/Source/HtmlRenderer.WinForms/HtmlRenderer.WinForms.csproj
+index ce1a987..283613b 100644
+--- a/Source/HtmlRenderer.WinForms/HtmlRenderer.WinForms.csproj
++++ b/Source/HtmlRenderer.WinForms/HtmlRenderer.WinForms.csproj
+@@ -10,9 +10,7 @@
+     <AppDesignerFolder>Properties</AppDesignerFolder>
+     <RootNamespace>TheArtOfDev.HtmlRenderer.WinForms</RootNamespace>
+     <AssemblyName>HtmlRenderer.WinForms</AssemblyName>
+-    <StartupObject>
+-    </StartupObject>
+-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
++    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+     <FileUpgradeFlags>
+     </FileUpgradeFlags>
+     <UpgradeBackupLocation>
+@@ -33,32 +31,107 @@
+     <IsWebBootstrapper>false</IsWebBootstrapper>
+     <UseApplicationTrust>false</UseApplicationTrust>
+     <BootstrapperEnabled>true</BootstrapperEnabled>
+-    <TargetFrameworkProfile>
+-    </TargetFrameworkProfile>
++    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
++    <NoWin32Manifest>False</NoWin32Manifest>
++    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
++    <NoStdLib>False</NoStdLib>
++    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
++    <SignAssembly>True</SignAssembly>
++    <AssemblyOriginatorKeyFile>HtmlRenderer.WinForms.snk</AssemblyOriginatorKeyFile>
++    <DelaySign>False</DelaySign>
++    <AssemblyOriginatorKeyMode>File</AssemblyOriginatorKeyMode>
++    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
++    <OutputPath>bin/$(Configuration)/$(Platform)</OutputPath>
+   </PropertyGroup>
+   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+     <DebugSymbols>true</DebugSymbols>
+-    <DebugType>full</DebugType>
+-    <Optimize>false</Optimize>
+-    <OutputPath>bin\DebugNet20\</OutputPath>
++    <DebugType>Full</DebugType>
++    <Optimize>False</Optimize>
+     <DefineConstants>DEBUG;TRACE</DefineConstants>
+     <ErrorReport>prompt</ErrorReport>
+     <WarningLevel>4</WarningLevel>
+-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+   </PropertyGroup>
+   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+     <DebugType>pdbonly</DebugType>
+     <Optimize>true</Optimize>
+-    <OutputPath>bin\ReleaseNet20\</OutputPath>
+     <DefineConstants>TRACE</DefineConstants>
+     <ErrorReport>prompt</ErrorReport>
+     <WarningLevel>4</WarningLevel>
+     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+   </PropertyGroup>
++  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Win32' ">
++    <DebugSymbols>true</DebugSymbols>
++    <DebugType>Full</DebugType>
++    <Optimize>False</Optimize>
++    <DefineConstants>DEBUG;TRACE</DefineConstants>
++    <ErrorReport>prompt</ErrorReport>
++    <WarningLevel>4</WarningLevel>
++    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
++  </PropertyGroup>
++  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|Win32' ">
++    <DebugType>PdbOnly</DebugType>
++    <Optimize>True</Optimize>
++    <DefineConstants>TRACE</DefineConstants>
++    <ErrorReport>prompt</ErrorReport>
++    <WarningLevel>4</WarningLevel>
++    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
++  </PropertyGroup>
++  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Win64' ">
++    <DebugSymbols>true</DebugSymbols>
++    <DebugType>Full</DebugType>
++    <Optimize>False</Optimize>
++    <DefineConstants>DEBUG;TRACE</DefineConstants>
++    <ErrorReport>prompt</ErrorReport>
++    <WarningLevel>4</WarningLevel>
++    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
++  </PropertyGroup>
++  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|Win64' ">
++    <DebugType>PdbOnly</DebugType>
++    <Optimize>True</Optimize>
++    <DefineConstants>TRACE</DefineConstants>
++    <ErrorReport>prompt</ErrorReport>
++    <WarningLevel>4</WarningLevel>
++    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
++  </PropertyGroup>
++  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
++    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
++    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
++  </PropertyGroup>
++  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
++    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
++    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
++  </PropertyGroup>
++  <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
++    <BaseAddress>4194304</BaseAddress>
++    <PlatformTarget>x86</PlatformTarget>
++    <RegisterForComInterop>False</RegisterForComInterop>
++    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
++    <FileAlignment>4096</FileAlignment>
++  </PropertyGroup>
++  <PropertyGroup Condition=" '$(Platform)' == 'Win32' ">
++    <BaseAddress>4194304</BaseAddress>
++    <PlatformTarget>x86</PlatformTarget>
++    <RegisterForComInterop>False</RegisterForComInterop>
++    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
++    <FileAlignment>4096</FileAlignment>
++  </PropertyGroup>
++  <PropertyGroup Condition=" '$(Platform)' == 'Win64' ">
++    <BaseAddress>4194304</BaseAddress>
++    <PlatformTarget>x64</PlatformTarget>
++    <RegisterForComInterop>False</RegisterForComInterop>
++    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
++    <FileAlignment>4096</FileAlignment>
++  </PropertyGroup>
+   <ItemGroup>
+     <Reference Include="System" />
++    <Reference Include="System.Core">
++      <RequiredTargetFramework>3.5</RequiredTargetFramework>
++    </Reference>
+     <Reference Include="System.Data" />
++    <Reference Include="System.Data.DataSetExtensions">
++      <RequiredTargetFramework>3.5</RequiredTargetFramework>
++    </Reference>
+     <Reference Include="System.Drawing" />
+     <Reference Include="System.Windows.Forms" />
+   </ItemGroup>
+diff --git a/Source/HtmlRenderer.WinForms/HtmlRenderer.WinForms.snk b/Source/HtmlRenderer.WinForms/HtmlRenderer.WinForms.snk
+new file mode 100644
+index 0000000..9d4b135
+Binary files /dev/null and b/Source/HtmlRenderer.WinForms/HtmlRenderer.WinForms.snk differ
+diff --git a/Source/HtmlRenderer/Core/Dom/CssBox.cs b/Source/HtmlRenderer/Core/Dom/CssBox.cs
+index b2cd3d9..dee243c 100644
+--- a/Source/HtmlRenderer/Core/Dom/CssBox.cs
++++ b/Source/HtmlRenderer/Core/Dom/CssBox.cs
+@@ -32,7 +32,7 @@ namespace TheArtOfDev.HtmlRenderer.Core.Dom
+     /// To know more about boxes visit CSS spec:
+     /// http://www.w3.org/TR/CSS21/box.html
+     /// </remarks>
+-    internal class CssBox : CssBoxProperties, IDisposable
++    public class CssBox : CssBoxProperties, IDisposable
+     {
+         #region Fields and Consts
+ 
+diff --git a/Source/HtmlRenderer/Core/Dom/CssBoxProperties.cs b/Source/HtmlRenderer/Core/Dom/CssBoxProperties.cs
+index 7abfb53..78fcba9 100644
+--- a/Source/HtmlRenderer/Core/Dom/CssBoxProperties.cs
++++ b/Source/HtmlRenderer/Core/Dom/CssBoxProperties.cs
+@@ -27,7 +27,7 @@ namespace TheArtOfDev.HtmlRenderer.Core.Dom
+     /// Has additional fields to control the location and size of the box and 'actual' css values for some properties
+     /// that require additional calculations and parsing.<br/>
+     /// </summary>
+-    internal abstract class CssBoxProperties
++    public abstract class CssBoxProperties
+     {
+         #region CSS Fields
+ 
+diff --git a/Source/HtmlRenderer/Core/Dom/CssLineBox.cs b/Source/HtmlRenderer/Core/Dom/CssLineBox.cs
+index dd2db89..8e6028e 100644
+--- a/Source/HtmlRenderer/Core/Dom/CssLineBox.cs
++++ b/Source/HtmlRenderer/Core/Dom/CssLineBox.cs
+@@ -24,7 +24,7 @@ namespace TheArtOfDev.HtmlRenderer.Core.Dom
+     /// To learn more about line-boxes see CSS spec:
+     /// http://www.w3.org/TR/CSS21/visuren.html
+     /// </remarks>
+-    internal sealed class CssLineBox
++    public sealed class CssLineBox
+     {
+         #region Fields and Consts
+ 
+diff --git a/Source/HtmlRenderer/Core/Dom/CssRect.cs b/Source/HtmlRenderer/Core/Dom/CssRect.cs
+index d7ff14a..139890e 100644
+--- a/Source/HtmlRenderer/Core/Dom/CssRect.cs
++++ b/Source/HtmlRenderer/Core/Dom/CssRect.cs
+@@ -25,7 +25,7 @@ namespace TheArtOfDev.HtmlRenderer.Core.Dom
+     /// imagine the performance when drawing char by char on the device.<br/>
+     /// It may change for future versions of the library.
+     /// </remarks>
+-    internal abstract class CssRect
++    public abstract class CssRect
+     {
+         #region Fields and Consts
+ 
+diff --git a/Source/HtmlRenderer/Core/Dom/HtmlTag.cs b/Source/HtmlRenderer/Core/Dom/HtmlTag.cs
+index ca282fc..58bf42f 100644
+--- a/Source/HtmlRenderer/Core/Dom/HtmlTag.cs
++++ b/Source/HtmlRenderer/Core/Dom/HtmlTag.cs
+@@ -15,7 +15,7 @@
+ 
+ namespace TheArtOfDev.HtmlRenderer.Core.Dom
+ {
+-    internal sealed class HtmlTag
++    public sealed class HtmlTag
+     {
+         #region Fields and Consts
+ 
+diff --git a/Source/HtmlRenderer/Core/Handlers/SelectionHandler.cs b/Source/HtmlRenderer/Core/Handlers/SelectionHandler.cs
+index 9913a9c..1dbf30b 100644
+--- a/Source/HtmlRenderer/Core/Handlers/SelectionHandler.cs
++++ b/Source/HtmlRenderer/Core/Handlers/SelectionHandler.cs
+@@ -22,7 +22,7 @@ namespace TheArtOfDev.HtmlRenderer.Core.Handlers
+     /// <summary>
+     /// Handler for text selection in the html.
+     /// </summary>
+-    internal sealed class SelectionHandler : IDisposable
++    public sealed class SelectionHandler : IDisposable
+     {
+         #region Fields and Consts
+ 
+diff --git a/Source/HtmlRenderer/Core/HtmlContainerInt.cs b/Source/HtmlRenderer/Core/HtmlContainerInt.cs
+index 1d71de9..c06c840 100644
+--- a/Source/HtmlRenderer/Core/HtmlContainerInt.cs
++++ b/Source/HtmlRenderer/Core/HtmlContainerInt.cs
+@@ -94,7 +94,7 @@ public sealed class HtmlContainerInt : IDisposable
+         /// <summary>
+         /// the root css box of the parsed html
+         /// </summary>
+-        private CssBox _root;
++        public CssBox _root;
+ 
+         /// <summary>
+         /// list of all css boxes that have ":hover" selector on them
+@@ -476,7 +476,7 @@ public string SelectedHtml
+         /// <summary>
+         /// the root css box of the parsed html
+         /// </summary>
+-        internal CssBox Root
++        public CssBox Root
+         {
+             get { return _root; }
+         }
+@@ -729,9 +729,9 @@ public void HandleMouseUp(RControl parent, RPoint location, RMouseEvent e)
+                     }
+                 }
+             }
+-            catch (HtmlLinkClickedException)
++            catch (HtmlLinkClickedException t)
+             {
+-                throw;
++                throw t;
+             }
+             catch (Exception ex)
+             {
+diff --git a/Source/HtmlRenderer/Core/Utils/DomUtils.cs b/Source/HtmlRenderer/Core/Utils/DomUtils.cs
+index 6d00a4a..3c5fe98 100644
+--- a/Source/HtmlRenderer/Core/Utils/DomUtils.cs
++++ b/Source/HtmlRenderer/Core/Utils/DomUtils.cs
+@@ -20,900 +20,909 @@
+ 
+ namespace TheArtOfDev.HtmlRenderer.Core.Utils
+ {
++  /// <summary>
++  /// Utility class for traversing DOM structure and execution stuff on it.
++  /// </summary>
++  static public /*sealed*/ class DomUtils // wasn't static
++  {
+     /// <summary>
+-    /// Utility class for traversing DOM structure and execution stuff on it.
++    /// Check if the given location is inside the given box deep.<br/>
++    /// Check inner boxes and all lines that the given box spans to.
+     /// </summary>
+-    internal sealed class DomUtils
++    /// <param name="box">the box to check</param>
++    /// <param name="location">the location to check</param>
++    /// <returns>true - location inside the box, false - otherwise</returns>
++    public static bool IsInBox(this CssBox box, RPoint location)
+     {
+-        /// <summary>
+-        /// Check if the given location is inside the given box deep.<br/>
+-        /// Check inner boxes and all lines that the given box spans to.
+-        /// </summary>
+-        /// <param name="box">the box to check</param>
+-        /// <param name="location">the location to check</param>
+-        /// <returns>true - location inside the box, false - otherwise</returns>
+-        public static bool IsInBox(CssBox box, RPoint location)
+-        {
+-            foreach (var line in box.Rectangles)
+-            {
+-                if (line.Value.Contains(location))
+-                    return true;
+-            }
+-            foreach (var childBox in box.Boxes)
+-            {
+-                if (IsInBox(childBox, location))
+-                    return true;
+-            }
+-            return false;
++      foreach (var line in box.Rectangles)
++      {
++        if (line.Value.Contains(location))
++          return true;
++      }
++      foreach (var childBox in box.Boxes)
++      {
++        if (IsInBox(childBox, location))
++          return true;
++      }
++      return false;
++    }
++
++    /// <summary>
++    /// Check if the given box contains only inline child boxes.
++    /// </summary>
++    /// <param name="box">the box to check</param>
++    /// <returns>true - only inline child boxes, false - otherwise</returns>
++    public static bool ContainsInlinesOnly(this CssBox box)
++    {
++      foreach (CssBox b in box.Boxes)
++      {
++        if (!b.IsInline)
++        {
++          return false;
+         }
++      }
+ 
+-        /// <summary>
+-        /// Check if the given box contains only inline child boxes.
+-        /// </summary>
+-        /// <param name="box">the box to check</param>
+-        /// <returns>true - only inline child boxes, false - otherwise</returns>
+-        public static bool ContainsInlinesOnly(CssBox box)
++      return true;
++    }
++
++    /// <summary>
++    /// Recursively searches for the parent with the specified HTML Tag name
++    /// </summary>
++    /// <param name="root"></param>
++    /// <param name="tagName"></param>
++    /// <param name="box"></param>
++    public static CssBox FindParent(this CssBox root, string tagName, CssBox box)
++    {
++      if (box == null)
++      {
++        return root;
++      }
++      else if (box.HtmlTag != null && box.HtmlTag.Name.Equals(tagName, StringComparison.CurrentCultureIgnoreCase))
++      {
++        return box.ParentBox ?? root;
++      }
++      else
++      {
++        return FindParent(root, tagName, box.ParentBox);
++      }
++    }
++
++    /// <summary>
++    /// Gets the previous sibling of this box.
++    /// </summary>
++    /// <returns>Box before this one on the tree. Null if its the first</returns>
++    public static CssBox GetPreviousSibling(this CssBox b)
++    {
++      if (b.ParentBox != null)
++      {
++        int index = b.ParentBox.Boxes.IndexOf(b);
++        if (index > 0)
+         {
+-            foreach (CssBox b in box.Boxes)
+-            {
+-                if (!b.IsInline)
+-                {
+-                    return false;
+-                }
+-            }
++          int diff = 1;
++          CssBox sib = b.ParentBox.Boxes[index - diff];
++
++          while ((sib.Display == CssConstants.None || sib.Position == CssConstants.Absolute || sib.Position == CssConstants.Fixed) && index - diff - 1 >= 0)
++          {
++            sib = b.ParentBox.Boxes[index - ++diff];
++          }
+ 
+-            return true;
++          return (sib.Display == CssConstants.None || sib.Position == CssConstants.Fixed) ? null : sib;
+         }
++      }
++      return null;
++    }
+ 
+-        /// <summary>
+-        /// Recursively searches for the parent with the specified HTML Tag name
+-        /// </summary>
+-        /// <param name="root"></param>
+-        /// <param name="tagName"></param>
+-        /// <param name="box"></param>
+-        public static CssBox FindParent(CssBox root, string tagName, CssBox box)
++    /// <summary>
++    /// Gets the previous sibling of this box.
++    /// </summary>
++    /// <returns>Box before this one on the tree. Null if its the first</returns>
++    public static CssBox GetPreviousContainingBlockSibling(this CssBox b)
++    {
++      var conBlock = b;
++      int index = conBlock.ParentBox.Boxes.IndexOf(conBlock);
++      while (conBlock.ParentBox != null && index < 1 && conBlock.Display != CssConstants.Block && conBlock.Display != CssConstants.Table && conBlock.Display != CssConstants.TableCell && conBlock.Display != CssConstants.ListItem)
++      {
++        conBlock = conBlock.ParentBox;
++        index = conBlock.ParentBox != null ? conBlock.ParentBox.Boxes.IndexOf(conBlock) : -1;
++      }
++      conBlock = conBlock.ParentBox;
++      if (conBlock != null && index > 0)
++      {
++        int diff = 1;
++        CssBox sib = conBlock.Boxes[index - diff];
++
++        while ((sib.Display == CssConstants.None || sib.Position == CssConstants.Absolute || sib.Position == CssConstants.Fixed) && index - diff - 1 >= 0)
+         {
+-            if (box == null)
+-            {
+-                return root;
+-            }
+-            else if (box.HtmlTag != null && box.HtmlTag.Name.Equals(tagName, StringComparison.CurrentCultureIgnoreCase))
+-            {
+-                return box.ParentBox ?? root;
+-            }
+-            else
+-            {
+-                return FindParent(root, tagName, box.ParentBox);
+-            }
++          sib = conBlock.Boxes[index - ++diff];
+         }
+ 
+-        /// <summary>
+-        /// Gets the previous sibling of this box.
+-        /// </summary>
+-        /// <returns>Box before this one on the tree. Null if its the first</returns>
+-        public static CssBox GetPreviousSibling(CssBox b)
+-        {
+-            if (b.ParentBox != null)
+-            {
+-                int index = b.ParentBox.Boxes.IndexOf(b);
+-                if (index > 0)
+-                {
+-                    int diff = 1;
+-                    CssBox sib = b.ParentBox.Boxes[index - diff];
++        return sib.Display == CssConstants.None ? null : sib;
++      }
++      return null;
++    }
+ 
+-                    while ((sib.Display == CssConstants.None || sib.Position == CssConstants.Absolute || sib.Position == CssConstants.Fixed) && index - diff - 1 >= 0)
+-                    {
+-                        sib = b.ParentBox.Boxes[index - ++diff];
+-                    }
++    /// <summary>
++    /// fix word space for first word in inline tag.
++    /// </summary>
++    /// <param name="box">the box to check</param>
++    public static bool IsBoxHasWhitespace(this CssBox box)
++    {
++      if (!box.Words[0].IsImage && box.Words[0].HasSpaceBefore && box.IsInline)
++      {
++        var sib = GetPreviousContainingBlockSibling(box);
++        if (sib != null && sib.IsInline)
++          return true;
++      }
++      return false;
++    }
+ 
+-                    return (sib.Display == CssConstants.None || sib.Position == CssConstants.Fixed) ? null : sib;
+-                }
+-            }
+-            return null;
++    /// <summary>
++    /// Gets the next sibling of this box.
++    /// </summary>
++    /// <returns>Box before this one on the tree. Null if its the first</returns>
++    public static CssBox GetNextSibling(this CssBox b)
++    {
++      CssBox sib = null;
++      if (b.ParentBox != null)
++      {
++        var index = b.ParentBox.Boxes.IndexOf(b) + 1;
++        while (index <= b.ParentBox.Boxes.Count - 1)
++        {
++          var pSib = b.ParentBox.Boxes[index];
++          if (pSib.Display != CssConstants.None && pSib.Position != CssConstants.Absolute && pSib.Position != CssConstants.Fixed)
++          {
++            sib = pSib;
++            break;
++          }
++          index++;
+         }
++      }
++      return sib;
++    }
+ 
+-        /// <summary>
+-        /// Gets the previous sibling of this box.
+-        /// </summary>
+-        /// <returns>Box before this one on the tree. Null if its the first</returns>
+-        public static CssBox GetPreviousContainingBlockSibling(CssBox b)
++    /// <summary>
++    /// Get attribute value by given key starting search from given box, search up the tree until
++    /// attribute found or root.
++    /// </summary>
++    /// <param name="box">the box to start lookup at</param>
++    /// <param name="attribute">the attribute to get</param>
++    /// <returns>the value of the attribute or null if not found</returns>
++    public static string GetAttribute(this CssBox box, string attribute)
++    {
++      string value = null;
++      while (box != null && value == null)
++      {
++        value = box.GetAttribute(attribute, null);
++        box = box.ParentBox;
++      }
++      return value;
++    }
++
++    /// <summary>
++    /// Get css box under the given sub-tree at the given x,y location, get the inner most.<br/>
++    /// the location must be in correct scroll offset.
++    /// </summary>
++    /// <param name="box">the box to start search from</param>
++    /// <param name="location">the location to find the box by</param>
++    /// <param name="visible">Optional: if to get only visible boxes (default - true)</param>
++    /// <returns>css link box if exists or null</returns>
++    public static CssBox GetCssBox(this CssBox box, RPoint location, bool visible = true)
++    {
++      if (box != null)
++      {
++        if ((!visible || box.Visibility == CssConstants.Visible) && (box.Bounds.IsEmpty || box.Bounds.Contains(location)))
+         {
+-            var conBlock = b;
+-            int index = conBlock.ParentBox.Boxes.IndexOf(conBlock);
+-            while (conBlock.ParentBox != null && index < 1 && conBlock.Display != CssConstants.Block && conBlock.Display != CssConstants.Table && conBlock.Display != CssConstants.TableCell && conBlock.Display != CssConstants.ListItem)
++          foreach (var childBox in box.Boxes)
++          {
++            if (CommonUtils.GetFirstValueOrDefault(box.Rectangles, box.Bounds).Contains(location))
+             {
+-                conBlock = conBlock.ParentBox;
+-                index = conBlock.ParentBox != null ? conBlock.ParentBox.Boxes.IndexOf(conBlock) : -1;
++              return GetCssBox(childBox, location) ?? childBox;
+             }
+-            conBlock = conBlock.ParentBox;
+-            if (conBlock != null && index > 0)
+-            {
+-                int diff = 1;
+-                CssBox sib = conBlock.Boxes[index - diff];
++          }
++        }
++      }
+ 
+-                while ((sib.Display == CssConstants.None || sib.Position == CssConstants.Absolute || sib.Position == CssConstants.Fixed) && index - diff - 1 >= 0)
+-                {
+-                    sib = conBlock.Boxes[index - ++diff];
+-                }
++      return null;
++    }
+ 
+-                return sib.Display == CssConstants.None ? null : sib;
+-            }
+-            return null;
++    /// <summary>
++    /// Collect all link boxes found in the HTML tree.
++    /// </summary>
++    /// <param name="box">the box to start search from</param>
++    /// <param name="linkBoxes">collection to add all link boxes to</param>
++    public static void GetAllLinkBoxes(this CssBox box, List<CssBox> linkBoxes)
++    {
++      if (box != null)
++      {
++        if (box.IsClickable && box.Visibility == CssConstants.Visible)
++        {
++          linkBoxes.Add(box);
+         }
+ 
+-        /// <summary>
+-        /// fix word space for first word in inline tag.
+-        /// </summary>
+-        /// <param name="box">the box to check</param>
+-        public static bool IsBoxHasWhitespace(CssBox box)
++        foreach (var childBox in box.Boxes)
+         {
+-            if (!box.Words[0].IsImage && box.Words[0].HasSpaceBefore && box.IsInline)
+-            {
+-                var sib = GetPreviousContainingBlockSibling(box);
+-                if (sib != null && sib.IsInline)
+-                    return true;
+-            }
+-            return false;
++          GetAllLinkBoxes(childBox, linkBoxes);
+         }
++      }
++    }
+ 
+-        /// <summary>
+-        /// Gets the next sibling of this box.
+-        /// </summary>
+-        /// <returns>Box before this one on the tree. Null if its the first</returns>
+-        public static CssBox GetNextSibling(CssBox b)
++    /// <summary>
++    /// Get css link box under the given sub-tree at the given x,y location.<br/>
++    /// the location must be in correct scroll offset.
++    /// </summary>
++    /// <param name="box">the box to start search from</param>
++    /// <param name="location">the location to find the box by</param>
++    /// <returns>css link box if exists or null</returns>
++    public static CssBox GetLinkBox(this CssBox box, RPoint location)
++    {
++      if (box != null)
++      {
++        if (box.IsClickable && box.Visibility == CssConstants.Visible)
+         {
+-            CssBox sib = null;
+-            if (b.ParentBox != null)
+-            {
+-                var index = b.ParentBox.Boxes.IndexOf(b) + 1;
+-                while (index <= b.ParentBox.Boxes.Count - 1)
+-                {
+-                    var pSib = b.ParentBox.Boxes[index];
+-                    if (pSib.Display != CssConstants.None && pSib.Position != CssConstants.Absolute && pSib.Position != CssConstants.Fixed)
+-                    {
+-                        sib = pSib;
+-                        break;
+-                    }
+-                    index++;
+-                }
+-            }
+-            return sib;
++          if (IsInBox(box, location))
++            return box;
+         }
+ 
+-        /// <summary>
+-        /// Get attribute value by given key starting search from given box, search up the tree until
+-        /// attribute found or root.
+-        /// </summary>
+-        /// <param name="box">the box to start lookup at</param>
+-        /// <param name="attribute">the attribute to get</param>
+-        /// <returns>the value of the attribute or null if not found</returns>
+-        public static string GetAttribute(CssBox box, string attribute)
++        if (box.ClientRectangle.IsEmpty || box.ClientRectangle.Contains(location))
+         {
+-            string value = null;
+-            while (box != null && value == null)
+-            {
+-                value = box.GetAttribute(attribute, null);
+-                box = box.ParentBox;
+-            }
+-            return value;
++          foreach (var childBox in box.Boxes)
++          {
++            var foundBox = GetLinkBox(childBox, location);
++            if (foundBox != null)
++              return foundBox;
++          }
+         }
++      }
+ 
+-        /// <summary>
+-        /// Get css box under the given sub-tree at the given x,y location, get the inner most.<br/>
+-        /// the location must be in correct scroll offset.
+-        /// </summary>
+-        /// <param name="box">the box to start search from</param>
+-        /// <param name="location">the location to find the box by</param>
+-        /// <param name="visible">Optional: if to get only visible boxes (default - true)</param>
+-        /// <returns>css link box if exists or null</returns>
+-        public static CssBox GetCssBox(CssBox box, RPoint location, bool visible = true)
++      return null;
++    }
++
++    /// <summary>
++    /// Get css box under the given sub-tree with the given id.<br/>
++    /// </summary>
++    /// <param name="box">the box to start search from</param>
++    /// <param name="id">the id to find the box by</param>
++    /// <returns>css box if exists or null</returns>
++    public static CssBox GetBoxById(this CssBox box, string id)
++    {
++      if (box != null && !string.IsNullOrEmpty(id))
++      {
++        if (box.HtmlTag != null && id.Equals(box.HtmlTag.TryGetAttribute("id"), StringComparison.OrdinalIgnoreCase))
+         {
+-            if (box != null)
+-            {
+-                if ((!visible || box.Visibility == CssConstants.Visible) && (box.Bounds.IsEmpty || box.Bounds.Contains(location)))
+-                {
+-                    foreach (var childBox in box.Boxes)
+-                    {
+-                        if (CommonUtils.GetFirstValueOrDefault(box.Rectangles, box.Bounds).Contains(location))
+-                        {
+-                            return GetCssBox(childBox, location) ?? childBox;
+-                        }
+-                    }
+-                }
+-            }
++          return box;
++        }
+ 
+-            return null;
++        foreach (var childBox in box.Boxes)
++        {
++          var foundBox = GetBoxById(childBox, id);
++          if (foundBox != null)
++            return foundBox;
+         }
++      }
++      return null;
++    }
+ 
+-        /// <summary>
+-        /// Collect all link boxes found in the HTML tree.
+-        /// </summary>
+-        /// <param name="box">the box to start search from</param>
+-        /// <param name="linkBoxes">collection to add all link boxes to</param>
+-        public static void GetAllLinkBoxes(CssBox box, List<CssBox> linkBoxes)
++    /// <summary>
++    /// Get css line box under the given sub-tree at the given y location or the nearest line from the top.<br/>
++    /// the location must be in correct scroll offset.
++    /// </summary>
++    /// <param name="box">the box to start search from</param>
++    /// <param name="location">the location to find the box at</param>
++    /// <returns>css word box if exists or null</returns>
++    public static CssLineBox GetCssLineBox(this CssBox box, RPoint location)
++    {
++      CssLineBox line = null;
++      if (box != null)
++      {
++        if (box.LineBoxes.Count > 0)
+         {
+-            if (box != null)
++          if (box.HtmlTag == null || box.HtmlTag.Name != "td" || box.Bounds.Contains(location))
++          {
++            foreach (var lineBox in box.LineBoxes)
+             {
+-                if (box.IsClickable && box.Visibility == CssConstants.Visible)
++              foreach (var rect in lineBox.Rectangles)
++              {
++                if (rect.Value.Top <= location.Y)
+                 {
+-                    linkBoxes.Add(box);
++                  line = lineBox;
+                 }
+ 
+-                foreach (var childBox in box.Boxes)
++                if (rect.Value.Top > location.Y)
+                 {
+-                    GetAllLinkBoxes(childBox, linkBoxes);
++                  return line;
+                 }
++              }
+             }
++          }
+         }
+ 
+-        /// <summary>
+-        /// Get css link box under the given sub-tree at the given x,y location.<br/>
+-        /// the location must be in correct scroll offset.
+-        /// </summary>
+-        /// <param name="box">the box to start search from</param>
+-        /// <param name="location">the location to find the box by</param>
+-        /// <returns>css link box if exists or null</returns>
+-        public static CssBox GetLinkBox(CssBox box, RPoint location)
++        foreach (var childBox in box.Boxes)
+         {
+-            if (box != null)
+-            {
+-                if (box.IsClickable && box.Visibility == CssConstants.Visible)
+-                {
+-                    if (IsInBox(box, location))
+-                        return box;
+-                }
++          line = GetCssLineBox(childBox, location) ?? line;
++        }
++      }
+ 
+-                if (box.ClientRectangle.IsEmpty || box.ClientRectangle.Contains(location))
+-                {
+-                    foreach (var childBox in box.Boxes)
+-                    {
+-                        var foundBox = GetLinkBox(childBox, location);
+-                        if (foundBox != null)
+-                            return foundBox;
+-                    }
+-                }
+-            }
++      return line;
++    }
+ 
+-            return null;
++    /// <summary>
++    /// Get css word box under the given sub-tree at the given x,y location.<br/>
++    /// the location must be in correct scroll offset.
++    /// </summary>
++    /// <param name="box">the box to start search from</param>
++    /// <param name="location">the location to find the box at</param>
++    /// <returns>css word box if exists or null</returns>
++    public static CssRect GetCssBoxWord(this CssBox box, RPoint location)
++    {
++      if (box != null && box.Visibility == CssConstants.Visible)
++      {
++        if (box.LineBoxes.Count > 0)
++        {
++          foreach (var lineBox in box.LineBoxes)
++          {
++            var wordBox = GetCssBoxWord(lineBox, location);
++            if (wordBox != null)
++              return wordBox;
++          }
+         }
+ 
+-        /// <summary>
+-        /// Get css box under the given sub-tree with the given id.<br/>
+-        /// </summary>
+-        /// <param name="box">the box to start search from</param>
+-        /// <param name="id">the id to find the box by</param>
+-        /// <returns>css box if exists or null</returns>
+-        public static CssBox GetBoxById(CssBox box, string id)
++        if (box.ClientRectangle.IsEmpty || box.ClientRectangle.Contains(location))
+         {
+-            if (box != null && !string.IsNullOrEmpty(id))
++          foreach (var childBox in box.Boxes)
++          {
++            var foundWord = GetCssBoxWord(childBox, location);
++            if (foundWord != null)
+             {
+-                if (box.HtmlTag != null && id.Equals(box.HtmlTag.TryGetAttribute("id"), StringComparison.OrdinalIgnoreCase))
+-                {
+-                    return box;
+-                }
+-
+-                foreach (var childBox in box.Boxes)
+-                {
+-                    var foundBox = GetBoxById(childBox, id);
+-                    if (foundBox != null)
+-                        return foundBox;
+-                }
++              return foundWord;
+             }
++          }
++        }
++      }
++
++      return null;
++    }
+ 
+-            return null;
++    /// <summary>
++    /// Get css word box under the given sub-tree at the given x,y location.<br/>
++    /// the location must be in correct scroll offset.
++    /// </summary>
++    /// <param name="lineBox">the line box to search in</param>
++    /// <param name="location">the location to find the box at</param>
++    /// <returns>css word box if exists or null</returns>
++    public static CssRect GetCssBoxWord(this CssLineBox lineBox, RPoint location)
++    {
++      foreach (var rects in lineBox.Rectangles)
++      {
++        foreach (var word in rects.Key.Words)
++        {
++          // add word spacing to word width so sentence won't have hols in it when moving the mouse
++          var rect = word.Rectangle;
++          rect.Width += word.OwnerBox.ActualWordSpacing;
++          if (rect.Contains(location))
++          {
++            return word;
++          }
+         }
++      }
++      return null;
++    }
+ 
+-        /// <summary>
+-        /// Get css line box under the given sub-tree at the given y location or the nearest line from the top.<br/>
+-        /// the location must be in correct scroll offset.
+-        /// </summary>
+-        /// <param name="box">the box to start search from</param>
+-        /// <param name="location">the location to find the box at</param>
+-        /// <returns>css word box if exists or null</returns>
+-        public static CssLineBox GetCssLineBox(CssBox box, RPoint location)
++    /// <summary>
++    /// Find the css line box that the given word is in.
++    /// </summary>
++    /// <param name="word">the word to search for it's line box</param>
++    /// <returns>line box that the word is in</returns>
++    public static CssLineBox GetCssLineBoxByWord(this CssRect word)
++    {
++      var box = word.OwnerBox;
++      while (box.LineBoxes.Count == 0)
++      {
++        box = box.ParentBox;
++      }
++      foreach (var lineBox in box.LineBoxes)
++      {
++        foreach (var lineWord in lineBox.Words)
+         {
+-            CssLineBox line = null;
+-            if (box != null)
+-            {
+-                if (box.LineBoxes.Count > 0)
+-                {
+-                    if (box.HtmlTag == null || box.HtmlTag.Name != "td" || box.Bounds.Contains(location))
+-                    {
+-                        foreach (var lineBox in box.LineBoxes)
+-                        {
+-                            foreach (var rect in lineBox.Rectangles)
+-                            {
+-                                if (rect.Value.Top <= location.Y)
+-                                {
+-                                    line = lineBox;
+-                                }
+-
+-                                if (rect.Value.Top > location.Y)
+-                                {
+-                                    return line;
+-                                }
+-                            }
+-                        }
+-                    }
+-                }
++          if (lineWord == word)
++          {
++            return lineBox;
++          }
++        }
++      }
++      return box.LineBoxes[0];
++    }
+ 
+-                foreach (var childBox in box.Boxes)
+-                {
+-                    line = GetCssLineBox(childBox, location) ?? line;
+-                }
+-            }
++    /// <summary>
++    /// Get selected plain text of the given html sub-tree.
++    /// </summary>
++    /// <param name="root">the DOM box to get selected text from its sub-tree</param>
++    /// <returns>the selected plain text string</returns>
++    public static string GetSelectedPlainText(this CssBox root)
++    {
++      var sb = new StringBuilder();
++      var lastWordIndex = GetSelectedPlainText(sb, root);
++      return sb.ToString(0, lastWordIndex).Trim();
++    }
+ 
+-            return line;
+-        }
++    /// <summary>
++    /// Generate html from the given DOM tree.<br/>
++    /// Generate all the style inside the html, in header or for every tag depending on <paramref name="styleGen"/> value.
++    /// </summary>
++    /// <param name="root">the box of the html generate html from</param>
++    /// <param name="styleGen">Optional: controls the way styles are generated when html is generated</param>
++    /// <param name="onlySelected">Optional: true - generate only selected html subset, false - generate all (default - false)</param>
++    /// <returns>generated html</returns>
++    public static string GenerateHtml(this CssBox root, HtmlGenerationStyle styleGen = HtmlGenerationStyle.Inline, bool onlySelected = false)
++    {
++      var sb = new StringBuilder();
++      if (root != null)
++      {
++        var selectedBoxes = onlySelected ? CollectSelectedBoxes(root) : null;
++        var selectionRoot = onlySelected ? GetSelectionRoot(root, selectedBoxes) : null;
++        WriteHtml(root.HtmlContainer.CssParser, sb, root, styleGen, selectedBoxes, selectionRoot);
++      }
++      return sb.ToString();
++    }
+ 
+-        /// <summary>
+-        /// Get css word box under the given sub-tree at the given x,y location.<br/>
+-        /// the location must be in correct scroll offset.
+-        /// </summary>
+-        /// <param name="box">the box to start search from</param>
+-        /// <param name="location">the location to find the box at</param>
+-        /// <returns>css word box if exists or null</returns>
+-        public static CssRect GetCssBoxWord(CssBox box, RPoint location)
+-        {
+-            if (box != null && box.Visibility == CssConstants.Visible)
+-            {
+-                if (box.LineBoxes.Count > 0)
+-                {
+-                    foreach (var lineBox in box.LineBoxes)
+-                    {
+-                        var wordBox = GetCssBoxWord(lineBox, location);
+-                        if (wordBox != null)
+-                            return wordBox;
+-                    }
+-                }
++    /// <summary>
++    /// Generate textual tree representation of the css boxes tree starting from the given root.<br/>
++    /// Used for debugging html parsing.
++    /// </summary>
++    /// <param name="root">the root to generate tree from</param>
++    /// <returns>generated tree</returns>
++    public static string GenerateBoxTree(this CssBox root)
++    {
++      var sb = new StringBuilder();
++      GenerateBoxTree(root, sb, 0);
++      return sb.ToString();
++    }
+ 
+-                if (box.ClientRectangle.IsEmpty || box.ClientRectangle.Contains(location))
+-                {
+-                    foreach (var childBox in box.Boxes)
+-                    {
+-                        var foundWord = GetCssBoxWord(childBox, location);
+-                        if (foundWord != null)
+-                        {
+-                            return foundWord;
+-                        }
+-                    }
+-                }
+-            }
++    /// <summary>
++    /// Get selected plain text of the given html sub-tree.<br/>
++    /// Append all the selected words.
++    /// </summary>
++    /// <param name="sb">the builder to append the selected text to</param>
++    /// <param name="box">the DOM box to get selected text from its sub-tree</param>
++    /// <returns>the index of the last word appended</returns>
++    public static int GetSelectedPlainText(this CssBox box, StringBuilder sb)
++    {
++      return GetSelectedPlainText(sb,box);
++    }
++    #region Private methods
+ 
+-            return null;
++    /// <summary>
++    /// Get selected plain text of the given html sub-tree.<br/>
++    /// Append all the selected words.
++    /// </summary>
++    /// <param name="sb">the builder to append the selected text to</param>
++    /// <param name="box">the DOM box to get selected text from its sub-tree</param>
++    /// <returns>the index of the last word appended</returns>
++    private static int GetSelectedPlainText(StringBuilder sb, CssBox box)
++    {
++      int lastWordIndex = 0;
++      foreach (var boxWord in box.Words)
++      {
++        // append the text of selected word (handle partial selected words)
++        if (boxWord.Selected)
++        {
++          sb.Append(GetSelectedWord(boxWord, true));
++          lastWordIndex = sb.Length;
+         }
+-
+-        /// <summary>
+-        /// Get css word box under the given sub-tree at the given x,y location.<br/>
+-        /// the location must be in correct scroll offset.
+-        /// </summary>
+-        /// <param name="lineBox">the line box to search in</param>
+-        /// <param name="location">the location to find the box at</param>
+-        /// <returns>css word box if exists or null</returns>
+-        public static CssRect GetCssBoxWord(CssLineBox lineBox, RPoint location)
++      }
++
++      // empty span box
++      if (box.Boxes.Count < 1 && box.Text != null && box.Text.IsWhitespace())
++      {
++        sb.Append(' ');
++      }
++
++      // deep traversal
++      if (box.Visibility != CssConstants.Hidden && box.Display != CssConstants.None)
++      {
++        foreach (var childBox in box.Boxes)
+         {
+-            foreach (var rects in lineBox.Rectangles)
+-            {
+-                foreach (var word in rects.Key.Words)
+-                {
+-                    // add word spacing to word width so sentence won't have hols in it when moving the mouse
+-                    var rect = word.Rectangle;
+-                    rect.Width += word.OwnerBox.ActualWordSpacing;
+-                    if (rect.Contains(location))
+-                    {
+-                        return word;
+-                    }
+-                }
+-            }
+-            return null;
++          var innerLastWordIdx = GetSelectedPlainText(sb, childBox);
++          lastWordIndex = Math.Max(lastWordIndex, innerLastWordIdx);
+         }
++      }
+ 
+-        /// <summary>
+-        /// Find the css line box that the given word is in.
+-        /// </summary>
+-        /// <param name="word">the word to search for it's line box</param>
+-        /// <returns>line box that the word is in</returns>
+-        public static CssLineBox GetCssLineBoxByWord(CssRect word)
++      if (sb.Length > 0)
++      {
++        // convert hr to line of dashes
++        if (box.HtmlTag != null && box.HtmlTag.Name == "hr")
+         {
+-            var box = word.OwnerBox;
+-            while (box.LineBoxes.Count == 0)
+-            {
+-                box = box.ParentBox;
+-            }
+-            foreach (var lineBox in box.LineBoxes)
+-            {
+-                foreach (var lineWord in lineBox.Words)
+-                {
+-                    if (lineWord == word)
+-                    {
+-                        return lineBox;
+-                    }
+-                }
+-            }
+-            return box.LineBoxes[0];
++          if (sb.Length > 1 && sb[sb.Length - 1] != '\n')
++            sb.AppendLine();
++          sb.AppendLine(new string('-', 80));
+         }
+ 
+-        /// <summary>
+-        /// Get selected plain text of the given html sub-tree.
+-        /// </summary>
+-        /// <param name="root">the DOM box to get selected text from its sub-tree</param>
+-        /// <returns>the selected plain text string</returns>
+-        public static string GetSelectedPlainText(CssBox root)
++        // new line for css block
++        if (box.Display == CssConstants.Block || box.Display == CssConstants.ListItem || box.Display == CssConstants.TableRow)
+         {
+-            var sb = new StringBuilder();
+-            var lastWordIndex = GetSelectedPlainText(sb, root);
+-            return sb.ToString(0, lastWordIndex).Trim();
++          if (!(box.IsBrElement && sb.Length > 1 && sb[sb.Length - 1] == '\n'))
++            sb.AppendLine();
+         }
+ 
+-        /// <summary>
+-        /// Generate html from the given DOM tree.<br/>
+-        /// Generate all the style inside the html, in header or for every tag depending on <paramref name="styleGen"/> value.
+-        /// </summary>
+-        /// <param name="root">the box of the html generate html from</param>
+-        /// <param name="styleGen">Optional: controls the way styles are generated when html is generated</param>
+-        /// <param name="onlySelected">Optional: true - generate only selected html subset, false - generate all (default - false)</param>
+-        /// <returns>generated html</returns>
+-        public static string GenerateHtml(CssBox root, HtmlGenerationStyle styleGen = HtmlGenerationStyle.Inline, bool onlySelected = false)
++        // space between table cells
++        if (box.Display == CssConstants.TableCell)
+         {
+-            var sb = new StringBuilder();
+-            if (root != null)
+-            {
+-                var selectedBoxes = onlySelected ? CollectSelectedBoxes(root) : null;
+-                var selectionRoot = onlySelected ? GetSelectionRoot(root, selectedBoxes) : null;
+-                WriteHtml(root.HtmlContainer.CssParser, sb, root, styleGen, selectedBoxes, selectionRoot);
+-            }
+-            return sb.ToString();
++          sb.Append(' ');
+         }
+ 
+-        /// <summary>
+-        /// Generate textual tree representation of the css boxes tree starting from the given root.<br/>
+-        /// Used for debugging html parsing.
+-        /// </summary>
+-        /// <param name="root">the root to generate tree from</param>
+-        /// <returns>generated tree</returns>
+-        public static string GenerateBoxTree(CssBox root)
++        // paragraphs has additional newline for nice formatting
++        if (box.HtmlTag != null && box.HtmlTag.Name == "p")
+         {
+-            var sb = new StringBuilder();
+-            GenerateBoxTree(root, sb, 0);
+-            return sb.ToString();
++          int newlines = 0;
++          for (int i = sb.Length - 1; i >= 0 && char.IsWhiteSpace(sb[i]); i--)
++            newlines += sb[i] == '\n' ? 1 : 0;
++          if (newlines < 2)
++            sb.AppendLine();
+         }
++      }
+ 
++      return lastWordIndex;
++    }
+ 
+-        #region Private methods
++    /// <summary>
++    /// Collect the boxes that have at least one word down the hierarchy that is selected recursively.<br/>
++    /// </summary>
++    /// <param name="root">the box to check its sub-tree</param>
++    /// <returns>the collection to add the selected tags to</returns>
++    private static Dictionary<CssBox, bool> CollectSelectedBoxes(CssBox root)
++    {
++      var selectedBoxes = new Dictionary<CssBox, bool>();
++      var maybeBoxes = new Dictionary<CssBox, bool>();
++      CollectSelectedBoxes(root, selectedBoxes, maybeBoxes);
++      return selectedBoxes;
++    }
+ 
+-        /// <summary>
+-        /// Get selected plain text of the given html sub-tree.<br/>
+-        /// Append all the selected words.
+-        /// </summary>
+-        /// <param name="sb">the builder to append the selected text to</param>
+-        /// <param name="box">the DOM box to get selected text from its sub-tree</param>
+-        /// <returns>the index of the last word appended</returns>
+-        private static int GetSelectedPlainText(StringBuilder sb, CssBox box)
++    /// <summary>
++    /// Collect the boxes that have at least one word down the hierarchy that is selected recursively.<br/>
++    /// Use <paramref name="maybeBoxes"/> to handle boxes that are between selected words but don't have selected word inside.<br/>
++    /// </summary>
++    /// <param name="box">the box to check its sub-tree</param>
++    /// <param name="selectedBoxes">the hash to add the selected boxes to</param>
++    /// <param name="maybeBoxes">used to handle boxes that are between selected words but don't have selected word inside</param>
++    /// <returns>is the current box is in selected sub-tree</returns>
++    private static bool CollectSelectedBoxes(CssBox box, Dictionary<CssBox, bool> selectedBoxes, Dictionary<CssBox, bool> maybeBoxes)
++    {
++      bool isInSelection = false;
++      foreach (var word in box.Words)
++      {
++        if (word.Selected)
+         {
+-            int lastWordIndex = 0;
+-            foreach (var boxWord in box.Words)
+-            {
+-                // append the text of selected word (handle partial selected words)
+-                if (boxWord.Selected)
+-                {
+-                    sb.Append(GetSelectedWord(boxWord, true));
+-                    lastWordIndex = sb.Length;
+-                }
+-            }
+-
+-            // empty span box
+-            if (box.Boxes.Count < 1 && box.Text != null && box.Text.IsWhitespace())
+-            {
+-                sb.Append(' ');
+-            }
+-
+-            // deep traversal
+-            if (box.Visibility != CssConstants.Hidden && box.Display != CssConstants.None)
+-            {
+-                foreach (var childBox in box.Boxes)
+-                {
+-                    var innerLastWordIdx = GetSelectedPlainText(sb, childBox);
+-                    lastWordIndex = Math.Max(lastWordIndex, innerLastWordIdx);
+-                }
+-            }
+-
+-            if (sb.Length > 0)
+-            {
+-                // convert hr to line of dashes
+-                if (box.HtmlTag != null && box.HtmlTag.Name == "hr")
+-                {
+-                    if (sb.Length > 1 && sb[sb.Length - 1] != '\n')
+-                        sb.AppendLine();
+-                    sb.AppendLine(new string('-', 80));
+-                }
+-
+-                // new line for css block
+-                if (box.Display == CssConstants.Block || box.Display == CssConstants.ListItem || box.Display == CssConstants.TableRow)
+-                {
+-                    if (!(box.IsBrElement && sb.Length > 1 && sb[sb.Length - 1] == '\n'))
+-                        sb.AppendLine();
+-                }
+-
+-                // space between table cells
+-                if (box.Display == CssConstants.TableCell)
+-                {
+-                    sb.Append(' ');
+-                }
+-
+-                // paragraphs has additional newline for nice formatting
+-                if (box.HtmlTag != null && box.HtmlTag.Name == "p")
+-                {
+-                    int newlines = 0;
+-                    for (int i = sb.Length - 1; i >= 0 && char.IsWhiteSpace(sb[i]); i--)
+-                        newlines += sb[i] == '\n' ? 1 : 0;
+-                    if (newlines < 2)
+-                        sb.AppendLine();
+-                }
+-            }
+-
+-            return lastWordIndex;
++          selectedBoxes[box] = true;
++          foreach (var maybeTag in maybeBoxes)
++            selectedBoxes[maybeTag.Key] = maybeTag.Value;
++          maybeBoxes.Clear();
++          isInSelection = true;
+         }
++      }
+ 
+-        /// <summary>
+-        /// Collect the boxes that have at least one word down the hierarchy that is selected recursively.<br/>
+-        /// </summary>
+-        /// <param name="root">the box to check its sub-tree</param>
+-        /// <returns>the collection to add the selected tags to</returns>
+-        private static Dictionary<CssBox, bool> CollectSelectedBoxes(CssBox root)
++      foreach (var childBox in box.Boxes)
++      {
++        var childInSelection = CollectSelectedBoxes(childBox, selectedBoxes, maybeBoxes);
++        if (childInSelection)
+         {
+-            var selectedBoxes = new Dictionary<CssBox, bool>();
+-            var maybeBoxes = new Dictionary<CssBox, bool>();
+-            CollectSelectedBoxes(root, selectedBoxes, maybeBoxes);
+-            return selectedBoxes;
++          selectedBoxes[box] = true;
++          isInSelection = true;
+         }
++      }
+ 
+-        /// <summary>
+-        /// Collect the boxes that have at least one word down the hierarchy that is selected recursively.<br/>
+-        /// Use <paramref name="maybeBoxes"/> to handle boxes that are between selected words but don't have selected word inside.<br/>
+-        /// </summary>
+-        /// <param name="box">the box to check its sub-tree</param>
+-        /// <param name="selectedBoxes">the hash to add the selected boxes to</param>
+-        /// <param name="maybeBoxes">used to handle boxes that are between selected words but don't have selected word inside</param>
+-        /// <returns>is the current box is in selected sub-tree</returns>
+-        private static bool CollectSelectedBoxes(CssBox box, Dictionary<CssBox, bool> selectedBoxes, Dictionary<CssBox, bool> maybeBoxes)
+-        {
+-            bool isInSelection = false;
+-            foreach (var word in box.Words)
+-            {
+-                if (word.Selected)
+-                {
+-                    selectedBoxes[box] = true;
+-                    foreach (var maybeTag in maybeBoxes)
+-                        selectedBoxes[maybeTag.Key] = maybeTag.Value;
+-                    maybeBoxes.Clear();
+-                    isInSelection = true;
+-                }
+-            }
++      if (box.HtmlTag != null && selectedBoxes.Count > 0)
++      {
++        maybeBoxes[box] = true;
++      }
+ 
+-            foreach (var childBox in box.Boxes)
+-            {
+-                var childInSelection = CollectSelectedBoxes(childBox, selectedBoxes, maybeBoxes);
+-                if (childInSelection)
+-                {
+-                    selectedBoxes[box] = true;
+-                    isInSelection = true;
+-                }
+-            }
++      return isInSelection;
++    }
+ 
+-            if (box.HtmlTag != null && selectedBoxes.Count > 0)
++    /// <summary>
++    /// find the box the is the root of selected boxes (the first box to contain multiple selected boxes)
++    /// </summary>
++    /// <param name="root">the root of the boxes tree</param>
++    /// <param name="selectedBoxes">the selected boxes to find selection root in</param>
++    /// <returns>the box that is the root of selected boxes</returns>
++    private static CssBox GetSelectionRoot(CssBox root, Dictionary<CssBox, bool> selectedBoxes)
++    {
++      var selectionRoot = root;
++      var selectionRootRun = root;
++      while (true)
++      {
++        bool foundRoot = false;
++        CssBox selectedChild = null;
++        foreach (var childBox in selectionRootRun.Boxes)
++        {
++          if (selectedBoxes.ContainsKey(childBox))
++          {
++            if (selectedChild != null)
+             {
+-                maybeBoxes[box] = true;
++              foundRoot = true;
++              break;
+             }
+-
+-            return isInSelection;
++            selectedChild = childBox;
++          }
+         }
+ 
+-        /// <summary>
+-        /// find the box the is the root of selected boxes (the first box to contain multiple selected boxes)
+-        /// </summary>
+-        /// <param name="root">the root of the boxes tree</param>
+-        /// <param name="selectedBoxes">the selected boxes to find selection root in</param>
+-        /// <returns>the box that is the root of selected boxes</returns>
+-        private static CssBox GetSelectionRoot(CssBox root, Dictionary<CssBox, bool> selectedBoxes)
+-        {
+-            var selectionRoot = root;
+-            var selectionRootRun = root;
+-            while (true)
+-            {
+-                bool foundRoot = false;
+-                CssBox selectedChild = null;
+-                foreach (var childBox in selectionRootRun.Boxes)
+-                {
+-                    if (selectedBoxes.ContainsKey(childBox))
+-                    {
+-                        if (selectedChild != null)
+-                        {
+-                            foundRoot = true;
+-                            break;
+-                        }
+-                        selectedChild = childBox;
+-                    }
+-                }
++        if (foundRoot || selectedChild == null)
++          break;
+ 
+-                if (foundRoot || selectedChild == null)
+-                    break;
++        selectionRootRun = selectedChild;
+ 
+-                selectionRootRun = selectedChild;
++        // the actual selection root must be a box with html tag
++        if (selectionRootRun.HtmlTag != null)
++          selectionRoot = selectionRootRun;
++      }
+ 
+-                // the actual selection root must be a box with html tag
+-                if (selectionRootRun.HtmlTag != null)
+-                    selectionRoot = selectionRootRun;
+-            }
++      // if the selection root doesn't contained any named boxes in it then we must go one level up, otherwise we will miss the selection root box formatting
++      if (!ContainsNamedBox(selectionRoot))
++      {
++        selectionRootRun = selectionRoot.ParentBox;
++        while (selectionRootRun.ParentBox != null && selectionRootRun.HtmlTag == null)
++          selectionRootRun = selectionRootRun.ParentBox;
+ 
+-            // if the selection root doesn't contained any named boxes in it then we must go one level up, otherwise we will miss the selection root box formatting
+-            if (!ContainsNamedBox(selectionRoot))
+-            {
+-                selectionRootRun = selectionRoot.ParentBox;
+-                while (selectionRootRun.ParentBox != null && selectionRootRun.HtmlTag == null)
+-                    selectionRootRun = selectionRootRun.ParentBox;
++        if (selectionRootRun.HtmlTag != null)
++          selectionRoot = selectionRootRun;
++      }
+ 
+-                if (selectionRootRun.HtmlTag != null)
+-                    selectionRoot = selectionRootRun;
+-            }
++      return selectionRoot;
++    }
+ 
+-            return selectionRoot;
+-        }
++    /// <summary>
++    /// Check if the given box has a names child box (has html tag) recursively.
++    /// </summary>
++    /// <param name="box">the box to check</param>
++    /// <returns>true - in sub-tree there is a named box, false - otherwise</returns>
++    private static bool ContainsNamedBox(CssBox box)
++    {
++      foreach (var childBox in box.Boxes)
++      {
++        if (childBox.HtmlTag != null || ContainsNamedBox(childBox))
++          return true;
++      }
++      return false;
++    }
+ 
+-        /// <summary>
+-        /// Check if the given box has a names child box (has html tag) recursively.
+-        /// </summary>
+-        /// <param name="box">the box to check</param>
+-        /// <returns>true - in sub-tree there is a named box, false - otherwise</returns>
+-        private static bool ContainsNamedBox(CssBox box)
++    /// <summary>
++    /// Write the given html DOM sub-tree into the given string builder.<br/>
++    /// If <paramref name="selectedBoxes"/> are given write html only from those tags.
++    /// </summary>
++    /// <param name="cssParser">used to parse CSS data</param>
++    /// <param name="sb">the string builder to write html into</param>
++    /// <param name="box">the html sub-tree to write</param>
++    /// <param name="styleGen">Controls the way styles are generated when html is generated</param>
++    /// <param name="selectedBoxes">Control if to generate only selected boxes, if given only boxes found in hash will be generated</param>
++    /// <param name="selectionRoot">the box the is the root of selected boxes (the first box to contain multiple selected boxes)</param>
++    private static void WriteHtml(CssParser cssParser, StringBuilder sb, CssBox box, HtmlGenerationStyle styleGen, Dictionary<CssBox, bool> selectedBoxes, CssBox selectionRoot)
++    {
++      if (box.HtmlTag == null || selectedBoxes == null || selectedBoxes.ContainsKey(box))
++      {
++        if (box.HtmlTag != null)
+         {
+-            foreach (var childBox in box.Boxes)
+-            {
+-                if (childBox.HtmlTag != null || ContainsNamedBox(childBox))
+-                    return true;
+-            }
+-            return false;
+-        }
+-
+-        /// <summary>
+-        /// Write the given html DOM sub-tree into the given string builder.<br/>
+-        /// If <paramref name="selectedBoxes"/> are given write html only from those tags.
+-        /// </summary>
+-        /// <param name="cssParser">used to parse CSS data</param>
+-        /// <param name="sb">the string builder to write html into</param>
+-        /// <param name="box">the html sub-tree to write</param>
+-        /// <param name="styleGen">Controls the way styles are generated when html is generated</param>
+-        /// <param name="selectedBoxes">Control if to generate only selected boxes, if given only boxes found in hash will be generated</param>
+-        /// <param name="selectionRoot">the box the is the root of selected boxes (the first box to contain multiple selected boxes)</param>
+-        private static void WriteHtml(CssParser cssParser, StringBuilder sb, CssBox box, HtmlGenerationStyle styleGen, Dictionary<CssBox, bool> selectedBoxes, CssBox selectionRoot)
+-        {
+-            if (box.HtmlTag == null || selectedBoxes == null || selectedBoxes.ContainsKey(box))
+-            {
+-                if (box.HtmlTag != null)
+-                {
+-                    if (box.HtmlTag.Name != "link" || !box.HtmlTag.Attributes.ContainsKey("href") ||
+-                        (!box.HtmlTag.Attributes["href"].StartsWith("property") && !box.HtmlTag.Attributes["href"].StartsWith("method")))
+-                    {
+-                        WriteHtmlTag(cssParser, sb, box, styleGen);
+-                        if (box == selectionRoot)
+-                            sb.Append("<!--StartFragment-->");
+-                    }
+-
+-                    if (styleGen == HtmlGenerationStyle.InHeader && box.HtmlTag.Name == "html" && box.HtmlContainer.CssData != null)
+-                    {
+-                        sb.AppendLine("<head>");
+-                        WriteStylesheet(sb, box.HtmlContainer.CssData);
+-                        sb.AppendLine("</head>");
+-                    }
+-                }
+-
+-                if (box.Words.Count > 0)
+-                {
+-                    foreach (var word in box.Words)
+-                    {
+-                        if (selectedBoxes == null || word.Selected)
+-                        {
+-                            var wordText = GetSelectedWord(word, selectedBoxes != null);
+-                            sb.Append(HtmlUtils.EncodeHtml(wordText));
+-                        }
+-                    }
+-                }
+-
+-                foreach (var childBox in box.Boxes)
+-                {
+-                    WriteHtml(cssParser, sb, childBox, styleGen, selectedBoxes, selectionRoot);
+-                }
+-
+-                if (box.HtmlTag != null && !box.HtmlTag.IsSingle)
+-                {
+-                    if (box == selectionRoot)
+-                        sb.Append("<!--EndFragment-->");
+-                    sb.AppendFormat("</{0}>", box.HtmlTag.Name);
+-                }
+-            }
++          if (box.HtmlTag.Name != "link" || !box.HtmlTag.Attributes.ContainsKey("href") ||
++              (!box.HtmlTag.Attributes["href"].StartsWith("property") && !box.HtmlTag.Attributes["href"].StartsWith("method")))
++          {
++            WriteHtmlTag(cssParser, sb, box, styleGen);
++            if (box == selectionRoot)
++              sb.Append("<!--StartFragment-->");
++          }
++
++          if (styleGen == HtmlGenerationStyle.InHeader && box.HtmlTag.Name == "html" && box.HtmlContainer.CssData != null)
++          {
++            sb.AppendLine("<head>");
++            WriteStylesheet(sb, box.HtmlContainer.CssData);
++            sb.AppendLine("</head>");
++          }
+         }
+ 
+-        /// <summary>
+-        /// Write the given html tag with all its attributes and styles.
+-        /// </summary>
+-        /// <param name="cssParser">used to parse CSS data</param>
+-        /// <param name="sb">the string builder to write html into</param>
+-        /// <param name="box">the css box with the html tag to write</param>
+-        /// <param name="styleGen">Controls the way styles are generated when html is generated</param>
+-        private static void WriteHtmlTag(CssParser cssParser, StringBuilder sb, CssBox box, HtmlGenerationStyle styleGen)
++        if (box.Words.Count > 0)
+         {
+-            sb.AppendFormat("<{0}", box.HtmlTag.Name);
+-
+-            // collect all element style properties including from stylesheet
+-            var tagStyles = new Dictionary<string, string>();
+-            var tagCssBlock = box.HtmlContainer.CssData.GetCssBlock(box.HtmlTag.Name);
+-            if (tagCssBlock != null)
+-            {
+-                // TODO:a handle selectors
+-                foreach (var cssBlock in tagCssBlock)
+-                    foreach (var prop in cssBlock.Properties)
+-                        tagStyles[prop.Key] = prop.Value;
+-            }
+-
+-            if (box.HtmlTag.HasAttributes())
+-            {
+-                sb.Append(" ");
+-                foreach (var att in box.HtmlTag.Attributes)
+-                {
+-                    // handle image tags by inserting the image using base64 data
+-                    if (styleGen == HtmlGenerationStyle.Inline && att.Key == HtmlConstants.Style)
+-                    {
+-                        // if inline style add the styles to the collection
+-                        var block = cssParser.ParseCssBlock(box.HtmlTag.Name, box.HtmlTag.TryGetAttribute("style"));
+-                        foreach (var prop in block.Properties)
+-                            tagStyles[prop.Key] = prop.Value;
+-                    }
+-                    else if (styleGen == HtmlGenerationStyle.Inline && att.Key == HtmlConstants.Class)
+-                    {
+-                        // if inline style convert the style class to actual properties and add to collection
+-                        var cssBlocks = box.HtmlContainer.CssData.GetCssBlock("." + att.Value);
+-                        if (cssBlocks != null)
+-                        {
+-                            // TODO:a handle selectors
+-                            foreach (var cssBlock in cssBlocks)
+-                                foreach (var prop in cssBlock.Properties)
+-                                    tagStyles[prop.Key] = prop.Value;
+-                        }
+-                    }
+-                    else
+-                    {
+-                        sb.AppendFormat("{0}=\"{1}\" ", att.Key, att.Value);
+-                    }
+-                }
+-
+-                sb.Remove(sb.Length - 1, 1);
+-            }
+-
+-            // if inline style insert the style tag with all collected style properties
+-            if (styleGen == HtmlGenerationStyle.Inline && tagStyles.Count > 0)
++          foreach (var word in box.Words)
++          {
++            if (selectedBoxes == null || word.Selected)
+             {
+-                var cleanTagStyles = StripDefaultStyles(box, tagStyles);
+-                if (cleanTagStyles.Count > 0)
+-                {
+-                    sb.Append(" style=\"");
+-                    foreach (var style in cleanTagStyles)
+-                        sb.AppendFormat("{0}: {1}; ", style.Key, style.Value);
+-                    sb.Remove(sb.Length - 1, 1);
+-                    sb.Append("\"");
+-                }
++              var wordText = GetSelectedWord(word, selectedBoxes != null);
++              sb.Append(HtmlUtils.EncodeHtml(wordText));
+             }
++          }
++        }
+ 
+-            sb.AppendFormat("{0}>", box.HtmlTag.IsSingle ? "/" : "");
++        foreach (var childBox in box.Boxes)
++        {
++          WriteHtml(cssParser, sb, childBox, styleGen, selectedBoxes, selectionRoot);
+         }
+ 
+-        /// <summary>
+-        /// Clean the given style collection by removing default styles so only custom styles remain.<br/>
+-        /// Return new collection where the old remains unchanged.
+-        /// </summary>
+-        /// <param name="box">the box the styles apply to, used to know the default style</param>
+-        /// <param name="tagStyles">the collection of styles to clean</param>
+-        /// <returns>new cleaned styles collection</returns>
+-        private static Dictionary<string, string> StripDefaultStyles(CssBox box, Dictionary<string, string> tagStyles)
++        if (box.HtmlTag != null && !box.HtmlTag.IsSingle)
+         {
+-            // ReSharper disable PossibleMultipleEnumeration
+-            var cleanTagStyles = new Dictionary<string, string>();
+-            var defaultBlocks = box.HtmlContainer.Adapter.DefaultCssData.GetCssBlock(box.HtmlTag.Name);
+-            foreach (var style in tagStyles)
+-            {
+-                bool isDefault = false;
+-                foreach (var defaultBlock in defaultBlocks)
+-                {
+-                    string value;
+-                    if (defaultBlock.Properties.TryGetValue(style.Key, out value) && value.Equals(style.Value, StringComparison.OrdinalIgnoreCase))
+-                    {
+-                        isDefault = true;
+-                        break;
+-                    }
+-                }
++          if (box == selectionRoot)
++            sb.Append("<!--EndFragment-->");
++          sb.AppendFormat("</{0}>", box.HtmlTag.Name);
++        }
++      }
++    }
+ 
+-                if (!isDefault)
+-                    cleanTagStyles[style.Key] = style.Value;
+-            }
+-            return cleanTagStyles;
+-            // ReSharper restore PossibleMultipleEnumeration
++    /// <summary>
++    /// Write the given html tag with all its attributes and styles.
++    /// </summary>
++    /// <param name="cssParser">used to parse CSS data</param>
++    /// <param name="sb">the string builder to write html into</param>
++    /// <param name="box">the css box with the html tag to write</param>
++    /// <param name="styleGen">Controls the way styles are generated when html is generated</param>
++    private static void WriteHtmlTag(CssParser cssParser, StringBuilder sb, CssBox box, HtmlGenerationStyle styleGen)
++    {
++      sb.AppendFormat("<{0}", box.HtmlTag.Name);
++
++      // collect all element style properties including from stylesheet
++      var tagStyles = new Dictionary<string, string>();
++      var tagCssBlock = box.HtmlContainer.CssData.GetCssBlock(box.HtmlTag.Name);
++      if (tagCssBlock != null)
++      {
++        // TODO:a handle selectors
++        foreach (var cssBlock in tagCssBlock)
++          foreach (var prop in cssBlock.Properties)
++            tagStyles[prop.Key] = prop.Value;
++      }
++
++      if (box.HtmlTag.HasAttributes())
++      {
++        sb.Append(" ");
++        foreach (var att in box.HtmlTag.Attributes)
++        {
++          // handle image tags by inserting the image using base64 data
++          if (styleGen == HtmlGenerationStyle.Inline && att.Key == HtmlConstants.Style)
++          {
++            // if inline style add the styles to the collection
++            var block = cssParser.ParseCssBlock(box.HtmlTag.Name, box.HtmlTag.TryGetAttribute("style"));
++            foreach (var prop in block.Properties)
++              tagStyles[prop.Key] = prop.Value;
++          }
++          else if (styleGen == HtmlGenerationStyle.Inline && att.Key == HtmlConstants.Class)
++          {
++            // if inline style convert the style class to actual properties and add to collection
++            var cssBlocks = box.HtmlContainer.CssData.GetCssBlock("." + att.Value);
++            if (cssBlocks != null)
++            {
++              // TODO:a handle selectors
++              foreach (var cssBlock in cssBlocks)
++                foreach (var prop in cssBlock.Properties)
++                  tagStyles[prop.Key] = prop.Value;
++            }
++          }
++          else
++          {
++            sb.AppendFormat("{0}=\"{1}\" ", att.Key, att.Value);
++          }
+         }
+ 
+-        /// <summary>
+-        /// Write stylesheet data inline into the html.
+-        /// </summary>
+-        /// <param name="sb">the string builder to write stylesheet into</param>
+-        /// <param name="cssData">the css data to write to the head</param>
+-        private static void WriteStylesheet(StringBuilder sb, CssData cssData)
++        sb.Remove(sb.Length - 1, 1);
++      }
++
++      // if inline style insert the style tag with all collected style properties
++      if (styleGen == HtmlGenerationStyle.Inline && tagStyles.Count > 0)
++      {
++        var cleanTagStyles = StripDefaultStyles(box, tagStyles);
++        if (cleanTagStyles.Count > 0)
+         {
+-            sb.AppendLine("<style type=\"text/css\">");
+-            foreach (var cssBlocks in cssData.MediaBlocks["all"])
+-            {
+-                sb.Append(cssBlocks.Key);
+-                sb.Append(" { ");
+-                foreach (var cssBlock in cssBlocks.Value)
+-                {
+-                    foreach (var property in cssBlock.Properties)
+-                    {
+-                        // TODO:a handle selectors
+-                        sb.AppendFormat("{0}: {1};", property.Key, property.Value);
+-                    }
+-                }
+-                sb.Append(" }");
+-                sb.AppendLine();
+-            }
+-            sb.AppendLine("</style>");
++          sb.Append(" style=\"");
++          foreach (var style in cleanTagStyles)
++            sb.AppendFormat("{0}: {1}; ", style.Key, style.Value);
++          sb.Remove(sb.Length - 1, 1);
++          sb.Append("\"");
+         }
++      }
++
++      sb.AppendFormat("{0}>", box.HtmlTag.IsSingle ? "/" : "");
++    }
+ 
+-        /// <summary>
+-        /// Get the selected word with respect to partial selected words.
+-        /// </summary>
+-        /// <param name="rect">the word to append</param>
+-        /// <param name="selectedText">is to get selected text or all the text in the word</param>
+-        private static string GetSelectedWord(CssRect rect, bool selectedText)
++    /// <summary>
++    /// Clean the given style collection by removing default styles so only custom styles remain.<br/>
++    /// Return new collection where the old remains unchanged.
++    /// </summary>
++    /// <param name="box">the box the styles apply to, used to know the default style</param>
++    /// <param name="tagStyles">the collection of styles to clean</param>
++    /// <returns>new cleaned styles collection</returns>
++    private static Dictionary<string, string> StripDefaultStyles(CssBox box, Dictionary<string, string> tagStyles)
++    {
++      // ReSharper disable PossibleMultipleEnumeration
++      var cleanTagStyles = new Dictionary<string, string>();
++      var defaultBlocks = box.HtmlContainer.Adapter.DefaultCssData.GetCssBlock(box.HtmlTag.Name);
++      foreach (var style in tagStyles)
++      {
++        bool isDefault = false;
++        foreach (var defaultBlock in defaultBlocks)
+         {
+-            if (selectedText && rect.SelectedStartIndex > -1 && rect.SelectedEndIndexOffset > -1)
+-            {
+-                return rect.Text.Substring(rect.SelectedStartIndex, rect.SelectedEndIndexOffset - rect.SelectedStartIndex);
+-            }
+-            else if (selectedText && rect.SelectedStartIndex > -1)
+-            {
+-                return rect.Text.Substring(rect.SelectedStartIndex) + (rect.HasSpaceAfter ? " " : "");
+-            }
+-            else if (selectedText && rect.SelectedEndIndexOffset > -1)
+-            {
+-                return rect.Text.Substring(0, rect.SelectedEndIndexOffset);
+-            }
+-            else
+-            {
+-                var whitespaceBefore = rect.OwnerBox.Words[0] == rect ? IsBoxHasWhitespace(rect.OwnerBox) : rect.HasSpaceBefore;
+-                return (whitespaceBefore ? " " : "") + rect.Text + (rect.HasSpaceAfter ? " " : "");
+-            }
++          string value;
++          if (defaultBlock.Properties.TryGetValue(style.Key, out value) && value.Equals(style.Value, StringComparison.OrdinalIgnoreCase))
++          {
++            isDefault = true;
++            break;
++          }
+         }
+ 
+-        /// <summary>
+-        /// Generate textual tree representation of the css boxes tree starting from the given root.<br/>
+-        /// Used for debugging html parsing.
+-        /// </summary>
+-        /// <param name="box">the box to generate for</param>
+-        /// <param name="builder">the string builder to generate to</param>
+-        /// <param name="indent">the current indent level to set indent of generated text</param>
+-        private static void GenerateBoxTree(CssBox box, StringBuilder builder, int indent)
+-        {
+-            builder.AppendFormat("{0}<{1}", new string(' ', 2 * indent), box.Display);
+-            if (box.HtmlTag != null)
+-                builder.AppendFormat(" element=\"{0}\"", box.HtmlTag != null ? box.HtmlTag.Name : string.Empty);
+-            if (box.Words.Count > 0)
+-                builder.AppendFormat(" words=\"{0}\"", box.Words.Count);
+-            builder.AppendFormat("{0}>\r\n", box.Boxes.Count > 0 ? "" : "/");
+-            if (box.Boxes.Count > 0)
+-            {
+-                foreach (var childBox in box.Boxes)
+-                {
+-                    GenerateBoxTree(childBox, builder, indent + 1);
+-                }
+-                builder.AppendFormat("{0}</{1}>\r\n", new string(' ', 2 * indent), box.Display);
+-            }
++        if (!isDefault)
++          cleanTagStyles[style.Key] = style.Value;
++      }
++      return cleanTagStyles;
++      // ReSharper restore PossibleMultipleEnumeration
++    }
++
++    /// <summary>
++    /// Write stylesheet data inline into the html.
++    /// </summary>
++    /// <param name="sb">the string builder to write stylesheet into</param>
++    /// <param name="cssData">the css data to write to the head</param>
++    private static void WriteStylesheet(StringBuilder sb, CssData cssData)
++    {
++      sb.AppendLine("<style type=\"text/css\">");
++      foreach (var cssBlocks in cssData.MediaBlocks["all"])
++      {
++        sb.Append(cssBlocks.Key);
++        sb.Append(" { ");
++        foreach (var cssBlock in cssBlocks.Value)
++        {
++          foreach (var property in cssBlock.Properties)
++          {
++            // TODO:a handle selectors
++            sb.AppendFormat("{0}: {1};", property.Key, property.Value);
++          }
+         }
++        sb.Append(" }");
++        sb.AppendLine();
++      }
++      sb.AppendLine("</style>");
++    }
+ 
+-        #endregion
++    /// <summary>
++    /// Get the selected word with respect to partial selected words.
++    /// </summary>
++    /// <param name="rect">the word to append</param>
++    /// <param name="selectedText">is to get selected text or all the text in the word</param>
++    private static string GetSelectedWord(CssRect rect, bool selectedText)
++    {
++      if (selectedText && rect.SelectedStartIndex > -1 && rect.SelectedEndIndexOffset > -1)
++      {
++        return rect.Text.Substring(rect.SelectedStartIndex, rect.SelectedEndIndexOffset - rect.SelectedStartIndex);
++      }
++      else if (selectedText && rect.SelectedStartIndex > -1)
++      {
++        return rect.Text.Substring(rect.SelectedStartIndex) + (rect.HasSpaceAfter ? " " : "");
++      }
++      else if (selectedText && rect.SelectedEndIndexOffset > -1)
++      {
++        return rect.Text.Substring(0, rect.SelectedEndIndexOffset);
++      }
++      else
++      {
++        var whitespaceBefore = rect.OwnerBox.Words[0] == rect ? IsBoxHasWhitespace(rect.OwnerBox) : rect.HasSpaceBefore;
++        return (whitespaceBefore ? " " : "") + rect.Text + (rect.HasSpaceAfter ? " " : "");
++      }
+     }
++
++    /// <summary>
++    /// Generate textual tree representation of the css boxes tree starting from the given root.<br/>
++    /// Used for debugging html parsing.
++    /// </summary>
++    /// <param name="box">the box to generate for</param>
++    /// <param name="builder">the string builder to generate to</param>
++    /// <param name="indent">the current indent level to set indent of generated text</param>
++    private static void GenerateBoxTree(CssBox box, StringBuilder builder, int indent)
++    {
++      builder.AppendFormat("{0}<{1}", new string(' ', 2 * indent), box.Display);
++      if (box.HtmlTag != null)
++        builder.AppendFormat(" element=\"{0}\"", box.HtmlTag != null ? box.HtmlTag.Name : string.Empty);
++      if (box.Words.Count > 0)
++        builder.AppendFormat(" words=\"{0}\"", box.Words.Count);
++      builder.AppendFormat("{0}>\r\n", box.Boxes.Count > 0 ? "" : "/");
++      if (box.Boxes.Count > 0)
++      {
++        foreach (var childBox in box.Boxes)
++        {
++          GenerateBoxTree(childBox, builder, indent + 1);
++        }
++        builder.AppendFormat("{0}</{1}>\r\n", new string(' ', 2 * indent), box.Display);
++      }
++    }
++
++    #endregion
++  }
+ }
+\ No newline at end of file
+diff --git a/Source/HtmlRenderer/Core/Utils/SubString.cs b/Source/HtmlRenderer/Core/Utils/SubString.cs
+index f06f740..2983506 100644
+--- a/Source/HtmlRenderer/Core/Utils/SubString.cs
++++ b/Source/HtmlRenderer/Core/Utils/SubString.cs
+@@ -17,7 +17,7 @@ namespace TheArtOfDev.HtmlRenderer.Core.Utils
+     /// <summary>
+     /// Represents sub-string of a full string starting at specific location with a specific length.
+     /// </summary>
+-    internal sealed class SubString
++    public sealed class SubString
+     {
+         #region Fields and Consts
+ 
+diff --git a/Source/HtmlRenderer/HtmlRenderer.csproj b/Source/HtmlRenderer/HtmlRenderer.csproj
+index 74549b4..7f8e764 100644
+--- a/Source/HtmlRenderer/HtmlRenderer.csproj
++++ b/Source/HtmlRenderer/HtmlRenderer.csproj
+@@ -9,28 +9,79 @@
+     <AppDesignerFolder>Properties</AppDesignerFolder>
+     <RootNamespace>TheArtOfDev.HtmlRenderer</RootNamespace>
+     <AssemblyName>HtmlRenderer</AssemblyName>
+-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+-    <FileAlignment>512</FileAlignment>
++    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
++    <NoWin32Manifest>False</NoWin32Manifest>
++    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
++    <NoStdLib>False</NoStdLib>
++    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
++    <DebugType>Full</DebugType>
++    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
++    <WarningLevel>4</WarningLevel>
++    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
++    <SignAssembly>True</SignAssembly>
++    <AssemblyOriginatorKeyFile>HtmlRenderer.snk</AssemblyOriginatorKeyFile>
++    <DelaySign>False</DelaySign>
++    <AssemblyOriginatorKeyMode>File</AssemblyOriginatorKeyMode>
++    <OutputPath>bin/$(Configuration)/$(Platform)</OutputPath>
+   </PropertyGroup>
+   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+     <DebugSymbols>true</DebugSymbols>
+-    <DebugType>full</DebugType>
+-    <Optimize>false</Optimize>
+-    <OutputPath>bin\Debug\</OutputPath>
+-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+     <ErrorReport>prompt</ErrorReport>
+-    <WarningLevel>4</WarningLevel>
+   </PropertyGroup>
+   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+-    <DebugType>pdbonly</DebugType>
+-    <Optimize>true</Optimize>
+-    <OutputPath>bin\Release\</OutputPath>
++    <ErrorReport>prompt</ErrorReport>
++  </PropertyGroup>
++  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+     <DefineConstants>TRACE</DefineConstants>
++    <Optimize>True</Optimize>
++    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
++    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
++  </PropertyGroup>
++  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
++    <Optimize>False</Optimize>
++    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
++    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
++  </PropertyGroup>
++  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Win32' ">
++    <DebugSymbols>true</DebugSymbols>
+     <ErrorReport>prompt</ErrorReport>
+-    <WarningLevel>4</WarningLevel>
++  </PropertyGroup>
++  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|Win32' ">
++    <ErrorReport>prompt</ErrorReport>
++  </PropertyGroup>
++  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Win64' ">
++    <DebugSymbols>true</DebugSymbols>
++    <ErrorReport>prompt</ErrorReport>
++  </PropertyGroup>
++  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|Win64' ">
++    <ErrorReport>prompt</ErrorReport>
++  </PropertyGroup>
++  <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
++    <BaseAddress>4194304</BaseAddress>
++    <PlatformTarget>AnyCPU</PlatformTarget>
++    <RegisterForComInterop>False</RegisterForComInterop>
++    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
++    <FileAlignment>512</FileAlignment>
++  </PropertyGroup>
++  <PropertyGroup Condition=" '$(Platform)' == 'Win32' ">
++    <BaseAddress>4194304</BaseAddress>
++    <PlatformTarget>x86</PlatformTarget>
++    <RegisterForComInterop>False</RegisterForComInterop>
++    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
++    <FileAlignment>512</FileAlignment>
++  </PropertyGroup>
++  <PropertyGroup Condition=" '$(Platform)' == 'Win64' ">
++    <BaseAddress>4194304</BaseAddress>
++    <PlatformTarget>x64</PlatformTarget>
++    <RegisterForComInterop>False</RegisterForComInterop>
++    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
++    <FileAlignment>512</FileAlignment>
+   </PropertyGroup>
+   <ItemGroup>
+     <Reference Include="System" />
++    <Reference Include="System.Core">
++      <RequiredTargetFramework>3.5</RequiredTargetFramework>
++    </Reference>
+   </ItemGroup>
+   <ItemGroup>
+     <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />
+diff --git a/Source/HtmlRenderer/HtmlRenderer.sln b/Source/HtmlRenderer/HtmlRenderer.sln
+new file mode 100644
+index 0000000..4c9857f
+--- /dev/null
++++ b/Source/HtmlRenderer/HtmlRenderer.sln
+@@ -0,0 +1,18 @@
++﻿
++Microsoft Visual Studio Solution File, Format Version 11.00
++# Visual Studio 2010
++# SharpDevelop 5.2
++Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlRenderer", "HtmlRenderer.csproj", "{FE611685-391F-4E3E-B27E-D3150E51E49B}"
++EndProject
++Global
++	GlobalSection(SolutionConfigurationPlatforms) = preSolution
++		Debug|Any CPU = Debug|Any CPU
++		Release|Any CPU = Release|Any CPU
++	EndGlobalSection
++	GlobalSection(ProjectConfigurationPlatforms) = postSolution
++		{FE611685-391F-4E3E-B27E-D3150E51E49B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
++		{FE611685-391F-4E3E-B27E-D3150E51E49B}.Debug|Any CPU.Build.0 = Debug|Any CPU
++		{FE611685-391F-4E3E-B27E-D3150E51E49B}.Release|Any CPU.ActiveCfg = Release|Any CPU
++		{FE611685-391F-4E3E-B27E-D3150E51E49B}.Release|Any CPU.Build.0 = Release|Any CPU
++	EndGlobalSection
++EndGlobal
+diff --git a/Source/HtmlRenderer/HtmlRenderer.snk b/Source/HtmlRenderer/HtmlRenderer.snk
+new file mode 100644
+index 0000000..bb7e38e
+Binary files /dev/null and b/Source/HtmlRenderer/HtmlRenderer.snk differ
