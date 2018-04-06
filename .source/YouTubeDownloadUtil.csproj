@@ -88,17 +88,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="cor3\ClipboardImageWatcher.cs" />
-    <Compile Include="cor3\ClipboardWatcher.cs" />
-    <Compile Include="cor3\ini.cs" />
-    <Compile Include="cor3\ITaskContext.cs" />
-    <Compile Include="cor3\SimpleProgressEventArgs.cs" />
-    <Compile Include="extensions\DirectoryHelper.cs" />
-    <Compile Include="extensions\DragDropFormsExtension.cs" />
-    <Compile Include="extensions\EnumHelper.cs" />
-    <Compile Include="extensions\FileSystemExtensions.cs" />
-    <Compile Include="extensions\PropertyInfoHelper.cs" />
-    <Compile Include="extensions\VariousStringExtensions.cs" />
     <Compile Include="HTML-Renderer\Source\HtmlRenderer.WinForms\Adapters\BrushAdapter.cs" />
     <Compile Include="HTML-Renderer\Source\HtmlRenderer.WinForms\Adapters\ContextMenuAdapter.cs" />
     <Compile Include="HTML-Renderer\Source\HtmlRenderer.WinForms\Adapters\ControlAdapter.cs" />
@@ -202,8 +191,19 @@
     <Compile Include="source\Actions.cs" />
     <Compile Include="source\CommandKeyHandler.cs" />
     <Compile Include="source\ConfigModel.cs" />
+    <Compile Include="source\cor3\ClipboardImageWatcher.cs" />
+    <Compile Include="source\cor3\ClipboardWatcher.cs" />
+    <Compile Include="source\cor3\ini.cs" />
+    <Compile Include="source\cor3\ITaskContext.cs" />
+    <Compile Include="source\cor3\SimpleProgressEventArgs.cs" />
     <Compile Include="source\DownloaderStatus.cs" />
     <Compile Include="source\DownloadTarget.cs" />
+    <Compile Include="source\extensions\DirectoryHelper.cs" />
+    <Compile Include="source\extensions\DragDropFormsExtension.cs" />
+    <Compile Include="source\extensions\EnumHelper.cs" />
+    <Compile Include="source\extensions\FileSystemExtensions.cs" />
+    <Compile Include="source\extensions\PropertyInfoHelper.cs" />
+    <Compile Include="source\extensions\VariousStringExtensions.cs" />
     <Compile Include="source\MainForm.ButtonContext.cs" />
     <Compile Include="source\MainForm.cs">
       <SubType>Form</SubType>
