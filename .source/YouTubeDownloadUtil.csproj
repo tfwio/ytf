@@ -122,7 +122,6 @@
     </Compile>
     <Compile Include="source\SimpleCommand.cs" />
     <Compile Include="source\YoutubeDlProcess.cs" />
-    <Compile Include="Windows7ProgressBar\Control\AssemblyInfo.cs" />
     <Compile Include="Windows7ProgressBar\Control\COMTypes.cs" />
     <Compile Include="Windows7ProgressBar\Control\Windows7ProgressBar.cs">
       <SubType>Component</SubType>
@@ -137,10 +136,6 @@
       <CustomToolNamespace>YouTubeDownloadUtil</CustomToolNamespace>
     </EmbeddedResource>
     <None Include="ico.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Windows7ProgressBar\Control\bin\Release\Windows7ProgressBar.dll" />
-    <Content Include="Windows7ProgressBar\Control\bin\Release\Windows7ProgressBar.XML" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="source\MainForm.resx">

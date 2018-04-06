@@ -71,8 +71,8 @@
       this.wavToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.flvToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.statusControls = new System.Windows.Forms.TableLayoutPanel();
-      this.statCurrent = new System.Windows.Forms.ProgressBar();
-      this.statTotal = new System.Windows.Forms.ProgressBar();
+      this.statCurrent = new wyDay.Controls.Windows7ProgressBar();
+      this.statTotal = new wyDay.Controls.Windows7ProgressBar();
       this.panel1.SuspendLayout();
       this.panel2.SuspendLayout();
       this.statusStrip1.SuspendLayout();
@@ -393,14 +393,17 @@
       // 
       // statCurrent
       // 
+      this.statCurrent.ContainerControl = this;
       this.statCurrent.Dock = System.Windows.Forms.DockStyle.Fill;
       this.statCurrent.Location = new System.Drawing.Point(3, 3);
       this.statCurrent.Name = "statCurrent";
+      this.statCurrent.ShowInTaskbar = true;
       this.statCurrent.Size = new System.Drawing.Size(270, 20);
       this.statCurrent.TabIndex = 0;
       // 
       // statTotal
       // 
+      this.statTotal.ContainerControl = this;
       this.statTotal.Dock = System.Windows.Forms.DockStyle.Fill;
       this.statTotal.Location = new System.Drawing.Point(279, 3);
       this.statTotal.Name = "statTotal";
@@ -464,7 +467,7 @@
     private System.Windows.Forms.ToolStripTextBox textMaxDownloads;
     private System.Windows.Forms.ToolStripStatusLabel statText;
     private System.Windows.Forms.TableLayoutPanel statusControls;
-    private System.Windows.Forms.ProgressBar statCurrent;
-    private System.Windows.Forms.ProgressBar statTotal;
+    private wyDay.Controls.Windows7ProgressBar statTotal;
+    private wyDay.Controls.Windows7ProgressBar statCurrent;
   }
 }
