@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
+
 namespace YouTubeDownloadUtil
 {
   // want: --flat-playlist
@@ -121,10 +123,20 @@ namespace YouTubeDownloadUtil
       set { XSubtitleTypes = value.ToString(); }
     }
 
+    [IniKey(Group = "global", Alias = "window-bounds")] public string RestoreBounds { get; set; }
+
+
     public event EventHandler Saved;
     protected virtual void OnSaved() => Saved?.Invoke(this, EventArgs.Empty);
+    public event EventHandler BeforeSaved;
+    protected virtual void OnBeforeSaved() => BeforeSaved?.Invoke(this, EventArgs.Empty);
 
-    public void Save() { var coll = new IniCollection(this); coll.Write(confDotIni); OnSaved(); }
+    public void Save() {
+      OnBeforeSaved(); // get the window state.
+      var coll = new IniCollection(this);
+      coll.Write(confDotIni);
+      OnSaved();
+    }
 
     static public ConfigModel Load() { return Load(DirectoryHelper.ExecutableDirectory); }
     static public ConfigModel Load(string confDir)
@@ -138,6 +150,7 @@ namespace YouTubeDownloadUtil
         MaxDownloads = "1",
         XAudioTypes = string.Empty,
         XSubtitleTypes = string.Empty,
+        RestoreBounds = string.Empty,
       };
       if (!confDotIni.Exists) ini.Save();
       var coll = new IniCollection(confDotIni);
