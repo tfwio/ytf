@@ -103,7 +103,7 @@ namespace YouTubeDownloadUtil
 
     /// <summary>Primary application flags (youtube-dl specific)</summary>
     [Ignore] public YoutubeDlFlags AppFlags {
-      get { YoutubeDlFlags l = 0; foreach (var n in YoutubeDlFlagsStr.StringToArray()) l |= n.TryParse(out YoutubeDlFlags kk) ? kk : 0; return l; }
+      get { YoutubeDlFlags l = 0; foreach (var n in YoutubeDlFlagsStr.StringToArray()) { YoutubeDlFlags kk; l |= n.TryParse<YoutubeDlFlags>(out kk) ? kk : 0; } return l; }
       set { YoutubeDlFlagsStr = value.ToString(); }
     }
 
@@ -111,7 +111,7 @@ namespace YouTubeDownloadUtil
     [IniKey(Group = "global", Alias = "audio-types")] public string XAudioTypes { get; set; }
 
     [Ignore] public ExtractAudioTypes AudioTypes {
-      get { ExtractAudioTypes l = 0; foreach (var n in XAudioTypes.StringToArray()) l |= n.TryParse(out ExtractAudioTypes kk) ? kk : 0; return l; }
+      get { ExtractAudioTypes l = 0; foreach (var n in XAudioTypes.StringToArray()) { ExtractAudioTypes kk; l |= n.TryParse<ExtractAudioTypes>(out kk) ? kk : 0; } return l; }
       set { XAudioTypes = value.ToString(); }
     }
 
@@ -119,7 +119,7 @@ namespace YouTubeDownloadUtil
     [IniKey(Group = "global", Alias = "subtitle-types")] public string XSubtitleTypes { get; set; }
 
     [Ignore] public ConvertSubTypes SubtitleTypes {
-      get { ConvertSubTypes l = 0; foreach (var n in XSubtitleTypes.StringToArray()) l |= n.TryParse(out ConvertSubTypes kk) ? kk : 0; return l; }
+      get { ConvertSubTypes l = 0; foreach (var n in XSubtitleTypes.StringToArray()) { ConvertSubTypes kk; l |= n.TryParse<ConvertSubTypes>(out kk) ? kk : 0; } return l; }
       set { XSubtitleTypes = value.ToString(); }
     }
 

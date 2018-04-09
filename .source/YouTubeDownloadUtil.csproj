@@ -196,6 +196,7 @@
     <Compile Include="source\cor3\ini.cs" />
     <Compile Include="source\cor3\ITaskContext.cs" />
     <Compile Include="source\cor3\SimpleProgressEventArgs.cs" />
+    <Compile Include="source\cor3\TimeConversion.cs" />
     <Compile Include="source\DownloaderStatus.cs" />
     <Compile Include="source\DownloadTarget.cs" />
     <Compile Include="source\extensions\DirectoryHelper.cs" />
@@ -219,6 +220,10 @@
       <DependentUpon>ResourceStrings.resx</DependentUpon>
     </Compile>
     <Compile Include="source\SimpleCommand.cs" />
+    <Compile Include="source\TimeTest.cs" />
+    <Compile Include="source\TimeTest.Designer.cs">
+      <DependentUpon>TimeTest.cs</DependentUpon>
+    </Compile>
     <Compile Include="source\YoutubeDlProcess.cs" />
     <Compile Include="Windows7ProgressBar\Control\COMTypes.cs" />
     <Compile Include="Windows7ProgressBar\Control\Windows7ProgressBar.cs">
@@ -238,6 +243,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="HTML-Renderer\Source\HtmlRenderer\Core\Utils\ImageLoad.png">
       <CustomToolNamespace>TheArtOfDev.HtmlRenderer.Core.Utils</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="source\TimeTest.resx">
+      <DependentUpon>TimeTest.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="HTML-Renderer\Source\HtmlRenderer\HtmlRenderer.csproj">
       <SubType>Designer</SubType>

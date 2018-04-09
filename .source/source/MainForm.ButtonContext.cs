@@ -114,11 +114,17 @@ namespace YouTubeDownloadUtil
       
       lbLast.Text = $"[{ConfigModel.Instance.TargetType}]"; // initial target-type is m4a (itunes audio)
       
+      cm.Items.Add("-");
+      cm.Items.Add("Time to Milliseconds",null,(a,e)=>{
+                     timeCalculatorForm.ShowDialog(this);
+                   });
+      
       // load defaults
 
-     UpdateDownloadTargets();
+      UpdateDownloadTargets();
       FlagsToMenu();
     }
+    TimeTest timeCalculatorForm = new TimeTest();
     
     ToolStripMenuItem ShellFolderItem(ToolStripMenuItem parent, string key)
     {
@@ -177,11 +183,12 @@ namespace YouTubeDownloadUtil
       lbMaxDownloads.Visible = (textMaxDownloads.Visible = mMaxDownloads.Checked);
 
       Event_ButtonShowContext(null, null);
-      mOptions.PerformClick();
+      //cm.Show();
+      mOptions.ShowDropDown();
 
       ConfigModel.Instance.AppFlags = F;
       ConfigModel.Instance.Save();
     }
-  
+    
   }
 }
