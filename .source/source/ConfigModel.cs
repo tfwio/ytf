@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
 using System.Windows.Forms;
+
+// this looks illegal
+using R = YouTubeDownloadUtil.ResourceStrings;
 
 namespace YouTubeDownloadUtil
 {
@@ -27,7 +31,7 @@ namespace YouTubeDownloadUtil
     PreferFFmpeg      = 4 * 0x1000,
     MaxDownloads      = 8 * 0x1000,
     Simulate          = 1 * 0x10000,
-    ReservedD         = 2 * 0x10000,
+    NameFromURL       = 2 * 0x10000,
     ReservedC         = 4 * 0x10000,
     ReservedB         = 8 * 0x10000,
     ReservedA         = 1 * 0x100000,
@@ -67,6 +71,35 @@ namespace YouTubeDownloadUtil
 
   class ConfigModel
   {
+    internal struct NamedValue { public string Name; public string Value; }
+
+    internal event EventHandler FlagsChanged;
+    protected void OnFlagsChanged()
+    {
+      var e = FlagsChanged;
+      if (e != null) e(this, EventArgs.Empty);
+    }
+
+    static internal Dictionary<YoutubeDlFlags, NamedValue> FlagUsage { get; set; } = new Dictionary<YoutubeDlFlags, NamedValue>{
+      { YoutubeDlFlags.AbortOnDuplicate , new NamedValue{ Name=R.mAbortOnDuplicate, Value=null                   } },
+      { YoutubeDlFlags.AddMetadata      , new NamedValue{ Name=R.mAddMetadata,      Value=R.mAddMetaDataTip      } },
+      { YoutubeDlFlags.Continue         , new NamedValue{ Name=R.mContinue,         Value=R.mContinueTip         } },
+      { YoutubeDlFlags.EmbedSubs        , new NamedValue{ Name=R.mEmbedSubs,        Value=R.mEmbedSubsTip        } },
+      { YoutubeDlFlags.EmbedThumb       , new NamedValue{ Name=R.mEmbedThumb,       Value=R.mEmbedThumbTip       } },
+      { YoutubeDlFlags.FlatPlaylist     , new NamedValue{ Name=R.mFlatPlaylist,     Value=null                   } },
+      { YoutubeDlFlags.GetPlaylist      , new NamedValue{ Name=R.mGetPlaylist,      Value=R.mGetPlaylistTip      } },
+      { YoutubeDlFlags.IgnoreErrors     , new NamedValue{ Name=R.mIgnoreErrors,     Value=R.mIgnoreErrorsTip     } },
+      { YoutubeDlFlags.Verbose          , new NamedValue{ Name=R.mVerbose,          Value=R.mVerboseTip          } },
+      { YoutubeDlFlags.WriteAnnotations , new NamedValue{ Name=R.mWriteAnnotations, Value=R.mWriteAnnotationsTip } },
+      { YoutubeDlFlags.WriteAutoSubs    , new NamedValue{ Name=R.mWriteAutoSub,     Value=R.mWriteAutoSubTip     } },
+      { YoutubeDlFlags.WriteSubs        , new NamedValue{ Name=R.mWriteSubs,        Value=R.mWriteSubsTip        } },
+      { YoutubeDlFlags.ExtractAudio     , new NamedValue{ Name=R.mExtractAudio,     Value=R.mExtractAudioTip     } },
+      { YoutubeDlFlags.PreferFFmpeg     , new NamedValue{ Name=R.mPreferFFmpeg,     Value=R.mPreferFFmpegTip     } },
+      { YoutubeDlFlags.MaxDownloads     , new NamedValue{ Name=R.mMaxDownloads,     Value=R.mMaxDownloadsTip     } },
+      { YoutubeDlFlags.Simulate         , new NamedValue{ Name=R.mSimulate,         Value=R.mSimulateTip         } },
+      { YoutubeDlFlags.NameFromURL      , new NamedValue{ Name=R.mNameFromURL,      Value=R.mNameFromURL_Msg     } },
+    };
+
     static readonly FileInfo confDotIni = new FileInfo(Path.Combine(System.DirectoryHelper.ExecutableDirectory, ResourceStrings.ConfDefault));
 
     static internal ConfigModel Instance = Load();
@@ -104,7 +137,7 @@ namespace YouTubeDownloadUtil
     /// <summary>Primary application flags (youtube-dl specific)</summary>
     [Ignore] public YoutubeDlFlags AppFlags {
       get { YoutubeDlFlags l = 0; foreach (var n in YoutubeDlFlagsStr.StringToArray()) { YoutubeDlFlags kk; l |= n.TryParse<YoutubeDlFlags>(out kk) ? kk : 0; } return l; }
-      set { YoutubeDlFlagsStr = value.ToString(); }
+      set { YoutubeDlFlagsStr = value.ToString(); OnFlagsChanged(); }
     }
 
     /// <summary>Extract audio types.</summary>
@@ -124,7 +157,6 @@ namespace YouTubeDownloadUtil
     }
 
     [IniKey(Group = "global", Alias = "window-bounds")] public string RestoreBounds { get; set; }
-
 
     public event EventHandler Saved;
     protected virtual void OnSaved() => Saved?.Invoke(this, EventArgs.Empty);

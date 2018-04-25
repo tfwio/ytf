@@ -55,9 +55,9 @@ namespace YouTubeDownloadUtil
   /// </summary>
   class DownloadTargetFile
   {
-    public string Title          { get; set; }    // friendly name for printing to UI
+    public string Title          { get; set; } // friendly name for printing to UI
     public string FileName       { get; set; } // file is downloaded to.
-    public string FileURI        { get; set; }  // http://.....
+    public string FileURI        { get; set; } // http://.....
     public string FileURI_x86_64 { get; set; } // in case we prefer
     public string BinPath        { get; set; } // where (target) binaries are located
     public bool IsArchive        { get; set; } // weather or not we extract the file or just keep as-is.

@@ -46,9 +46,18 @@ namespace YouTubeDownloadUtil
       (this as IRestoreBounds).WindowStateToForm();
     }
 
+    Timer statusTimer;
+
     public MainForm()
     {
       InitializeComponent();
+
+      statusTimer = new Timer { Interval = 3000, Enabled = false };
+      statusTimer.Tick += (n, a) => {
+        statText.Text = "youtube-dl";
+        statusTimer.Stop();
+      };
+      
       // additional properties
       statusControls.Visible = false;
       textMaxDownloads.Text = ConfigModel.Instance.MaxDownloads;
@@ -76,7 +85,8 @@ namespace YouTubeDownloadUtil
           if (e.Data.GetDataPresent(DataFormats.Text))
           {
             DragDropButtonText = (string)e.Data.GetData(DataFormats.Text);
-            textBox1.Text = (string)e.Data.GetData(DataFormats.Text);
+            textBox1.Text = string.Empty;
+            textBox1.Text = DragDropButtonText;
           }
           else if (e.Data.GetDataPresent(DataFormats.FileDrop))
           {
@@ -125,6 +135,13 @@ namespace YouTubeDownloadUtil
     {
       ckHasPlaylist.Visible = textBox1.Text.Contains("&list=") || textBox1.Text.Contains("?list=");
       ConfigModel.TargetURI = textBox1.Text;
+
+      if (ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.NameFromURL))
+      {
+        var text = ConfigModel.TargetURI.GetBasenameFromURL();
+        statText.Text = text;
+        statusTimer.Start();
+      }
     }
 
     // interface: IUI

@@ -29,6 +29,11 @@ namespace YouTubeDownloadUtil
     string StrSubLang            { get { return !string.IsNullOrEmpty(SubLang) ? $" --sub-lang {SubLang}" : string.Empty; } }
     string StrWriteAutoSub       { get { return Flags.HasFlag(YtFlag.WriteAutoSubs) ? " --write-auto-sub" : string.Empty; } }
     string StrWriteSub           { get { return Flags.HasFlag(YtFlag.WriteSubs) ? " --write-sub" : string.Empty; } }
+    // file-naming
+    string NameFromURL           { get { return Flags.HasFlag(YtFlag.NameFromURL) ? $" -o \"{TargetOutput}.%(ext)s\"" : string.Empty; } }
+
+    string TargetOutput          { get { return TargetUri.GetBasenameFromURL();  } }
+
     // extract audio (missing)
     // string StrMaxDownloads { get { return Flags.HasFlag(YtFlag.WriteSubs) ? " --write-sub" : string.Empty; } }
     public string CombinedVar    {
@@ -44,8 +49,9 @@ namespace YouTubeDownloadUtil
         return $"-{part1}{StrTargetType}";
       }
     }
-    public string CommandText    { get { return $"{CombinedVar}{StrWriteSub}{StrWriteAnnotations}{StrPlaylist}{StrFlatPlaylist}{StrSubLang}{StrWriteAutoSub}{StrEmbedSubs}{StrEmbedThumbnail}{StrAddMetaData}{StrPreferFFmpeg} \"{TargetUri}\""; } }
-    
+    public string CommandText    { get { return $"{CombinedVar}{StrWriteSub}{StrWriteAnnotations}{StrPlaylist}{StrFlatPlaylist}{StrSubLang}{StrWriteAutoSub}{StrEmbedSubs}{StrEmbedThumbnail}{StrAddMetaData}{StrPreferFFmpeg} \"{TargetUri}\" {NameFromURL}"; } }
+
+
     ProcessStartInfo NewStartInfo {
       get {
         // only reason we're not using this is the RTF box

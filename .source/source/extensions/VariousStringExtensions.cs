@@ -27,9 +27,25 @@ namespace System
     static public string Wrap(this string input, string pre, string post) { return string.Concat(pre,input,post); }
 
     static public string ReplaceExtension(this FileSystemInfo fileinfo, string extension) { return fileinfo == null ? string.Empty : fileinfo.FullName.Replace(fileinfo.Extension, extension); }
-    
+
     // parser helpers -----------------------------------------------
-    
+
+    // strip the last part out of an URL to use as output file-name
+    static public string GetBasenameFromURL(this string inputURI)
+    {
+      var target = inputURI
+        .Replace('\\', '/')
+        .Replace("//","/")
+        .Replace("https", "http")
+        .Replace("http", string.Empty);
+      if (target.Contains("?")) target = target.Substring(0, target.LastIndexOf('?')).Trim();
+      target = target.TrimEnd('/');
+      int lastSlash = target.LastIndexOf('/');
+      if (lastSlash > 0) target = target.Substring(lastSlash + 1);
+
+      return target;
+    }
+
     const string chars_to_escape=@"=;#\";
     
     static public string DecodeAvString(this string input)

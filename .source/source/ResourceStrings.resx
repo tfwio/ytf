@@ -286,4 +286,10 @@ By default, youtube-dl will resume downloads if possible.</value>
   <data name="EmbeddedResNamespace" xml:space="preserve">
     <value>YouTubeDownloadUtil.HTML_Renderer.Source.HtmlRenderer.Core.Utils</value>
   </data>
+  <data name="mNameFromURL" xml:space="preserve">
+    <value>Name From URL</value>
+  </data>
+  <data name="mNameFromURL_Msg" xml:space="preserve">
+    <value>Provide a name for output based on the navigation URL</value>
+  </data>
 </root>

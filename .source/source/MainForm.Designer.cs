@@ -134,7 +134,7 @@
       this.richTextBox1.Name = "richTextBox1";
       this.richTextBox1.ReadOnly = true;
       this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedBoth;
-      this.richTextBox1.Size = new System.Drawing.Size(384, 356);
+      this.richTextBox1.Size = new System.Drawing.Size(384, 335);
       this.richTextBox1.TabIndex = 3;
       this.richTextBox1.Text = "";
       this.richTextBox1.WordWrap = false;
@@ -143,7 +143,7 @@
       // 
       this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.statText});
-      this.statusStrip1.Location = new System.Drawing.Point(0, 436);
+      this.statusStrip1.Location = new System.Drawing.Point(0, 415);
       this.statusStrip1.Name = "statusStrip1";
       this.statusStrip1.Size = new System.Drawing.Size(384, 22);
       this.statusStrip1.TabIndex = 13;
@@ -384,7 +384,7 @@
       this.statusControls.Controls.Add(this.statCurrent, 0, 0);
       this.statusControls.Controls.Add(this.statTotal, 1, 0);
       this.statusControls.Dock = System.Windows.Forms.DockStyle.Bottom;
-      this.statusControls.Location = new System.Drawing.Point(0, 410);
+      this.statusControls.Location = new System.Drawing.Point(0, 389);
       this.statusControls.Name = "statusControls";
       this.statusControls.RowCount = 1;
       this.statusControls.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -414,7 +414,7 @@
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(384, 458);
+      this.ClientSize = new System.Drawing.Size(384, 437);
       this.Controls.Add(this.richTextBox1);
       this.Controls.Add(this.statusControls);
       this.Controls.Add(this.toolStrip1);

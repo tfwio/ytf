@@ -299,6 +299,24 @@ namespace YouTubeDownloadUtil {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Name From URL.
+        /// </summary>
+        internal static string mNameFromURL {
+            get {
+                return ResourceManager.GetString("mNameFromURL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Provide a name for output based on the navigation URL.
+        /// </summary>
+        internal static string mNameFromURL_Msg {
+            get {
+                return ResourceManager.GetString("mNameFromURL_Msg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to youtube-dl flags.
         /// </summary>
         internal static string mOptions {
