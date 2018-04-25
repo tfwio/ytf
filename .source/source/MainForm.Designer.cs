@@ -397,7 +397,6 @@
       this.statCurrent.Dock = System.Windows.Forms.DockStyle.Fill;
       this.statCurrent.Location = new System.Drawing.Point(3, 3);
       this.statCurrent.Name = "statCurrent";
-      this.statCurrent.ShowInTaskbar = true;
       this.statCurrent.Size = new System.Drawing.Size(270, 20);
       this.statCurrent.TabIndex = 0;
       // 
