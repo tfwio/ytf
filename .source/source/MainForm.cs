@@ -57,22 +57,26 @@ namespace YouTubeDownloadUtil
         statText.Text = "youtube-dl";
         statusTimer.Stop();
       };
-      
+
       // additional properties
       statusControls.Visible = false;
       textMaxDownloads.Text = ConfigModel.Instance.MaxDownloads;
+
       // more initializers
       UpdateEnvironmentPath();
       Actions.COutputSplash(this);
       CreateToolStrip();
+
       // events
       btnAbortProcess.MouseDown += Event_ButtonShowContext;
       textBox1.TextChanged += TextBox1TextChanged;
 
-      FormClosing += (object sender, FormClosingEventArgs e) => ConfigModel.Instance.Save();
       ConfigModel.Instance.BeforeSaved += (s,e) => (this as IRestoreBounds).WindowStateToConfig();
-
+      ConfigModel.Instance.Saved += (o, a) => SetStatus("Saved Configuration");
+      ConfigModel.Instance.FlagsChanged += (o, a) => ConfigModel.Instance.Save();
       textMaxDownloads.TextChanged += (a, b) => ConfigModel.Instance.MaxDownloads = textMaxDownloads.Text;
+      FormClosing += (s, e) => ConfigModel.Instance.Save();
+
       // drag-drop
       this.ApplyDragDropMethod(
         (sender, e) =>
@@ -137,11 +141,13 @@ namespace YouTubeDownloadUtil
       ConfigModel.TargetURI = textBox1.Text;
 
       if (ConfigModel.Instance.AppFlags.HasFlag(YoutubeDlFlags.NameFromURL))
-      {
-        var text = ConfigModel.TargetURI.GetBasenameFromURL();
-        statText.Text = text;
-        statusTimer.Start();
-      }
+        SetStatus(ConfigModel.TargetURI.GetBasenameFromURL());
+    }
+
+    void SetStatus(string text)
+    {
+      statText.Text = text;
+      statusTimer.Start();
     }
 
     // interface: IUI

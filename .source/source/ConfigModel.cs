@@ -72,14 +72,7 @@ namespace YouTubeDownloadUtil
   class ConfigModel
   {
     internal struct NamedValue { public string Name; public string Value; }
-
-    internal event EventHandler FlagsChanged;
-    protected void OnFlagsChanged()
-    {
-      var e = FlagsChanged;
-      if (e != null) e(this, EventArgs.Empty);
-    }
-
+    
     static internal Dictionary<YoutubeDlFlags, NamedValue> FlagUsage { get; set; } = new Dictionary<YoutubeDlFlags, NamedValue>{
       { YoutubeDlFlags.AbortOnDuplicate , new NamedValue{ Name=R.mAbortOnDuplicate, Value=null                   } },
       { YoutubeDlFlags.AddMetadata      , new NamedValue{ Name=R.mAddMetadata,      Value=R.mAddMetaDataTip      } },
@@ -160,15 +153,34 @@ namespace YouTubeDownloadUtil
 
     public event EventHandler Saved;
     protected virtual void OnSaved() => Saved?.Invoke(this, EventArgs.Empty);
+
     public event EventHandler BeforeSaved;
     protected virtual void OnBeforeSaved() => BeforeSaved?.Invoke(this, EventArgs.Empty);
 
-    public void Save() {
+    internal event EventHandler FlagsChanged;
+    protected void OnFlagsChanged() => FlagsChanged?.Invoke(this, EventArgs.Empty);
+
+    ConfigModel()
+    {
+      SaveTimer = new Timer() { Enabled = false, Interval = 1200 };
+      SaveTimer.Tick += (o,a) => SaveAction();
+    }
+
+    void SaveAction()
+    {
+      SaveTimer.Stop();
       OnBeforeSaved(); // get the window state.
       var coll = new IniCollection(this);
       coll.Write(confDotIni);
       OnSaved();
     }
+    public void Save(bool ignoreTimer=false)
+    {
+      if (ignoreTimer) { SaveAction(); return; }
+      if (SaveTimer.Enabled) SaveTimer.Stop();
+      SaveTimer.Start();
+    }
+    Timer SaveTimer;
 
     static public ConfigModel Load() { return Load(DirectoryHelper.ExecutableDirectory); }
     static public ConfigModel Load(string confDir)
