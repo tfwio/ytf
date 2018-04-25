@@ -12,6 +12,7 @@ namespace YouTubeDownloadUtil
 {
   public partial class FormFlagOptions : Form
   {
+    Font MainFont = new Font("Open Sans", 10.0f, FontStyle.Bold, GraphicsUnit.Point);
     public FormFlagOptions()
     {
       InitializeComponent();
@@ -29,8 +30,13 @@ namespace YouTubeDownloadUtil
           Text = dic.Name,
           Checked = ConfigModel.Instance.AppFlags.HasFlag(i),
           Tag = i,
-          Width=120,
-          Height = 24,
+          Width=320,
+          Font = MainFont,
+          Height = 32,
+          CheckAlign = ContentAlignment.MiddleLeft,
+          TextAlign = ContentAlignment.MiddleLeft,
+          Padding = new Padding(3,3,3,5),
+          //BackColor = SystemColors.Control,
         };
         if (!string.IsNullOrEmpty(dic.Value)) toolTipControl.SetToolTip(
           checker, $"<b>{dic.Name}</b><br/>{dic.Value}"
