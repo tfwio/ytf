@@ -220,6 +220,7 @@
     </Compile>
     <Compile Include="source\MainForm.Worker.cs" />
     <Compile Include="source\DownloadTargetFile.cs" />
+    <Compile Include="source\Microsoft_WMF_EMF.cs" />
     <Compile Include="source\ResourceStrings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
