@@ -445,6 +445,24 @@ namespace YouTubeDownloadUtil {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Keep Top-Level Window.
+        /// </summary>
+        internal static string mTopLevel {
+            get {
+                return ResourceManager.GetString("mTopLevel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Forces the Window to stay on top of others..
+        /// </summary>
+        internal static string mTopLevelTip {
+            get {
+                return ResourceManager.GetString("mTopLevelTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Verbose.
         /// </summary>
         internal static string mVerbose {

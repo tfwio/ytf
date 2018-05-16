@@ -292,4 +292,10 @@ By default, youtube-dl will resume downloads if possible.</value>
   <data name="mNameFromURL_Msg" xml:space="preserve">
     <value>Provide a name for output based on the navigation URL</value>
   </data>
+  <data name="mTopLevel" xml:space="preserve">
+    <value>Keep Top-Level Window</value>
+  </data>
+  <data name="mTopLevelTip" xml:space="preserve">
+    <value>Forces the Window to stay on top of others.</value>
+  </data>
 </root>

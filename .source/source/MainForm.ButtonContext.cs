@@ -30,7 +30,7 @@ namespace YouTubeDownloadUtil
   partial class MainForm
   {
     internal ContextMenuStrip cm = new ContextMenuStrip();
-    internal ToolStripMenuItem mExplore, mRemovePath, mNameFromURL, mOptions, mAbortOnDuplicate, mAddMetadata, mContinue, mEmbedSubs, mEmbedThumb, mFlatPlaylist, mGetPlaylist, mIgnoreErrors, mSimulate, mVerbose, mWriteAutoSub, mWriteSubs, mDownloadTargets, mWriteAnnotations, mPreferFFmpeg, mExtractAudio, mMaxDownloads;
+    internal ToolStripMenuItem mExplore, mRemovePath, mTopLevel, mNameFromURL, mOptions, mAbortOnDuplicate, mAddMetadata, mContinue, mEmbedSubs, mEmbedThumb, mFlatPlaylist, mGetPlaylist, mIgnoreErrors, mSimulate, mVerbose, mWriteAutoSub, mWriteSubs, mDownloadTargets, mWriteAnnotations, mPreferFFmpeg, mExtractAudio, mMaxDownloads;
     
     string DragDropButtonText = string.Empty; // used for temporary storage on drag-enter/drop.
     
@@ -76,6 +76,11 @@ namespace YouTubeDownloadUtil
       cm.Items.Clear();
       mOptions          = cm.Items.Add(ResourceStrings.mOptions) as ToolStripMenuItem;
       mExplore          = cm.Items.Add(ResourceStrings.mExplore, null, (s,e)=> Actions.ExploreToPath()) as ToolStripMenuItem;
+      mTopLevel         = cm.Items.Add(ResourceStrings.mTopLevel, null, (s,e)=> {
+        mTopLevel.Checked = (TopMost = (ConfigModel.Instance.KeepOnTop = !ConfigModel.Instance.KeepOnTop));
+        ConfigModel.Instance.Save();
+        }) as ToolStripMenuItem;
+      mTopLevel.ToolTipText = ResourceStrings.mTopLevelTip;
       cm.Items.Add("Browse Flags", null, (s,e)=> flagOptions.ShowDialog(this));
       mRemovePath       = cm.Items.Add(ResourceStrings.mRemovePath, null, (s,e)=> RemoveTargetPath()) as ToolStripMenuItem;
       // Flags

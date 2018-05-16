@@ -151,6 +151,21 @@ namespace YouTubeDownloadUtil
 
     [IniKey(Group = "global", Alias = "window-bounds")] public string RestoreBounds { get; set; }
 
+    /// <summary>Keep the Window at top-level.</summary>
+    [IniKey(Group = "global", Alias = "keep-on-top")] public string KeepOnTopStr { get; set; }
+    const bool DefaultKeepOnTopValue = false;
+    [Ignore]
+    public bool KeepOnTop
+    {
+      get
+      {
+        bool result;
+        bool got = bool.TryParse(KeepOnTopStr,out result);
+        return got ? result : DefaultKeepOnTopValue;
+      }
+      set { KeepOnTopStr = value.ToString(); }
+    }
+
     public event EventHandler Saved;
     protected virtual void OnSaved() => Saved?.Invoke(this, EventArgs.Empty);
 
@@ -195,6 +210,7 @@ namespace YouTubeDownloadUtil
         XAudioTypes = string.Empty,
         XSubtitleTypes = string.Empty,
         RestoreBounds = string.Empty,
+        KeepOnTop = false,
       };
       if (!confDotIni.Exists) ini.Save();
       var coll = new IniCollection(confDotIni);

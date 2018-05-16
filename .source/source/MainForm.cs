@@ -44,6 +44,7 @@ namespace YouTubeDownloadUtil
     {
       base.OnLoad(e);
       (this as IRestoreBounds).WindowStateToForm();
+      mTopLevel.Checked = (TopMost = ConfigModel.Instance.KeepOnTop);
     }
 
     Timer statusTimer;
@@ -75,7 +76,7 @@ namespace YouTubeDownloadUtil
       ConfigModel.Instance.Saved += (o, a) => SetStatus("Saved Configuration");
       ConfigModel.Instance.FlagsChanged += (o, a) => ConfigModel.Instance.Save();
       textMaxDownloads.TextChanged += (a, b) => ConfigModel.Instance.MaxDownloads = textMaxDownloads.Text;
-      FormClosing += (s, e) => ConfigModel.Instance.Save();
+      FormClosing += (s, e) => ConfigModel.Instance.Save(true);
 
       // drag-drop
       this.ApplyDragDropMethod(
