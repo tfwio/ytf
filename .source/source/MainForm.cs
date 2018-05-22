@@ -39,7 +39,6 @@ namespace YouTubeDownloadUtil
       downloader.Abort(ResourceStrings.msgUserAbort);
     }
 
-
     protected override void OnLoad(EventArgs e)
     {
       base.OnLoad(e);
@@ -49,9 +48,31 @@ namespace YouTubeDownloadUtil
 
     Timer statusTimer;
 
+    System.Drawing.Text.PrivateFontCollection pfc = new System.Drawing.Text.PrivateFontCollection();
+
+    /// <summary>Use this wisely.  EG: don't add the same font twice, of course.</summary>
+    /// <param name="fontResource">Embedded byte[] resource</param>
+    /// <returns>The Family</returns>
+    FontFamily CreateResFont(byte[] fontResource)
+    {
+      var pinnedArray = System.Runtime.InteropServices.GCHandle.Alloc(fontResource, System.Runtime.InteropServices.GCHandleType.Pinned);
+      IntPtr pointer = pinnedArray.AddrOfPinnedObject();
+
+      pfc.AddMemoryFont(pointer, fontResource.Length);
+      pinnedArray.Free();
+
+      return pfc.Families.First();
+    }
+
     public MainForm()
     {
       InitializeComponent();
+
+      var fam1 = CreateResFont(ResImage.OpenSans_Semibold);
+      cm.Font = new Font(fam1, 13.0f, FontStyle.Regular);
+
+      var fam2 = CreateResFont(ResImage.OpenSans_Regular);
+      textBox1.Font = new Font(fam2, 10.5f, FontStyle.Regular);
 
       statusTimer = new Timer { Interval = 3000, Enabled = false };
       statusTimer.Tick += (n, a) => {

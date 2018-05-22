@@ -221,6 +221,11 @@
     <Compile Include="source\MainForm.Worker.cs" />
     <Compile Include="source\DownloadTargetFile.cs" />
     <Compile Include="source\Microsoft_WMF_EMF.cs" />
+    <Compile Include="source\ResImage.Designer.cs">
+      <DependentUpon>ResImage.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
     <Compile Include="source\ResourceStrings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -244,6 +249,12 @@
     <EmbeddedResource Include="readme.rtf" />
     <EmbeddedResource Include="source\FormFlagOptions.resx">
       <DependentUpon>FormFlagOptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="source\ResImage.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ResImage.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>YouTubeDownloadUtil</CustomToolNamespace>
     </EmbeddedResource>
     <EmbeddedResource Include="source\ResourceStrings.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -269,6 +280,5 @@
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
