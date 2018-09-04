@@ -1,0 +1,16 @@
+ .../HTML-Renderer/Source/HtmlRenderer/Adapters/Entities/RColor.cs       | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/.source/paket-files/ArthurHub/HTML-Renderer/Source/HtmlRenderer/Adapters/Entities/RColor.cs b/.source/paket-files/ArthurHub/HTML-Renderer/Source/HtmlRenderer/Adapters/Entities/RColor.cs
+index 83fb26a..d2b31a6 100644
+--- a/.source/paket-files/ArthurHub/HTML-Renderer/Source/HtmlRenderer/Adapters/Entities/RColor.cs
++++ b/.source/paket-files/ArthurHub/HTML-Renderer/Source/HtmlRenderer/Adapters/Entities/RColor.cs
+@@ -170,7 +170,7 @@ namespace TheArtOfDev.HtmlRenderer.Adapters.Entities
+             CheckByte(red);
+             CheckByte(green);
+             CheckByte(blue);
+-            return new RColor((uint)(red << 16 | green << 8 | blue | alpha << 24) & (long)uint.MaxValue);
++            return new RColor((long)(red << 16 | green << 8 | blue | alpha << 24) & (long)uint.MaxValue);
+         }
+ 
+         /// <summary>

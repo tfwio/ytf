@@ -170,7 +170,7 @@ namespace TheArtOfDev.HtmlRenderer.Adapters.Entities
             CheckByte(red);
             CheckByte(green);
             CheckByte(blue);
-            return new RColor((uint)(red << 16 | green << 8 | blue | alpha << 24) & (long)uint.MaxValue);
+            return new RColor((long)(red << 16 | green << 8 | blue | alpha << 24) & (long)uint.MaxValue);
         }
 
         /// <summary>
