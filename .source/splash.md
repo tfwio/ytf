@@ -12,7 +12,7 @@ As indispensable as youtube-dl may be, it still needs a bit of help dealing with
 
 i.   Get youtube-dl (from the link below) and extract it somewhere.
 ii.  DragDrop youtube-dl.exe into this app to tell it where it is.
-iii. Get AVConv and do the same.
+iii. Get AVConv and do the same (naaa ---just use FFmpeg).
 iv.  Get FFmpeg and do the same.
 v.   Go get AtomicParsley and do the same.
 
