@@ -155,8 +155,14 @@ namespace YouTubeDownloadUtil
       return base.ProcessCmdKey(ref msg, keyData);
     }
 
-    void Event_BeginDownloadType(object sender, EventArgs e) { var l = sender as ToolStripMenuItem; ConfigModel.Instance.TargetType = l.Text; lbLast.Text = $"[{ConfigModel.Instance.TargetType}]"; Worker_Begin(); }
+    void Event_BeginDownloadType(object sender, EventArgs e) {
+      var l = sender as ToolStripMenuItem;
+      ConfigModel.Instance.TargetType = l.Text;
+      lbLast.Text = $"[{ConfigModel.Instance.TargetType}]";
+      Worker_Begin();
+    }
     void Event_BeginDownload(object sender, EventArgs e) { Worker_Begin(); }
+
     void TextBox1TextChanged(object sender, EventArgs e)
     {
       ckHasPlaylist.Visible = textBox1.Text.Contains("&list=") || textBox1.Text.Contains("?list=");
