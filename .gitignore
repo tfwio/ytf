@@ -25,4 +25,4 @@ DemoVB
 /.source/paket-files/ArthurHub/HTML-Renderer/Source/Demo
 /.source/paket-files/ArthurHub/HTML-Renderer/Source/HtmlRenderer.PdfSharp
 /.source/paket-files/ArthurHub/HTML-Renderer/Source/HtmlRenderer.WPF
-/build
+build
