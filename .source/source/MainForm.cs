@@ -9,6 +9,9 @@ namespace YouTubeDownloadUtil
 {
   public partial class MainForm : Form, IUI, IRestoreBounds
   {
+  	readonly Font OpenSans_SB13, OpenSans_R10_5, Roboto_M12_Bold, Roboto_M9;
+    readonly System.Drawing.Text.PrivateFontCollection pfc = new System.Drawing.Text.PrivateFontCollection();
+  	
     readonly Color colorDark = Color.FromArgb(64, 64, 64);
     readonly Color colorLight = SystemColors.ControlLight;
 
@@ -48,8 +51,7 @@ namespace YouTubeDownloadUtil
 
     Timer statusTimer;
 
-    System.Drawing.Text.PrivateFontCollection pfc = new System.Drawing.Text.PrivateFontCollection();
-
+		#region Font Helpers
     /// <summary>Use this wisely.  EG: don't add the same font twice, of course.</summary>
     /// <param name="fontResource">Embedded byte[] resource</param>
     /// <returns>The Family</returns>
@@ -57,23 +59,67 @@ namespace YouTubeDownloadUtil
     {
       var pinnedArray = System.Runtime.InteropServices.GCHandle.Alloc(fontResource, System.Runtime.InteropServices.GCHandleType.Pinned);
       IntPtr pointer = pinnedArray.AddrOfPinnedObject();
-
+			
       pfc.AddMemoryFont(pointer, fontResource.Length);
       pinnedArray.Free();
 
       return pfc.Families.First();
     }
-
+		/// <summary>
+		/// Combines CreateResFont with a method which directly creates a
+		/// font of a particular style and size.
+		/// 
+		/// Be careful not to add the same font.
+		/// </summary>
+		/// <param name="res">Binary byte[] resource.</param>
+		/// <param name="emSize">font's float size.</param>
+		/// <param name="fontStyle">you know.</param>
+		/// <returns></returns>
+    Font CreateFont(byte[] res, float emSize, FontStyle fontStyle)
+    {
+    	var fam_temp = CreateResFont(res);
+    	return new Font(fam_temp, emSize, fontStyle);
+    }
+    Font GetEmbeddedFont(string name, float emSize, FontStyle fontStyle)
+    {
+    	// 1. Check if the family name exists
+    	bool hasFamily = false;
+      for (int i = 0; i < this.pfc.Families.Length; i++)
+				hasFamily |= pfc.Families[i].Name == name;
+    	// 2. return Null if we havent found the target font family.
+      if (!hasFamily) return null;
+      // 3. Get pointer to the fam.
+      var fam = pfc.Families.First(fnt => fnt.Name == name);
+      // 4. create/return desired Font.
+      return new Font(fam, emSize, fontStyle);
+    }
+		#endregion
+    
     public MainForm()
     {
       InitializeComponent();
+      
+      CreateResFont(ResImage.Roboto_Regular);
+      CreateResFont(ResImage.Roboto_Medium);
+      CreateResFont(ResImage.OpenSans_Semibold);
+      CreateResFont(ResImage.OpenSans_Regular);
+      
+      Roboto_M9 = GetEmbeddedFont("Roboto Medium", 9F, FontStyle.Regular);
+      Roboto_M12_Bold = GetEmbeddedFont("Roboto Medium", 12F, FontStyle.Bold);
 
-      var fam1 = CreateResFont(ResImage.OpenSans_Semibold);
-      cm.Font = new Font(fam1, 13.0f, FontStyle.Regular);
-
-      var fam2 = CreateResFont(ResImage.OpenSans_Regular);
-      textBox1.Font = new Font(fam2, 10.5f, FontStyle.Regular);
-
+      textBox1.Font = Roboto_M12_Bold;
+      textMaxDownloads.Font = Roboto_M9;
+      ckHasPlaylist.Font = Roboto_M9;
+      toolStripLabel1.Font = Roboto_M9;
+      toolStripLabel2.Font = Roboto_M9;
+      toolStripTextBox1.Font = Roboto_M9;
+      toolStripTextBox2.Font = Roboto_M9;
+      
+      OpenSans_SB13 = CreateFont(ResImage.OpenSans_Semibold, 13.0f, FontStyle.Regular);
+      OpenSans_R10_5 = CreateFont(ResImage.OpenSans_Regular, 10.5f, FontStyle.Regular);
+      cm.Font = OpenSans_SB13;
+      textBox1.Font = OpenSans_R10_5;
+			
       statusTimer = new Timer { Interval = 3000, Enabled = false };
       statusTimer.Tick += (n, a) => {
         statText.Text = "youtube-dl";

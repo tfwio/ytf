@@ -70,12 +70,12 @@
       this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
       this.wavToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.flvToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.statusControls = new System.Windows.Forms.TableLayoutPanel();
-      this.statCurrent = new wyDay.Controls.Windows7ProgressBar();
-      this.statTotal = new wyDay.Controls.Windows7ProgressBar();
       this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
       this.singleJSONToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.dumpSingleJSONJToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.statusControls = new System.Windows.Forms.TableLayoutPanel();
+      this.statCurrent = new wyDay.Controls.Windows7ProgressBar();
+      this.statTotal = new wyDay.Controls.Windows7ProgressBar();
       this.panel1.SuspendLayout();
       this.panel2.SuspendLayout();
       this.statusStrip1.SuspendLayout();
@@ -106,7 +106,6 @@
       // textBox1
       // 
       this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-      this.textBox1.Font = new System.Drawing.Font("Roboto", 12F, System.Drawing.FontStyle.Bold);
       this.textBox1.Location = new System.Drawing.Point(0, 0);
       this.textBox1.Name = "textBox1";
       this.textBox1.Size = new System.Drawing.Size(353, 27);
@@ -145,7 +144,7 @@
       // statusStrip1
       // 
       this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.statText});
+      this.statText});
       this.statusStrip1.Location = new System.Drawing.Point(0, 415);
       this.statusStrip1.Name = "statusStrip1";
       this.statusStrip1.Size = new System.Drawing.Size(384, 22);
@@ -162,11 +161,11 @@
       // 
       this.toolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
       this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.lbMaxDownloads,
-            this.textMaxDownloads,
-            this.ckHasPlaylist,
-            this.btnAbort,
-            this.lbLast});
+      this.lbMaxDownloads,
+      this.textMaxDownloads,
+      this.ckHasPlaylist,
+      this.btnAbort,
+      this.lbLast});
       this.toolStrip1.Location = new System.Drawing.Point(0, 29);
       this.toolStrip1.Name = "toolStrip1";
       this.toolStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
@@ -189,11 +188,10 @@
       // 
       this.ckHasPlaylist.AutoToolTip = false;
       this.ckHasPlaylist.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripLabel1,
-            this.toolStripTextBox1,
-            this.toolStripLabel2,
-            this.toolStripTextBox2});
-      this.ckHasPlaylist.Font = new System.Drawing.Font("Roboto", 9F);
+      this.toolStripLabel1,
+      this.toolStripTextBox1,
+      this.toolStripLabel2,
+      this.toolStripTextBox2});
       this.ckHasPlaylist.ImageTransparentColor = System.Drawing.Color.Magenta;
       this.ckHasPlaylist.Name = "ckHasPlaylist";
       this.ckHasPlaylist.Size = new System.Drawing.Size(105, 22);
@@ -202,30 +200,26 @@
       // 
       // toolStripLabel1
       // 
-      this.toolStripLabel1.Font = new System.Drawing.Font("Roboto", 11F);
       this.toolStripLabel1.Name = "toolStripLabel1";
-      this.toolStripLabel1.Size = new System.Drawing.Size(99, 18);
+      this.toolStripLabel1.Size = new System.Drawing.Size(80, 14);
       this.toolStripLabel1.Text = "Α: (start/first)";
       // 
       // toolStripTextBox1
       // 
-      this.toolStripTextBox1.Font = new System.Drawing.Font("Roboto", 11F);
       this.toolStripTextBox1.Name = "toolStripTextBox1";
-      this.toolStripTextBox1.Size = new System.Drawing.Size(64, 25);
+      this.toolStripTextBox1.Size = new System.Drawing.Size(64, 23);
       this.toolStripTextBox1.Text = "1";
       // 
       // toolStripLabel2
       // 
-      this.toolStripLabel2.Font = new System.Drawing.Font("Roboto", 11F);
       this.toolStripLabel2.Name = "toolStripLabel2";
-      this.toolStripLabel2.Size = new System.Drawing.Size(91, 18);
+      this.toolStripLabel2.Size = new System.Drawing.Size(74, 14);
       this.toolStripLabel2.Text = "Ω: (end/last)";
       // 
       // toolStripTextBox2
       // 
-      this.toolStripTextBox2.Font = new System.Drawing.Font("Roboto", 11F);
       this.toolStripTextBox2.Name = "toolStripTextBox2";
-      this.toolStripTextBox2.Size = new System.Drawing.Size(64, 25);
+      this.toolStripTextBox2.Size = new System.Drawing.Size(64, 23);
       this.toolStripTextBox2.Text = "1";
       // 
       // btnAbort
@@ -243,26 +237,26 @@
       this.lbLast.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
       this.lbLast.DropDownButtonWidth = 14;
       this.lbLast.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.lbBest,
-            this.toolStripSeparator2,
-            this.bestaudioToolStripMenuItem,
-            this.lbM4a,
-            this.lbMp3,
-            this.oggToolStripMenuItem,
-            this.toolStripMenuItem1,
-            this.toolStripMenuItem2,
-            this.lbMp4,
-            this.webmToolStripMenuItem,
-            this.toolStripMenuItem4,
-            this.gpToolStripMenuItem,
-            this.worstvideoToolStripMenuItem,
-            this.worstaudioToolStripMenuItem,
-            this.toolStripMenuItem3,
-            this.wavToolStripMenuItem,
-            this.flvToolStripMenuItem,
-            this.toolStripMenuItem5,
-            this.singleJSONToolStripMenuItem,
-            this.dumpSingleJSONJToolStripMenuItem});
+      this.lbBest,
+      this.toolStripSeparator2,
+      this.bestaudioToolStripMenuItem,
+      this.lbM4a,
+      this.lbMp3,
+      this.oggToolStripMenuItem,
+      this.toolStripMenuItem1,
+      this.toolStripMenuItem2,
+      this.lbMp4,
+      this.webmToolStripMenuItem,
+      this.toolStripMenuItem4,
+      this.gpToolStripMenuItem,
+      this.worstvideoToolStripMenuItem,
+      this.worstaudioToolStripMenuItem,
+      this.toolStripMenuItem3,
+      this.wavToolStripMenuItem,
+      this.flvToolStripMenuItem,
+      this.toolStripMenuItem5,
+      this.singleJSONToolStripMenuItem,
+      this.dumpSingleJSONJToolStripMenuItem});
       this.lbLast.ImageTransparentColor = System.Drawing.Color.Magenta;
       this.lbLast.Name = "lbLast";
       this.lbLast.Size = new System.Drawing.Size(52, 19);
@@ -382,6 +376,25 @@
       this.flvToolStripMenuItem.Text = "flv";
       this.flvToolStripMenuItem.Click += new System.EventHandler(this.Event_BeginDownloadType);
       // 
+      // toolStripMenuItem5
+      // 
+      this.toolStripMenuItem5.Name = "toolStripMenuItem5";
+      this.toolStripMenuItem5.Size = new System.Drawing.Size(186, 6);
+      // 
+      // singleJSONToolStripMenuItem
+      // 
+      this.singleJSONToolStripMenuItem.Name = "singleJSONToolStripMenuItem";
+      this.singleJSONToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
+      this.singleJSONToolStripMenuItem.Text = "dump JSON \'-j\'";
+      this.singleJSONToolStripMenuItem.Click += new System.EventHandler(this.Event_BeginDownloadType);
+      // 
+      // dumpSingleJSONJToolStripMenuItem
+      // 
+      this.dumpSingleJSONJToolStripMenuItem.Name = "dumpSingleJSONJToolStripMenuItem";
+      this.dumpSingleJSONJToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
+      this.dumpSingleJSONJToolStripMenuItem.Text = "dump single JSON \'-J\'";
+      this.dumpSingleJSONJToolStripMenuItem.Click += new System.EventHandler(this.Event_BeginDownloadType);
+      // 
       // statusControls
       // 
       this.statusControls.ColumnCount = 2;
@@ -414,25 +427,6 @@
       this.statTotal.Name = "statTotal";
       this.statTotal.Size = new System.Drawing.Size(102, 20);
       this.statTotal.TabIndex = 0;
-      // 
-      // toolStripMenuItem5
-      // 
-      this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-      this.toolStripMenuItem5.Size = new System.Drawing.Size(186, 6);
-      // 
-      // singleJSONToolStripMenuItem
-      // 
-      this.singleJSONToolStripMenuItem.Name = "singleJSONToolStripMenuItem";
-      this.singleJSONToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
-      this.singleJSONToolStripMenuItem.Text = "dump JSON \'-j\'";
-      this.singleJSONToolStripMenuItem.Click += new System.EventHandler(this.Event_BeginDownloadType);
-      // 
-      // dumpSingleJSONJToolStripMenuItem
-      // 
-      this.dumpSingleJSONJToolStripMenuItem.Name = "dumpSingleJSONJToolStripMenuItem";
-      this.dumpSingleJSONJToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
-      this.dumpSingleJSONJToolStripMenuItem.Text = "dump single JSON \'-J\'";
-      this.dumpSingleJSONJToolStripMenuItem.Click += new System.EventHandler(this.Event_BeginDownloadType);
       // 
       // MainForm
       // 
