@@ -160,7 +160,7 @@ namespace YouTubeDownloadUtil
       get
       {
         bool result;
-        bool got = bool.TryParse(KeepOnTopStr,out result);
+        bool got = bool.TryParse(KeepOnTopStr, out result);
         return got ? result : DefaultKeepOnTopValue;
       }
       set { KeepOnTopStr = value.ToString(); }
