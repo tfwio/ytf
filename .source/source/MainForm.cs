@@ -9,6 +9,15 @@ namespace YouTubeDownloadUtil
 {
   public partial class MainForm : Form, IUI, IRestoreBounds
   {
+		static public string AppRootPath
+		{
+			get
+			{
+				var fileinfo = new FileInfo(Path.GetFullPath(System.Reflection.Assembly.GetExecutingAssembly().Location));
+				return fileinfo.Directory.FullName;
+			}
+		}
+    
   	readonly Font OpenSans_SB13, OpenSans_R10_5, Roboto_M12_Bold, Roboto_M9;
     readonly System.Drawing.Text.PrivateFontCollection pfc = new System.Drawing.Text.PrivateFontCollection();
   	
