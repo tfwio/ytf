@@ -9,7 +9,7 @@
       "command": "cmd.exe",
       "args": [
         "/c",
-        "${workspaceFolder}\\.source\\Build-AllCPU-Debug.cmd"
+        "${workspaceFolder}\\.source\\Build-AnyCPU-Debug.cmd"
       ],
       "group": {
         "kind": "build",
