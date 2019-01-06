@@ -101,7 +101,6 @@ namespace YouTubeDownloadUtil
       richTextBox1.Focus();
       btnAbort.Visible = true;
       statCurrent.Value = 0;
-      statTotal.Value = 0;
       statusControls.Visible = true;
       statCurrent.ShowInTaskbar = true;
     }
@@ -125,7 +124,6 @@ namespace YouTubeDownloadUtil
       statusControls.Visible = false;
       statText.Text = "youtube-dl";
       statCurrent.Value = 0;
-      statTotal.Value = 0;
       statCurrent.ShowInTaskbar = false;
     }
 
