@@ -63,7 +63,7 @@ namespace YouTubeDownloadUtil
           RedirectStandardError = true,
           RedirectStandardOutput = true,
           CreateNoWindow = true,
-          WorkingDirectory = TargetPath.EnvironmentPathFilter()
+          WorkingDirectory = TargetPath.Decode().EnvironmentPathFilter()
         };
         // si.RedirectStandardInput = false;
         return si;
