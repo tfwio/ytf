@@ -190,8 +190,8 @@ namespace YouTubeDownloadUtil
 							var encodedpath = Path.GetFullPath(DragDropButtonText).Encode();
 							WriteSomeStuff(
 								"Added a Target Directory",
-								$"Directory Name: “{Path.GetFileName(DragDropButtonText)}”",
-								$"Full Path: “{DragDropButtonText}”",
+								$"Directory Name: “{Path.GetFileName(DragDropButtonText)}”\n",
+								$"Full Path: “{DragDropButtonText}”\n",
 								$"Coded Path: “{encodedpath}”"
 							);
             }
@@ -205,8 +205,8 @@ namespace YouTubeDownloadUtil
 								var encodedpath = Path.GetFullPath(DragDropButtonText).Encode();
 								WriteSomeStuff(
 									"Updated youtube-dl.exe executable path...",
-									$"Directory Name: “{Path.GetFileName(DragDropButtonText)}”",
-									$"Full Path: “{DragDropButtonText}”",
+									$"Directory Name: “{Path.GetFileName(DragDropButtonText)}”\n",
+									$"Full Path: “{DragDropButtonText}”\n",
 									$"Coded Path: “{encodedpath}”"
 								);
 							}
@@ -217,8 +217,8 @@ namespace YouTubeDownloadUtil
 								var encodedpath = Path.GetFullPath(DragDropButtonText).Encode();
 								WriteSomeStuff(
 									"Updated avconv.exe executable path...",
-									$"Directory Name: “{Path.GetFileName(DragDropButtonText)}”",
-									$"Full Path: “{DragDropButtonText}”",
+									$"Directory Name: “{Path.GetFileName(DragDropButtonText)}”\n",
+									$"Full Path: “{DragDropButtonText}”\n",
 									$"Coded Path: “{encodedpath}”"
 								);
 							}
@@ -229,8 +229,8 @@ namespace YouTubeDownloadUtil
 								var encodedpath = Path.GetFullPath(DragDropButtonText).Encode();
 								WriteSomeStuff(
 									"Updated ffmpeg.exe executable path...",
-									$"Directory Name: “{Path.GetFileName(DragDropButtonText)}”",
-									$"Full Path: “{DragDropButtonText}”",
+									$"Directory Name: “{Path.GetFileName(DragDropButtonText)}”\n",
+									$"Full Path: “{DragDropButtonText}”\n",
 									$"Coded Path: “{encodedpath}”"
 								);
 							}
@@ -333,7 +333,7 @@ namespace YouTubeDownloadUtil
 				richTextBox1.Clear();
 				richTextBox1.SelectionIndent = 10;
 				richTextBox1.SelectionFont = boldFont;
-				richTextBox1.AppendText($"{heading}\n");
+				richTextBox1.AppendText($"{heading}\n\n");
 				richTextBox1.SelectionFont = reguFont;
 				richTextBox1.SelectionIndent = 20;
 				foreach (var line in lines) richTextBox1.AppendText($"{line}\n");
