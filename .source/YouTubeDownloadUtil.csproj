@@ -215,7 +215,8 @@
     </Compile>
     <Compile Include="source\MainForm.Worker.cs" />
     <Compile Include="source\DownloadTargetFile.cs" />
-    <Compile Include="source\Microsoft_WMF_EMF.cs" />
+    <Compile Include="source\RootString.cs" />
+    <None Include="source\Microsoft_WMF_EMF.cs" />
     <Compile Include="source\ResImage.Designer.cs">
       <DependentUpon>ResImage.resx</DependentUpon>
       <DesignTime>True</DesignTime>
@@ -275,6 +276,7 @@
     <EmbeddedResource Include="source\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
+    <Content Include="source\RootString.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
