@@ -119,7 +119,10 @@ namespace YouTubeDownloadUtil
             return;
           case Win32Native_NoWorkingDirectory:
             Aborted = true;
-            AbortMessage = $"{msgLauchError}<ErrorCode> {w32err.ErrorCode}, <NativeErrorCode> {w32err.NativeErrorCode}\n<DOTNET/Exception>{w32err.Message}\n{ResourceStrings.Win32Native_NoWorkingDirectory_Msg}\n";
+            // Provide addition of $WORKPATH$ in string for replacement.
+            var err_msg = ResourceStrings.Win32Native_NoWorkingDirectory_Msg
+            	.Replace("$WORKPATH$", shellProcess.StartInfo.WorkingDirectory);
+            AbortMessage = $"{msgLauchError}<ErrorCode> {w32err.ErrorCode}, <NativeErrorCode> {w32err.NativeErrorCode}\n<DOTNET/Exception>{w32err.Message}\n{err_msg}\n";
             return;
           default:
             throw w32err;

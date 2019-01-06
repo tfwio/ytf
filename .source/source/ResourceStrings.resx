@@ -194,7 +194,8 @@
 &lt;to-fix&gt; Drag-Drop youtube-dl.exe back onto the app for it to be configured properly.</value>
   </data>
   <data name="Win32Native_NoWorkingDirectory_Msg" xml:space="preserve">
-    <value>The target-directory (WorkPath) wasn't found.\n&lt;to-fix&gt; Select another target (output) path.</value>
+    <value>The target-directory (WorkPath) wasn't found.\n&lt;to-fix&gt; Select another target (output) path.
+PATH = $WORKPATH$</value>
   </data>
   <data name="mAddMetaDataTip" xml:space="preserve">
     <value>Write metadata to the video file</value>
