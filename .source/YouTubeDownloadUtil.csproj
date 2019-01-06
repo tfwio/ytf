@@ -228,12 +228,6 @@
       <DependentUpon>ResourceStrings.resx</DependentUpon>
     </Compile>
     <Compile Include="source\SimpleCommand.cs" />
-    <Compile Include="source\TimeTest.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="source\TimeTest.Designer.cs">
-      <DependentUpon>TimeTest.cs</DependentUpon>
-    </Compile>
     <Compile Include="source\YoutubeDlProcess.cs" />
     <Compile Include="Windows7ProgressBar\Control\COMTypes.cs" />
     <Compile Include="Windows7ProgressBar\Control\Windows7ProgressBar.cs">
@@ -262,9 +256,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="paket-files\ArthurHub\HTML-Renderer\Source\HtmlRenderer\Core\Utils\ImageLoad.png">
       <CustomToolNamespace>TheArtOfDev.HtmlRenderer.Core.Utils</CustomToolNamespace>
-    </EmbeddedResource>
-    <EmbeddedResource Include="source\TimeTest.resx">
-      <DependentUpon>TimeTest.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="config.ini" />
     <None Include="paket-files\ArthurHub\HTML-Renderer\Source\HtmlRenderer\HtmlRenderer.csproj">

@@ -128,17 +128,11 @@ namespace YouTubeDownloadUtil
 			
 			lbLast.Text = $"[{ConfigModel.Instance.TargetType}]"; // initial target-type is m4a (itunes audio)
 			
-			cm.Items.Add("-");
-			cm.Items.Add("Time to Milliseconds",null,(a,e)=>{
-			             	timeCalculatorForm.ShowDialog(this);
-			             });
-			
 			// load defaults
 
 			UpdateDownloadTargets();
 			lbMaxDownloads.Visible = (textMaxDownloads.Visible = mMaxDownloads.Checked);
 		}
-		TimeTest timeCalculatorForm = new TimeTest();
 		
 		ToolStripMenuItem ShellFolderItem(ToolStripMenuItem parent, string key)
 		{
