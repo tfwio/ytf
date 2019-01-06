@@ -279,7 +279,6 @@ namespace YouTubeDownloadUtil
       new CommandKeyHandler<IUI>{Name="Output: Clear Output Text",Keys=Keys.C|Keys.Alt, Action = Actions.COutputClear },
       new CommandKeyHandler<IUI>{Name="Output: Show Splash Document",Keys=Keys.R|Keys.Alt, Action = Actions.COutputSplash },
       new CommandKeyHandler<IUI>{Name="Output: Toggle Word-Wrap",Keys=Keys.Z|Keys.Alt, Action = Actions.COutputWordWrap },
-      new CommandKeyHandler<IUI>{Name="Output: Show Target WorkPath (Output-Dir)",Keys=Keys.D|Keys.Control, Action = Actions.COutputWorkPath },
       new CommandKeyHandler<IUI>{Name="Output: Focus", Keys=Keys.Alt|Keys.D, Action = (f)=> f.TextInput.Focus() },
       new CommandKeyHandler<IUI>{Name="Outout: Short-Cut Keys", Keys=Keys.F5, Action = Actions.COutputShortcuts },
       new CommandKeyHandler<IUI>{Name="Outout: Reset Zoom Factor", Keys=Keys.NumPad0|Keys.Control, Action = Actions.COutputZoomReset },

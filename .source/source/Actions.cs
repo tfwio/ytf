@@ -44,7 +44,6 @@ namespace YouTubeDownloadUtil
 		internal static void COutputClear(IUI f)     { f.OutputRTF.Clear(); f.OutputRTF.SelectionTabs = null; }
 		internal static void COutputSplash(IUI f)    { f.OutputRTF.Rtf = Actions.RtfHelpText(); f.OutputRTF.WordWrap = true; }
 		internal static void COutputWordWrap(IUI f)  { f.OutputRTF.WordWrap = !f.OutputRTF.WordWrap; }
-		internal static void COutputWorkPath(IUI f) { f.OutputRTF.AppendText(ConfigModel.Instance.TargetOutputDirectory + "\n"); }
 		internal static void COutputZoomReset(IUI f) { f.OutputRTF.ZoomFactor = 1; }
 		internal static void COutputShortcuts(IUI f)
 		{
