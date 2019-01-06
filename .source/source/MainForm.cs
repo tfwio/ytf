@@ -286,6 +286,23 @@ namespace YouTubeDownloadUtil
       {
       }
     }
+    
+		void WriteSomeStuff(string heading, params string[] lines)
+		{
+			using (var boldFont = new System.Drawing.Font(richTextBox1.Font.FontFamily, 14.0f, System.Drawing.FontStyle.Bold))
+				using (var reguFont = new System.Drawing.Font(richTextBox1.Font.FontFamily, 12.0f, System.Drawing.FontStyle.Regular))
+			{
+				richTextBox1.SelectAll();
+				richTextBox1.SelectionTabs = null;
+				richTextBox1.Clear();
+				richTextBox1.SelectionIndent = 10;
+				richTextBox1.SelectionFont = boldFont;
+				richTextBox1.AppendText($"{heading}\n");
+				richTextBox1.SelectionFont = reguFont;
+				richTextBox1.SelectionIndent = 20;
+				foreach (var line in lines) richTextBox1.AppendText($"{line}\n");
+			}
+		}
 
   }
 
