@@ -1,5 +1,5 @@
-{\rtf1\ansi\ansicpg1252\deff0\deflang1033{\fonttbl{\f0\fnil\fcharset0 Microsoft Sans Serif;}{\f1\fnil\fcharset0 Calibri;}{\f2\fnil\fcharset0 Consolas;}}
-{\colortbl ;\red64\green64\blue64;\red192\green192\blue192;\red0\green0\blue255;}
+{\rtf1\ansi\ansicpg1252\deff0\deflang1033{\fonttbl{\f0\fnil\fcharset0 Microsoft Sans Serif;}{\f1\fnil\fcharset0 Calibri;}}
+{\colortbl ;\red64\green64\blue64;\red0\green0\blue255;}
 {\*\generator Msftedit 5.41.21.2510;}\viewkind4\uc1\pard\li720\sa200\sl240\slmult1\cf1\b\f0\fs28\par
 \pard\li720\sa200\fs48 youtube-dl ui/utility\b0\fs24\par
 Helper for running youtube-dl.\par
@@ -1715,50 +1715,77 @@ b6010101b7090909090909090909090909092e0101015409090909090909090909090909090909
 090909090909090909090909090909090909090909090909090909090909090909090909090909
 090909090909090909090909090909090908070a0b040c02010101010101010101010101010101
 01010101040000002701ffff030000000000
-}\cf1\lang1033\f0\fs24\par
-\b\fs28 FIRST STEPS\b0\par
-\fs24 As indispensible as \b\fs22 youtube-dl\b0  \fs24 may be, it still needs a bit of help dealing with the variety of AV file-formats it encounters.\fs28\par
-\pard{\pntext\f0 i.\tab}{\*\pn\pnlvlbody\pnf0\pnindent0\pnstart1\pnlcrm{\pntxta.}}
-\fi-360\li1440\fs24 Get youtube-dl (from the link below) and extract it somewhere.\par
-\i{\pntext\f0 ii.\tab}DragDrop \highlight2\b\i0\f2\fs20 youtube-dl.exe\highlight0\b0\f0\fs24  into this app to tell it where it is.\par
-{\pntext\f0 iii.\tab}Get AVConv and do the same.\par
-{\pntext\f0 iv.\tab}Get FFmpeg and do the same.\par
-\pard{\pntext\f0 v.\tab}{\*\pn\pnlvlbody\pnf0\pnindent0\pnstart1\pnlcrm{\pntxta.}}
-\fi-360\li1440\sa200 Go get AtomicParsley and do the same.\par
-\pard\li720\sa200\b\fs28 LINKS\b0\par
+}\par
+\cf1\lang1033\b\f0\fs36 SETUP\b0\fs28\par
+\fs24 At this point, there really isn't much to set up.  All the tools you *need* are provided in the stand-alone zip archive in the \ldblquote tools\rdblquote  sub-directory.\par
+\b\fs28 To Download\b0\fs24\par
+\pard\li1080\sa200 The button below the the 'address-bar' in the upper right of the screen is a split-button.  On it's left side you see the currently selected audio or video format we're attempting to download.  On the button's right side we'll see the little drop-down indicator.\par
+Click the button part to download.\par
+Click the drop-down arrow on the right part of the button to select a different audio or video format and it will begin downloading and set the button part to that format so that you can just click the button to select the last used and/or applied format.\par
+\pard\li720\sa200\b\fs28\ldblquote Download Target\rdblquote  Directories\b0\fs24\par
+\pard\li1080\sa200 This is just a directory that we're telling the program to use so that when we download something, it ends up in that directory.\par
+\b To add a download directory\b0 , just drag-drop a folder from Windows Explorer into the program, and it should show up in the program's main menu in the \ldblquote Download Targets\rdblquote  sub-menu.\line If you drag the same directory again, it will simply be ignored.\par
+Once added, it does not immediately become active, so you can 'select' it by locating it in your menu and clicking on it.  Once you selected one of the directories from the sub-menu it should indicate that its selected with a check-mark if you bring up the menu again.\par
+You can add (too many) several download targets in case you would like to organize the things you download into specific directories.  I.E. audio books, movies, music, etc\'85\par
+Also, via the \ldblquote Target: Shell Folder\rdblquote  sub-menu, you can otherwise select one of the directories common to your Windows Shell.  I.E. Desktop, Documents, Downloads, Music and Videos.\par
+If you select one of the Shell Folder targets there will not be any particular check-mark to indicate that its selected.  In this case you can \b press Ctrl+T to show your currently selected target directory\b0  and subequently it will also display all the directory-paths you've configured to your application.\par
+If any of the directories that you added no longer exist, you may not notice but they will probably no longer exist in your menu the next time you load this application.\par
+\pard\li720\sa200\b\fs28 DO NOT EVER ATTEMPT TO DOWNLOAD LIVE-STREAMS WITH THIS TOOL!\b0\fs24\par
+\pard\li1080\sa200 There is no way to terminate it without crashing the program and painful attempting to salvage any of the downloaded content.  You've been warned.\par
+In case you're not sure what a live stream is... its just a video that is streaming live ;)\par
+Maybe there's actually a Windows user out there that has had success downloading a live stream with youtube-dl (the command-line tool) and I've personally had a limited amout of success around 50% of the time but apparently its not the easiest thing to do as far as I've seen.\par
+\pard\li720\sa200\b\fs28 youtube-dl Flags\b0\fs24\par
+\pard\li1080\sa200 The flags that are enabled by default are fairly comprehensive and mostly pertain to youtube (though there are likely over 100 web-sites supported by the command-line tool.\par
+Feel free to try turning on or off whatever options you see available and perhaps turn on the \b verbose\b0  flag to see what kind of effects might have taken effect.\par
+For a more intuitive inkling as to what some of the flags do, you can select the \b Browse Flags\b0  menu option which shows a window which shows tool-tip popups when you highlight a particular flag, explaining what it does.\par
+\pard\li720\sa200\b\fs28 youtube-dl Flags: \ldblquote Abort on Duplicate (File Exists)\rdblquote\b0\fs24\par
+\pard\li1080\sa200 This is the only provided option (or flag) that does not directly correspond to the \b youtube-dl.exe\b0  command-line tool.  It actually spins up the youtube-dl command and once it can predict the projected file-name, attempts to terminate running the command so that you don't waste time downloading a file you allready have.\par
+\pard\li720\sa200\b\fs28 ABORT DAMMIT!!\b0\fs24\par
+\pard\li1080\sa200 I've got to admit, it can be really frigging annoying if you accidentally click abort and even more annoying if you click it twice and it crashes the program (or creates some strange runtime bug).\par
+\pard\li720\sa200\b\fs28 PLAYLISTS\b0\fs24\par
+\pard\li1080\sa200 If you drag-drop a video from a playlist into this tool, it will continue to download the entire playlist.\line This can be annoying.\line If it IS annoying, just be sure to delete the \ldblquote &list=[some hash]\rdblquote  part out of the URL address before downloading.\par
+\pard\li720\sa200\b\fs28 Some Settings and inputs do nothing what-so-ever\b0\fs24\par
+\pard\li1080\sa200 I started working up some ideas for handing more features into the program and decided not to continue to support those features (regarding ytdl's playlist options).\par
+If you drag-drop a youtube playlist (or video that is a part of a playlist) you might notice some additional menu items pop up \emdash  effectively, \b they really do nothing at all.\b0   Actually if \ldblquote &list=\rdblquote  is in the address text-box a little menu pops up in the menu bar that again, does nothing effective as far as I can remember.\par
+\pard\li720\sa200\b\fs36 LINKS\b0\fs28\par
 \fs24 youtube-dl uses a small handful of tools to help when it comes to adding meta-data (title, album, cover-art, etc...) to the media it downloads while also many audio formats from the wild can use some fine-tuning every now and again in which case FFmpeg and/or (libAV) will become quite useful.\fs28\par
 \b\fs24 Open Sans TrueType Font\par
-\b0 by Steve Matteson commissioned by Google.\line License: Apache License\line This application embeds 'Open Sans Regular' and 'Open Sans Semibold'.\fs28\par
-\b\fs24 seven-zip\par
+\pard\li1080\sa200\b0 This application embeds 'Open Sans Regular' and 'Open Sans Semibold'.\b\par
+\b0 by Steve Matteson commissioned by Google.\line License: Apache License v2.0\par
+\cf0{\field{\*\fldinst{HYPERLINK "https://fonts.google.com/specimen/Open+Sans"}}{\fldrslt{\ul\cf2 https://fonts.google.com/specimen/Open+Sans}}}\cf1\f0\fs24\line{\field{\*\fldinst{HYPERLINK "https://twitter.com/@SteveMatteson1"}}{\fldrslt{\ul\cf2 https://twitter.com/@SteveMatteson1}}}\f0\fs24\par
+\pard\li720\sa200\b Roboto TrueType Font\par
+\pard\li1080\sa200\b0 This application embeds \ldblquote Roboto Regular\rdblquote  (\ldblquote Roboto\rdblquote ) and \ldblquote Roboto Medium\rdblquote .\par
+by Christian Robertson\line License: Apache License v2.0\par
+{\field{\*\fldinst{HYPERLINK "https://fonts.google.com/specimen/Roboto"}}{\fldrslt{\ul\cf2 https://fonts.google.com/specimen/Roboto}}}\f0\fs24\line{\field{\*\fldinst{HYPERLINK "https://github.com/google/roboto/"}}{\fldrslt{\ul\cf2 https://github.com/google/roboto/}}}\f0\fs24\line\fs28\par
+\pard\li720\sa200\b\fs24 seven-zip\par
 \pard\li1080\sa200\b0 7z would be useful in extracting tools that are useful to this program such as FFmpeg, libAV/AVconv and etc.\par
-\cf0{\field{\*\fldinst{HYPERLINK "https://www.7-zip.org/download.html"}}{\fldrslt{\ul\cf3 https://www.7-zip.org/download.html}}}\cf1\f0\fs24\par
+\cf0{\field{\*\fldinst{HYPERLINK "https://www.7-zip.org/download.html"}}{\fldrslt{\ul\cf2 https://www.7-zip.org/download.html}}}\cf1\f0\fs24\par
 the version (2018.03.26.1) above was current when \i this\i0  program was authored.\par
 \pard\li720\sa200\b youtube-dl\par
 \pard\li1080\sa200\b0 I doubt explanation is needed.\line Please visit the youtube-dl web-page(s) for info.\par
-\cf0{\field{\*\fldinst{HYPERLINK "https://github.com/rg3/youtube-dl/releases"}}{\fldrslt{\ul\cf3 https://github.com/rg3/youtube-dl/releases}}}\cf1\f0\fs24\line\cf0 youtube-dl.exe\cf1\line\line the version (2018.03.26.1) above was current when \i this\i0  program was authored.\par
+\cf0{\field{\*\fldinst{HYPERLINK "https://github.com/rg3/youtube-dl/releases"}}{\fldrslt{\ul\cf2 https://github.com/rg3/youtube-dl/releases}}}\cf1\f0\fs24\line\cf0 youtube-dl.exe\cf1\line\line the version (2018.03.26.1) above was current when \i this\i0  program was authored.\par
 \pard\li720\sa200\b libav / avconv\b0\par
-For whatever reason(s) libav, is the default youtube-dl helper if you have both avconv and FFmpeg on your path.  I've noticed that it breaks down when writing vtt subtitles to mp4 files, so tend to use FFmpeg as the default (with a command-line argument).\par
-\pard\li1080\sa200\cf0{\field{\*\fldinst{HYPERLINK "http://builds.libav.org/windows/release-lgpl/"}}{\fldrslt{\ul\cf3 http://builds.libav.org/windows/release-lgpl/}}}\cf1\f0\fs28\line\fs24\line It may seem daunting when you see the many available builds for libav, though simple enough to just choose the most recent release version.\par
-\cf0{\field{\*\fldinst{HYPERLINK "http://builds.libav.org/windows/nightly-lgpl/"}}{\fldrslt{\ul\cf3 http://builds.libav.org/windows/nightly-lgpl/}}}\cf1\f0\fs24\par
+For whatever reason(s) libav, is the default youtube-dl helper (was) if you have both avconv and FFmpeg on your PATH.  I've noticed that it breaks down when writing vtt subtitles to mp4 files, so tend to use FFmpeg as the default (with a command-line argument).\par
+\pard\li1080\sa200\cf0{\field{\*\fldinst{HYPERLINK "http://builds.libav.org/windows/release-lgpl/"}}{\fldrslt{\ul\cf2 http://builds.libav.org/windows/release-lgpl/}}}\cf1\f0\fs28\line\fs24\line It may seem daunting when you see the many available builds for libav, though simple enough to just choose the most recent release version.\par
+\cf0{\field{\*\fldinst{HYPERLINK "http://builds.libav.org/windows/nightly-lgpl/"}}{\fldrslt{\ul\cf2 http://builds.libav.org/windows/nightly-lgpl/}}}\cf1\f0\fs24\par
 Alternatively, you can download a nightly version, as above just find the most recent one on the page.\par
 \pard\li720\sa200\b FFmpeg\b0\par
-\pard\li1080\sa200\cf0{\field{\*\fldinst{HYPERLINK "https://ffmpeg.zeranoe.com/builds/"}}{\fldrslt{\ul\cf3 https://ffmpeg.zeranoe.com/builds/}}}\cf1\f0\fs28\line\fs24\line The version zeranoe.com selects automatically should be the best one for you.\line e.g. the latest version, (auto-selected) 32 or 64 bit, static.\par
+\pard\li1080\sa200\cf0{\field{\*\fldinst{HYPERLINK "https://ffmpeg.zeranoe.com/builds/"}}{\fldrslt{\ul\cf2 https://ffmpeg.zeranoe.com/builds/}}}\cf1\f0\fs28\line\fs24\line The version zeranoe.com selects automatically should be the best one for you.\line e.g. the latest version, (auto-selected) 32 or 64 bit, static.\par
 Just click the blue "Download Build" button on their site ;)\par
 \pard\li720\sa200\b AtomicParsley\par
-\pard\li1080\sa200\cf0\b0{\field{\*\fldinst{HYPERLINK "https://sourceforge.net/projects/atomicparsley/files/atomicparsley/AtomicParsley%20v0.9.0/"}}{\fldrslt{\ul\cf3 https://sourceforge.net/projects/atomicparsley/files/atomicparsley/AtomicParsley%20v0.9.0/}}}\cf1\f0\fs24\line\line AtomicParsley-win32-0.9.0.zip \emdash  is what we're interested in.\par
+\pard\li1080\sa200\cf0\b0{\field{\*\fldinst{HYPERLINK "https://sourceforge.net/projects/atomicparsley/files/atomicparsley/AtomicParsley%20v0.9.0/"}}{\fldrslt{\ul\cf2 https://sourceforge.net/projects/atomicparsley/files/atomicparsley/AtomicParsley%20v0.9.0/}}}\cf1\f0\fs24\line\line AtomicParsley-win32-0.9.0.zip \emdash  is what we're interested in.\par
 for itunes audio (m4a) and video (mp4).\par
 \pard\li720\sa200\b PhantomJS\par
 \pard\li1080\sa200\b0 If there is a need for PhantomJS, you might want to check your clock and make sure you haven't been drinking too much caffeine.  Nevertheless, PhantomJS might help out when spidering through javascript obfuscated targets, and handy to have on this app's PATH so you don't hit a wall if one of the targets fails due to the dependency.\par
-\cf0{\field{\*\fldinst{HYPERLINK "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-windows.zip"}}{\fldrslt{\ul\cf3 https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-windows.zip}}}\cf1\f0\fs24\par
+\cf0{\field{\*\fldinst{HYPERLINK "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-windows.zip"}}{\fldrslt{\ul\cf2 https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-windows.zip}}}\cf1\f0\fs24\par
 \pard\li720\sa200\b\fs28 OTHER HELPFUL SOFTWARE\par
 \pard\li1080\sa200\fs24 Subtitle Edit\b0  Is a program for windows that may work in other OSs using WINE or such\emdash allows you to edit subtitles and convert between different subtitle file formats with the command-line or via the program's UI.\par
 \b youtube-dl-utility\b0  is released to the public domain with the standard liability disclaimer:\par
 \pard\li720\sa200\b\fs28 COPYRIGHT\par
 \pard\li1080\sa200\fs24 youtube-dl-utility\b0  is released to the public domain with the standard liability disclaimer:\par
-\pard\li1440\sa200 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,\line EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF\line MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.\line IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR\line OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,\line ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR\line OTHER DEALINGS IN THE SOFTWARE.\par
-\pard\li1080\sa200\b youtube-dl\b0  is released to the public domain under \cf0{\field{\*\fldinst{HYPERLINK "https://unlicense.org"}}{\fldrslt{\ul\cf3 https://unlicense.org}}}\cf1\f0\fs24\line with several contributions: \cf0{\field{\*\fldinst{HYPERLINK "https://github.com/rg3/youtube-dl/graphs/contributors"}}{\fldrslt{\ul\cf3 https://github.com/rg3/youtube-dl/graphs/contributors}}}\cf1\f0\fs24\par
-\b Windows7ProgressBar \b0 and Windows7TaskBar control(s) released under a BSD license.\line Copyright \'a9 2005-2009 wyDay\line\cf0{\field{\*\fldinst{HYPERLINK "https://wyday.com/windows-7-progress-bar/"}}{\fldrslt{\ul\cf3 https://wyday.com/windows-7-progress-bar/}}}\cf1\f0\fs24\par
+\pard\li1440\sa200 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\par
+\pard\li1080\sa200\b youtube-dl\b0  is released to the public domain under \cf0{\field{\*\fldinst{HYPERLINK "https://unlicense.org"}}{\fldrslt{\ul\cf2 https://unlicense.org}}}\cf1\f0\fs24\line with several contributions: \cf0{\field{\*\fldinst{HYPERLINK "https://github.com/rg3/youtube-dl/graphs/contributors"}}{\fldrslt{\ul\cf2 https://github.com/rg3/youtube-dl/graphs/contributors}}}\cf1\f0\fs24\par
+\b Windows7ProgressBar \b0 and Windows7TaskBar control(s) released under a BSD license.\line Copyright \'a9 2005-2009 wyDay\line\cf0{\field{\*\fldinst{HYPERLINK "https://wyday.com/windows-7-progress-bar/"}}{\fldrslt{\ul\cf2 https://wyday.com/windows-7-progress-bar/}}}\cf1\f0\fs24\par
 \pard\li720\sa200\par
-\par
 }
  
