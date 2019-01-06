@@ -21,7 +21,7 @@ namespace YouTubeDownloadUtil
           RedirectStandardOutput = true,
           UseShellExecute = false,
           FileName = FileName,
-          WorkingDirectory = WorkPath,
+          WorkingDirectory = WorkPath.Decode(),
           Arguments = Arguments,
         };
       }
