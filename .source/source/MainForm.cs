@@ -247,7 +247,8 @@ namespace YouTubeDownloadUtil
       new CommandKeyHandler<IUI>{Name="Output: Focus", Keys=Keys.Alt|Keys.D, Action = (f)=> f.TextInput.Focus() },
       new CommandKeyHandler<IUI>{Name="Outout: Short-Cut Keys", Keys=Keys.F5, Action = Actions.COutputShortcuts },
       new CommandKeyHandler<IUI>{Name="Outout: Reset Zoom Factor", Keys=Keys.NumPad0|Keys.Control, Action = Actions.COutputZoomReset },
-      new CommandKeyHandler<IUI>{Name="Shel: Explore to Path",Keys=Keys.E|Keys.Control, Action =(IUI f)=>Actions.ExploreToPath()},
+      new CommandKeyHandler<IUI>{Name="Output: Show Embedded Font Families", Keys=Keys.Control|Keys.Shift|Keys.F, Action=Actions.COutputEmbededFonts},
+      new CommandKeyHandler<IUI>{Name="Shell: Explore to Path",Keys=Keys.E|Keys.Control, Action =(IUI f)=>Actions.ExploreToPath()},
       new CommandKeyHandler<IUI>{Name="Run Using Last Taret-Type", Keys=Keys.Control|Keys.Enter, Action=Actions.CRunLastType},
       new CommandKeyHandler<IUI>{Name="Test Download (Atomic Parsley)", Keys=Keys.Control|Keys.Shift|Keys.D, Action=DownloadTargetFile.TestDownloadAtomicParsley},
     };
