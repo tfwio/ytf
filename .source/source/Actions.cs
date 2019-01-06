@@ -5,6 +5,7 @@ namespace YouTubeDownloadUtil
 		void Worker_Begin();
 		void Print(string heading, params string[] lines);
 		void PrintMore(string heading, params string[] lines);
+		void SetStatus(string text);
 		System.Drawing.Text.PrivateFontCollection PrivateFonts { get; }
 		System.Windows.Forms.RichTextBox OutputRTF { get; }
 		System.Windows.Forms.TextBox TextInput { get; }

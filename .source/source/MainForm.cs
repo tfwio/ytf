@@ -31,7 +31,7 @@ namespace YouTubeDownloadUtil
       var value = (sender as ToolStripMenuItem).Tag as string;
       var n = Path.GetFileName(DownloadTarget.Default.TargetPath = value);
       DownloadTarget.Default.TargetPath = (ConfigModel.Instance.TargetOutputDirectory = value);
-      Text = $"Dir: {n}";
+      // SetStatus($"Dir: {n}");
       UpdateDownloadTargets();
       ConfigModel.Instance.Save();
 			
@@ -137,7 +137,7 @@ namespace YouTubeDownloadUtil
       cm.Font = OpenSans_SB13;
       textBox1.Font = OpenSans_R10_5;
 			
-      statusTimer = new Timer { Interval = 3000, Enabled = false };
+      statusTimer = new Timer { Interval = 4500, Enabled = false };
       statusTimer.Tick += (n, a) => {
         statText.Text = "youtube-dl";
         statusTimer.Stop();
@@ -263,6 +263,7 @@ namespace YouTubeDownloadUtil
         SetStatus(ConfigModel.TargetURI.GetBasenameFromURL());
     }
 
+    void IUI.SetStatus(string text) { SetStatus(text); }
     void SetStatus(string text)
     {
       statText.Text = text;
