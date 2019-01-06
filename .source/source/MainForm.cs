@@ -20,7 +20,7 @@ namespace YouTubeDownloadUtil
     
   	readonly Font OpenSans_SB13, OpenSans_R10_5, Roboto_M12_Bold, Roboto_M9;
     readonly System.Drawing.Text.PrivateFontCollection pfc = new System.Drawing.Text.PrivateFontCollection();
-  	
+    System.Drawing.Text.PrivateFontCollection IUI.PrivateFonts { get { return pfc; } }
     readonly Color colorDark = Color.FromArgb(64, 64, 64);
     readonly Color colorLight = SystemColors.ControlLight;
 
