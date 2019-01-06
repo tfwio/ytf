@@ -154,6 +154,14 @@ namespace YouTubeDownloadUtil
 			DownloadTarget.Default.TargetPath = (sender as ToolStripMenuItem).Tag.ToString();
 			ConfigModel.Instance.TargetOutputDirectory = DownloadTarget.Default.TargetPath;
 			ConfigModel.Instance.Save();
+			
+			var xpath = Path.GetFullPath(ConfigModel.Instance.TargetOutputDirectory.Decode().EnvironmentPathFilter());
+			WriteSomeStuff(
+				"Selected Target Output Directory…",
+				$"Directory Name: “{Path.GetFileName(xpath)}”\n",
+				$"Full Path: “{xpath}”\n",
+				$"Coded Path: “{xpath.Encode()}”"
+			);
 		}
 
 		void FlagsToMenu(ToolStripMenuItem item)
