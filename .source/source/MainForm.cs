@@ -34,6 +34,14 @@ namespace YouTubeDownloadUtil
       Text = $"Dir: {n}";
       UpdateDownloadTargets();
       ConfigModel.Instance.Save();
+			
+			var encodedpath = Path.GetFullPath(value).Encode();
+			WriteSomeStuff(
+				"Selected Target Output Directory…",
+				$"Directory Name: “{Path.GetFileName(value)}”\n",
+				$"Full Path: “{value}”\n",
+				$"Coded Path: “{encodedpath}”"
+			);
     }
 
     void UpdateEnvironmentPath()
@@ -174,30 +182,58 @@ namespace YouTubeDownloadUtil
             DragDropButtonText = (e.Data.GetData(DataFormats.FileDrop) as string[]).FirstOrDefault();
             if (Directory.Exists(DragDropButtonText))
             {
-              cm.Show(btnAbortProcess, new Point(btnAbortProcess.Width, btnAbortProcess.Height), ToolStripDropDownDirection.BelowLeft);
-              Text = "is directory";
-              ConfigModel.Instance.AddDirectory(DragDropButtonText);
-              UpdateDownloadTargets();
-              DownloadTarget.Default.TargetPath = DragDropButtonText;
+							cm.Show(btnAbortProcess, new Point(btnAbortProcess.Width, btnAbortProcess.Height), ToolStripDropDownDirection.BelowLeft);
+							// Text = "is directory";
+							ConfigModel.Instance.AddDirectory(DragDropButtonText);
+							UpdateDownloadTargets();
+							DownloadTarget.Default.TargetPath = DragDropButtonText;
+							var encodedpath = Path.GetFullPath(DragDropButtonText).Encode();
+							WriteSomeStuff(
+								"Added a Target Directory",
+								$"Directory Name: “{Path.GetFileName(DragDropButtonText)}”",
+								$"Full Path: “{DragDropButtonText}”",
+								$"Coded Path: “{encodedpath}”"
+							);
             }
             else if (File.Exists(DragDropButtonText))
             {
-              var fn = DragDropButtonText.GetFileInfo();
-              if (fn.Name.ToLower() == "youtube-dl.exe")
-              {
-                ConfigModel.Instance.PathYoutubeDL = fn.Directory.FullName;
-                UpdateEnvironmentPath(); ConfigModel.Instance.Save();
-              }
-              else if (fn.Name.ToLower() == "avconv.exe")
-              {
-                ConfigModel.Instance.PathAVConv = fn.Directory.FullName;
-                UpdateEnvironmentPath(); ConfigModel.Instance.Save();
-              }
-              else if (fn.Name.ToLower() == "ffmpeg.exe")
-              {
-                ConfigModel.Instance.PathFFmpeg = fn.Directory.FullName;
-                UpdateEnvironmentPath(); ConfigModel.Instance.Save();
-              }
+							var fn = DragDropButtonText.GetFileInfo();
+							if (fn.Name.ToLower() == "youtube-dl.exe")
+							{
+								ConfigModel.Instance.PathYoutubeDL = fn.Directory.FullName;
+								UpdateEnvironmentPath(); ConfigModel.Instance.Save();
+								var encodedpath = Path.GetFullPath(DragDropButtonText).Encode();
+								WriteSomeStuff(
+									"Updated youtube-dl.exe executable path...",
+									$"Directory Name: “{Path.GetFileName(DragDropButtonText)}”",
+									$"Full Path: “{DragDropButtonText}”",
+									$"Coded Path: “{encodedpath}”"
+								);
+							}
+							else if (fn.Name.ToLower() == "avconv.exe")
+							{
+								ConfigModel.Instance.PathAVConv = fn.Directory.FullName;
+								UpdateEnvironmentPath(); ConfigModel.Instance.Save();
+								var encodedpath = Path.GetFullPath(DragDropButtonText).Encode();
+								WriteSomeStuff(
+									"Updated avconv.exe executable path...",
+									$"Directory Name: “{Path.GetFileName(DragDropButtonText)}”",
+									$"Full Path: “{DragDropButtonText}”",
+									$"Coded Path: “{encodedpath}”"
+								);
+							}
+							else if (fn.Name.ToLower() == "ffmpeg.exe")
+							{
+								ConfigModel.Instance.PathFFmpeg = fn.Directory.FullName;
+								UpdateEnvironmentPath(); ConfigModel.Instance.Save();
+								var encodedpath = Path.GetFullPath(DragDropButtonText).Encode();
+								WriteSomeStuff(
+									"Updated ffmpeg.exe executable path...",
+									$"Directory Name: “{Path.GetFileName(DragDropButtonText)}”",
+									$"Full Path: “{DragDropButtonText}”",
+									$"Coded Path: “{encodedpath}”"
+								);
+							}
             }
           }
         });
@@ -286,7 +322,7 @@ namespace YouTubeDownloadUtil
       {
       }
     }
-    
+
 		void WriteSomeStuff(string heading, params string[] lines)
 		{
 			using (var boldFont = new System.Drawing.Font(richTextBox1.Font.FontFamily, 14.0f, System.Drawing.FontStyle.Bold))
