@@ -47,9 +47,9 @@ namespace YouTubeDownloadUtil
     void UpdateEnvironmentPath()
     {
       var pathVars = new List<string>();
-      if (ConfigModel.Instance.PathAVConv.DirectoryExistsAndNonempty()) pathVars.Add(ConfigModel.Instance.PathAVConv);
-      if (ConfigModel.Instance.PathFFmpeg.DirectoryExistsAndNonempty()) pathVars.Add(ConfigModel.Instance.PathFFmpeg);
-      if (ConfigModel.Instance.PathYoutubeDL.DirectoryExistsAndNonempty()) pathVars.Add(ConfigModel.Instance.PathYoutubeDL);
+      if (ConfigModel.Instance.PathAVConv.Decode().DirectoryExistsAndNonempty()) pathVars.Add(ConfigModel.Instance.PathAVConv.Decode());
+      if (ConfigModel.Instance.PathFFmpeg.Decode().DirectoryExistsAndNonempty()) pathVars.Add(ConfigModel.Instance.PathFFmpeg.Decode());
+      if (ConfigModel.Instance.PathYoutubeDL.Decode().DirectoryExistsAndNonempty()) pathVars.Add(ConfigModel.Instance.PathYoutubeDL.Decode());
       var newPath = string.Join(";", pathVars.ToArray());
       System.Environment.SetEnvironmentVariable("PATH", $"{newPath};{ConfigModel.OriginalPath}");
     }
