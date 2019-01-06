@@ -284,6 +284,7 @@ namespace YouTubeDownloadUtil
       new CommandKeyHandler<IUI>{Name="Outout: Short-Cut Keys", Keys=Keys.F5, Action = Actions.COutputShortcuts },
       new CommandKeyHandler<IUI>{Name="Outout: Reset Zoom Factor", Keys=Keys.NumPad0|Keys.Control, Action = Actions.COutputZoomReset },
       new CommandKeyHandler<IUI>{Name="Output: Show Embedded Font Families", Keys=Keys.Control|Keys.Shift|Keys.F, Action=Actions.COutputEmbededFonts},
+      new CommandKeyHandler<IUI>{Name="Output: Show Current Download Target Path", Keys=Keys.Control|Keys.T, Action=Actions.COutputCurrentTargetPath},
       new CommandKeyHandler<IUI>{Name="Shell: Explore to Path",Keys=Keys.E|Keys.Control, Action =(IUI f)=>Actions.ExploreToPath()},
       new CommandKeyHandler<IUI>{Name="Run Using Last Taret-Type", Keys=Keys.Control|Keys.Enter, Action=Actions.CRunLastType},
       new CommandKeyHandler<IUI>{Name="Test Download (Atomic Parsley)", Keys=Keys.Control|Keys.Shift|Keys.D, Action=DownloadTargetFile.TestDownloadAtomicParsley},
@@ -323,23 +324,31 @@ namespace YouTubeDownloadUtil
       }
     }
 
-		void WriteSomeStuff(string heading, params string[] lines)
+		void WriteSomeStuff(string heading, params string[] lines) { WriteSomeStuff(true, heading, lines); }
+		void WriteSomeStuff(bool clear, string heading, params string[] lines)
 		{
 			using (var boldFont = new System.Drawing.Font(richTextBox1.Font.FontFamily, 14.0f, System.Drawing.FontStyle.Bold))
 				using (var reguFont = new System.Drawing.Font(richTextBox1.Font.FontFamily, 12.0f, System.Drawing.FontStyle.Regular))
 			{
-				richTextBox1.SelectAll();
-				richTextBox1.SelectionTabs = null;
-				richTextBox1.Clear();
-				richTextBox1.SelectionIndent = 10;
-				richTextBox1.SelectionFont = boldFont;
-				richTextBox1.AppendText($"{heading}\n\n");
+        if (clear)
+        {
+          richTextBox1.SelectAll();
+          richTextBox1.SelectionTabs = null;
+          richTextBox1.Clear();
+        }
+        if (!string.IsNullOrEmpty(heading))
+        {
+          richTextBox1.SelectionIndent = 10;
+          richTextBox1.SelectionFont = boldFont;
+          richTextBox1.AppendText($"{heading}\n\n");
+        }
 				richTextBox1.SelectionFont = reguFont;
 				richTextBox1.SelectionIndent = 20;
 				foreach (var line in lines) richTextBox1.AppendText($"{line}\n");
 			}
 		}
-
+    void IUI.Print(string heading, params string[] lines) { WriteSomeStuff(heading, lines); }
+    void IUI.PrintMore(string heading, params string[] lines) { WriteSomeStuff(false, heading, lines); }
   }
 
   interface IRestoreBounds

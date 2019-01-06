@@ -3,6 +3,8 @@ namespace YouTubeDownloadUtil
 {
 	interface IUI {
 		void Worker_Begin();
+		void Print(string heading, params string[] lines);
+		void PrintMore(string heading, params string[] lines);
 		System.Drawing.Text.PrivateFontCollection PrivateFonts { get; }
 		System.Windows.Forms.RichTextBox OutputRTF { get; }
 		System.Windows.Forms.TextBox TextInput { get; }
@@ -65,6 +67,27 @@ namespace YouTubeDownloadUtil
 				}
 			}
 		}
+		internal static void COutputCurrentTargetPath(IUI f)
+		{
+			var pathvalue = System.IO.Path.GetFullPath(ConfigModel.Instance.TargetOutputDirectory.Decode());
+			
+			f.Print(
+				"Selected Target Output Directory…",
+				$"Directory Name: “{System.IO.Path.GetFileName(pathvalue)}”\n",
+				$"Full Path: “{pathvalue}”\n",
+				$"Coded Path: “{pathvalue.Encode()}”"
+			);
+			
+			var targets = new System.Collections.Generic.List<string>();
+			
+			foreach (var item in ConfigModel.Instance.DownloadTargetsList) targets.Add($"{item.Encode()}\n");
+			f.OutputRTF.AppendText("\n");
+			f.PrintMore("All Download Targets", targets.ToArray());
+		}
+		// internal static void COutputAppChecklist(IUI f)
+		// {
+		// 	
+		// }
 	}
 }
 
