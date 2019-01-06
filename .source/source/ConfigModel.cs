@@ -130,21 +130,21 @@ namespace YouTubeDownloadUtil
 			set { YoutubeDlFlagsStr = value.ToString(); OnFlagsChanged(); }
 		}
 
-		/// <summary>Extract audio types.</summary>
-		[IniKey(Group = "global", Alias = "audio-types")] public string XAudioTypes { get; set; }
-
-		[Ignore] public ExtractAudioTypes AudioTypes {
-			get { ExtractAudioTypes l = 0; foreach (var n in XAudioTypes.StringToArray()) { ExtractAudioTypes kk; l |= n.TryParse<ExtractAudioTypes>(out kk) ? kk : 0; } return l; }
-			set { XAudioTypes = value.ToString(); }
-		}
-
-		/// <summary>Convert subtitle types.</summary>
-		[IniKey(Group = "global", Alias = "subtitle-types")] public string XSubtitleTypes { get; set; }
-
-		[Ignore] public ConvertSubTypes SubtitleTypes {
-			get { ConvertSubTypes l = 0; foreach (var n in XSubtitleTypes.StringToArray()) { ConvertSubTypes kk; l |= n.TryParse<ConvertSubTypes>(out kk) ? kk : 0; } return l; }
-			set { XSubtitleTypes = value.ToString(); }
-		}
+		// /// <summary>Extract audio types.</summary>
+		// [IniKey(Group = "global", Alias = "audio-types")] public string XAudioTypes { get; set; }
+		// 
+		// [Ignore] public ExtractAudioTypes AudioTypes {
+		// 	get { ExtractAudioTypes l = 0; foreach (var n in XAudioTypes.StringToArray()) { ExtractAudioTypes kk; l |= n.TryParse<ExtractAudioTypes>(out kk) ? kk : 0; } return l; }
+		// 	set { XAudioTypes = value.ToString(); }
+		// }
+		// 
+		// /// <summary>Convert subtitle types.</summary>
+		// [IniKey(Group = "global", Alias = "subtitle-types")] public string XSubtitleTypes { get; set; }
+		// 
+		// [Ignore] public ConvertSubTypes SubtitleTypes {
+		// 	get { ConvertSubTypes l = 0; foreach (var n in XSubtitleTypes.StringToArray()) { ConvertSubTypes kk; l |= n.TryParse<ConvertSubTypes>(out kk) ? kk : 0; } return l; }
+		// 	set { XSubtitleTypes = value.ToString(); }
+		// }
 
 		[IniKey(Group = "global", Alias = "window-bounds")] public string RestoreBounds { get; set; }
 
@@ -204,8 +204,8 @@ namespace YouTubeDownloadUtil
 				PathFFmpeg = string.Empty,
 				PathAVConv = string.Empty,
 				MaxDownloads = "1",
-				XAudioTypes = string.Empty,
-				XSubtitleTypes = string.Empty,
+				// XAudioTypes = string.Empty,
+				// XSubtitleTypes = string.Empty,
 				RestoreBounds = string.Empty,
 				KeepOnTop = false,
 			};
