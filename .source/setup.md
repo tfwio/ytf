@@ -7,7 +7,37 @@
 
 A simple (prototypical) youtube-dl wrapper in winforms.
 
-Setup instructions
+![](.doc/demo.gif)
+
+Setting Up
+=======================
+
+Download and Extract the Bundle
+-----------------------
+
+Just visit the releases page and you'll encounter too many words but at least you can download a bundle with either Win64 or Win32 versions of FFmpeg and other (necessary) tools.  
+https://github.com/tfwio/youtube-dl-winforms/releases
+
+The reason its so big is due to the bundled binaries (in the ./tools directory) aside from my little utility (UI) app.  
+Its configured to-go and will download to the example downloads directory.
+
+When extracting, I suggest using 7-zip.  Use the Right-Mouse button and use the z-zip submenu: “Extract to "./ytdl_util-dotnet-client35-anycpu-win32-0.1.1"” (since the archive's contents are as shown in the image below)
+
+![](.doc/explorer-shell-extract.png)
+
+If you use windows shell "Extract..." method (via right-clicking the bundle.zip's context-menu), windows will likely "Block" every executable extracted like it does every binary you downloaded (which probably just amounts to some annoying popup dialog confirmations) as illustrated when you right-click `YouTubeDownloadUtil.exe` and select "Properties".
+You can see what I mean in the below snap-shot of the Property Page for the binary...
+Hence, why I prefer to use 7-zip (https://www.7-zip.org/) to extract.
+
+![](.doc/props-unblock.png)
+
+Adding a 'Download Target'
+------------------------
+
+![](.doc/add-dl-targets.gif)
+
+
+[old] Setup instructions
 =======================
 
 I hadn't provided binaries yet.  
