@@ -2,13 +2,16 @@
 namespace YouTubeDownloadUtil
 {
 	interface IUI {
+
 		void Worker_Begin();
 		void Print(string heading, params string[] lines);
 		void PrintMore(string heading, params string[] lines);
 		void SetStatus(string text);
-		System.Drawing.Text.PrivateFontCollection PrivateFonts { get; }
+
+    System.Drawing.Text.PrivateFontCollection PrivateFonts { get; }
 		System.Windows.Forms.RichTextBox OutputRTF { get; }
 		System.Windows.Forms.TextBox TextInput { get; }
+
 	}
 	static class Actions
 	{

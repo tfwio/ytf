@@ -150,7 +150,6 @@ namespace YouTubeDownloadUtil
       // more initializers
       UpdateEnvironmentPath();
       Actions.COutputSplash(this);
-      CreateToolStrip();
 
       // events
       btnAbortProcess.MouseDown += Event_ButtonShowContext;
@@ -161,6 +160,8 @@ namespace YouTubeDownloadUtil
       ConfigModel.Instance.FlagsChanged += (o, a) => ConfigModel.Instance.Save();
       textMaxDownloads.TextChanged += (a, b) => ConfigModel.Instance.MaxDownloads = textMaxDownloads.Text;
       FormClosing += (s, e) => ConfigModel.Instance.Save(true);
+
+      CreateToolStrip();
 
       // drag-drop
       this.ApplyDragDropMethod(
@@ -264,6 +265,7 @@ namespace YouTubeDownloadUtil
     }
 
     void IUI.SetStatus(string text) { SetStatus(text); }
+
     void SetStatus(string text)
     {
       statText.Text = text;
