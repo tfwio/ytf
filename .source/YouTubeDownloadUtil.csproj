@@ -257,7 +257,9 @@
     <EmbeddedResource Include="paket-files\ArthurHub\HTML-Renderer\Source\HtmlRenderer\Core\Utils\ImageLoad.png">
       <CustomToolNamespace>TheArtOfDev.HtmlRenderer.Core.Utils</CustomToolNamespace>
     </EmbeddedResource>
-    <EmbeddedResource Include="config.ini" />
+    <EmbeddedResource Include="config.ini">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <None Include="paket-files\ArthurHub\HTML-Renderer\Source\HtmlRenderer\HtmlRenderer.csproj">
       <SubType>Designer</SubType>
     </None>
@@ -267,7 +269,6 @@
     <EmbeddedResource Include="source\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
-    <Content Include="source\RootString.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
