@@ -19,8 +19,12 @@ namespace YouTubeDownloadUtil
 
 		internal static Action ExploreToPath { get; } = () => {
 			lock (L) {
-				if (ConfigModel.Instance.TargetOutputDirectory.Contains("start:")) System.Diagnostics.Process.Start("start", ResourceStrings.ExploreToPath.Replace("$path$", ConfigModel.Instance.TargetOutputDirectory.Replace("start:", "")));
-				else System.Diagnostics.Process.Start("explorer.exe", ResourceStrings.ExploreToPath.Replace("$path$", ConfigModel.Instance.TargetOutputDirectory));
+        bool isEnvironmenVar = ConfigModel.Instance.TargetOutputDirectory.Contains("start:");
+        var targetDirectory = isEnvironmenVar
+          ? ConfigModel.Instance.TargetOutputDirectory
+          : System.IO.Path.GetFullPath(ConfigModel.Instance.TargetOutputDirectory.Decode());
+        if (isEnvironmenVar) System.Diagnostics.Process.Start("start",ResourceStrings.ExploreToPath.Replace("$path$", targetDirectory.Replace("start:", "")));
+				else System.Diagnostics.Process.Start("explorer.exe",ResourceStrings.ExploreToPath.Replace("$path$",targetDirectory));
 			};
 		};
 		internal static void COutputEmbededFonts(IUI f)

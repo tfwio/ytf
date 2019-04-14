@@ -51,7 +51,28 @@ namespace YouTubeDownloadUtil
   // a mvc view
   partial class MainForm
   {
+    // single download
+    void StateProgress_OneColumn()
+    {
+      statItemCount.Visible = false;
+      statusControls.ColumnStyles[1].SizeType = System.Windows.Forms.SizeType.Percent;
+      statusControls.ColumnStyles[0].SizeType = System.Windows.Forms.SizeType.Percent;
+      statusControls.ColumnStyles[1].Width = 0F;
+      statusControls.ColumnStyles[0].Width = 100F;
+    }
+    // multiple downloads
+    void StateProgress_TwoColumn()
+    {
+      statItemCount.Visible = true;
+      statusControls.ColumnStyles[1].SizeType = System.Windows.Forms.SizeType.Percent;
+      statusControls.ColumnStyles[0].SizeType = System.Windows.Forms.SizeType.Percent;
+      statusControls.ColumnStyles[1].Width = 50F;
+      statusControls.ColumnStyles[0].Width = 50F;
+    }
 
+    // See UI_WorkerThread_DataHandler
+    // This is the string data filter.
+    // It creates values to be placed into the main ProgressBar.
     void UI_WorkerThread_DataFilter(string text, YoutubeDownloader obj)
     {
       if (!string.IsNullOrEmpty(text) && text.Contains(ResourceStrings.msgDownloadDestination))
@@ -66,6 +87,13 @@ namespace YouTubeDownloadUtil
         var dat = new DownloaderStatus(text);
         statCurrent.Value = dat.IntPercent;
         statText.Text = dat.Percent;
+      }
+      else if  (!string.IsNullOrEmpty(text)
+                && text.Contains("[download] Downloading video")
+                && text.Contains(" of ")
+        )
+      {
+        // this is a placeholder for downloading a playlist.
       }
       else if (!string.IsNullOrEmpty(text)
                && text.Contains(ResourceStrings.msgAllreadyDownloaded)
@@ -87,8 +115,10 @@ namespace YouTubeDownloadUtil
       richTextBox1.AppendText($"{iserrorstr} {data}\n");
     }
     
+    // Prepares a download job; called before downloading begins.
     void UI_WorkerProcess_Pre(YoutubeDownloader obj)
     {
+      // we would like to prepare and/or reset a playlist counter.
       richTextBox1.BackColor = colorDark;
       richTextBox1.ForeColor = colorLight;
       foreach (var c in TogglableControls) c.Enabled = false;
@@ -105,8 +135,11 @@ namespace YouTubeDownloadUtil
       statCurrent.ShowInTaskbar = true;
     }
 
+    // After downloading or Process is complete, we then restore
+    // the application to a "ready" state.
     void UI_WorkerProcess_Post(YoutubeDownloader obj)
     {
+
       if (obj.Aborted && obj.KnownTargetFile!=null)
       {
         var fi = new FileInfo(Path.Combine(obj.TargetPath, obj.KnownTargetFile));
@@ -123,8 +156,12 @@ namespace YouTubeDownloadUtil
       btnAbort.Visible = false;
       statusControls.Visible = false;
       statText.Text = "youtube-dl";
+
+      StateProgress_OneColumn(); // reset to a single column state.
+
       statCurrent.Value = 0;
       statCurrent.ShowInTaskbar = false;
+      statItemCount.Value = 1;
     }
 
   }

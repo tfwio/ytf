@@ -64,11 +64,11 @@ namespace YouTubeDownloadUtil
 				if (string.IsNullOrEmpty(itemPath)) continue;
 				var tempPath = Path.GetFullPath(itemPath.Decode());
 				if (!Directory.Exists(tempPath)) continue;
-				
+        var targetOutputDirectory = Path.GetFullPath(ConfigModel.Instance.TargetOutputDirectory.Decode());
 				var itm = new ToolStripMenuItem(Path.GetFileName(tempPath)){
 					Tag = tempPath,
 					ToolTipText = tempPath,
-					Checked = (tempPath == ConfigModel.Instance.TargetOutputDirectory)
+					Checked = tempPath.CompareTo(targetOutputDirectory) == 0
 				};
 				itm.Click += DownloadTargetClickHandler;
 				mDownloadTargets.DropDownItems.Add(itm);

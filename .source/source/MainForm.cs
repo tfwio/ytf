@@ -162,6 +162,7 @@ namespace YouTubeDownloadUtil
       FormClosing += (s, e) => ConfigModel.Instance.Save(true);
 
       CreateToolStrip();
+      StateProgress_OneColumn();
 
       // drag-drop
       this.ApplyDragDropMethod(
