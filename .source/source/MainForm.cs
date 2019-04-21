@@ -121,10 +121,11 @@ namespace YouTubeDownloadUtil
       CreateResFont(ResImage.OpenSans_Semibold);
       CreateResFont(ResImage.OpenSans_Regular);
       
-      Roboto_M9 = GetEmbeddedFont("Roboto Medium", 9F, FontStyle.Regular);
+      Roboto_M9       = GetEmbeddedFont("Roboto Medium", 9F, FontStyle.Regular);
       Roboto_M12_Bold = GetEmbeddedFont("Roboto Medium", 12F, FontStyle.Bold);
 
       textBox1.Font = Roboto_M12_Bold;
+      textFileName.Font = Roboto_M12_Bold;
       textMaxDownloads.Font = Roboto_M9;
       ckHasPlaylist.Font = Roboto_M9;
       toolStripLabel1.Font = Roboto_M9;
@@ -144,7 +145,8 @@ namespace YouTubeDownloadUtil
       };
 
       // additional properties
-      statusControls.Visible = false;
+      StateName_Show();
+      StateProgress_Hide();
       textMaxDownloads.Text = ConfigModel.Instance.MaxDownloads;
 
       // more initializers
@@ -162,7 +164,9 @@ namespace YouTubeDownloadUtil
       FormClosing += (s, e) => ConfigModel.Instance.Save(true);
 
       CreateToolStrip();
-      StateProgress_OneColumn();
+      StateProgress_Hide();
+      StateName_Show();
+      StateName_Hide();
 
       // drag-drop
       this.ApplyDragDropMethod(

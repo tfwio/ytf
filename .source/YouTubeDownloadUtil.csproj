@@ -10,7 +10,6 @@
     <AssemblyName>YouTubeDownloadUtil</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <NoWin32Manifest>False</NoWin32Manifest>
     <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
     <NoStdLib>False</NoStdLib>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
@@ -62,6 +61,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE;NCORE</DefineConstants>
     <DebugType>Full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <DebugType>None</DebugType>
@@ -184,20 +184,26 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="source\Actions.cs" />
-    <Compile Include="source\CommandKeyHandler.cs" />
     <Compile Include="source\ConfigModel.cs" />
     <Compile Include="source\cor3\ClipboardImageWatcher.cs" />
     <Compile Include="source\cor3\ClipboardWatcher.cs" />
+    <Compile Include="source\cor3\CommandKeyHandler.cs" />
     <Compile Include="source\cor3\ini.cs" />
     <Compile Include="source\cor3\ITaskContext.cs" />
+    <Compile Include="source\cor3\RootString.cs" />
+    <Compile Include="source\cor3\SimpleCommand.cs" />
     <Compile Include="source\cor3\SimpleProgressEventArgs.cs" />
     <Compile Include="source\cor3\TimeConversion.cs" />
+    <Compile Include="source\cor3\UriConverterExtensions.cs" />
+    <Compile Include="source\cor3\UrlInfo.cs" />
+    <Compile Include="source\cor3\YoutubeInfoTester.cs" />
     <Compile Include="source\DownloaderStatus.cs" />
     <Compile Include="source\DownloadTarget.cs" />
     <Compile Include="source\extensions\DirectoryHelper.cs" />
     <Compile Include="source\extensions\DragDropFormsExtension.cs" />
     <Compile Include="source\extensions\EnumHelper.cs" />
     <Compile Include="source\extensions\FileSystemExtensions.cs" />
+    <Compile Include="source\extensions\GetYoutubeVideoTitle.cs" />
     <Compile Include="source\extensions\PropertyInfoHelper.cs" />
     <Compile Include="source\extensions\VariousStringExtensions.cs" />
     <Compile Include="source\FormFlagOptions.cs">
@@ -215,7 +221,7 @@
     </Compile>
     <Compile Include="source\MainForm.Worker.cs" />
     <Compile Include="source\DownloadTargetFile.cs" />
-    <Compile Include="source\RootString.cs" />
+    <None Include="app.config" />
     <None Include="source\Microsoft_WMF_EMF.cs" />
     <Compile Include="source\ResImage.Designer.cs">
       <DependentUpon>ResImage.resx</DependentUpon>
@@ -227,7 +233,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>ResourceStrings.resx</DependentUpon>
     </Compile>
-    <Compile Include="source\SimpleCommand.cs" />
     <Compile Include="source\YoutubeDlProcess.cs" />
     <Compile Include="Windows7ProgressBar\Control\COMTypes.cs" />
     <Compile Include="Windows7ProgressBar\Control\Windows7ProgressBar.cs">
@@ -269,6 +274,13 @@
     <EmbeddedResource Include="source\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

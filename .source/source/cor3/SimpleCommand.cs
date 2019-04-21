@@ -1,8 +1,7 @@
-﻿using System;
-using System.Diagnostics;
-namespace YouTubeDownloadUtil
+﻿using System.Diagnostics;
+namespace System.Windows.Forms
 {
-  class SimpleCommand<T> where T:System.Windows.Forms.Control
+  class SimpleCommand<T> where T:Control
   {
     System.ComponentModel.BackgroundWorker Worker { get; set; }
     Process Proc;

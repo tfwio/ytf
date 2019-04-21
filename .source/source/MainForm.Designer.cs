@@ -74,6 +74,9 @@
       this.singleJSONToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.dumpSingleJSONJToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.statusControls = new System.Windows.Forms.TableLayoutPanel();
+      this.textFileName = new System.Windows.Forms.TextBox();
+      this.panelFileName = new System.Windows.Forms.Panel();
+      this.label1 = new System.Windows.Forms.Label();
       this.statItemCount = new wyDay.Controls.Windows7ProgressBar();
       this.statCurrent = new wyDay.Controls.Windows7ProgressBar();
       this.panel1.SuspendLayout();
@@ -81,6 +84,7 @@
       this.statusStrip1.SuspendLayout();
       this.toolStrip1.SuspendLayout();
       this.statusControls.SuspendLayout();
+      this.panelFileName.SuspendLayout();
       this.SuspendLayout();
       // 
       // panel1
@@ -136,7 +140,7 @@
       this.richTextBox1.Name = "richTextBox1";
       this.richTextBox1.ReadOnly = true;
       this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedBoth;
-      this.richTextBox1.Size = new System.Drawing.Size(384, 335);
+      this.richTextBox1.Size = new System.Drawing.Size(384, 307);
       this.richTextBox1.TabIndex = 3;
       this.richTextBox1.Text = "";
       this.richTextBox1.WordWrap = false;
@@ -397,26 +401,58 @@
       // 
       // statusControls
       // 
+      this.statusControls.AutoSize = true;
       this.statusControls.ColumnCount = 2;
-      this.statusControls.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-      this.statusControls.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+      this.statusControls.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 80F));
+      this.statusControls.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
       this.statusControls.Controls.Add(this.statItemCount, 0, 0);
       this.statusControls.Controls.Add(this.statCurrent, 0, 0);
+      this.statusControls.Controls.Add(this.panelFileName, 0, 1);
       this.statusControls.Dock = System.Windows.Forms.DockStyle.Bottom;
-      this.statusControls.Location = new System.Drawing.Point(0, 389);
+      this.statusControls.Location = new System.Drawing.Point(0, 361);
       this.statusControls.Name = "statusControls";
-      this.statusControls.RowCount = 1;
+      this.statusControls.RowCount = 2;
       this.statusControls.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-      this.statusControls.Size = new System.Drawing.Size(384, 26);
+      this.statusControls.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+      this.statusControls.Size = new System.Drawing.Size(384, 54);
       this.statusControls.TabIndex = 16;
+      // 
+      // textFileName
+      // 
+      this.textFileName.Dock = System.Windows.Forms.DockStyle.Fill;
+      this.textFileName.Location = new System.Drawing.Point(69, 0);
+      this.textFileName.Name = "textFileName";
+      this.textFileName.Size = new System.Drawing.Size(309, 20);
+      this.textFileName.TabIndex = 17;
+      // 
+      // panelFileName
+      // 
+      this.statusControls.SetColumnSpan(this.panelFileName, 2);
+      this.panelFileName.Controls.Add(this.textFileName);
+      this.panelFileName.Controls.Add(this.label1);
+      this.panelFileName.Dock = System.Windows.Forms.DockStyle.Fill;
+      this.panelFileName.Location = new System.Drawing.Point(3, 25);
+      this.panelFileName.Name = "panelFileName";
+      this.panelFileName.Size = new System.Drawing.Size(378, 26);
+      this.panelFileName.TabIndex = 2;
+      // 
+      // label1
+      // 
+      this.label1.Dock = System.Windows.Forms.DockStyle.Left;
+      this.label1.Location = new System.Drawing.Point(0, 0);
+      this.label1.Name = "label1";
+      this.label1.Size = new System.Drawing.Size(69, 26);
+      this.label1.TabIndex = 18;
+      this.label1.Text = "File Name";
+      this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
       // 
       // statItemCount
       // 
       this.statItemCount.ContainerControl = this;
       this.statItemCount.Dock = System.Windows.Forms.DockStyle.Fill;
-      this.statItemCount.Location = new System.Drawing.Point(195, 3);
+      this.statItemCount.Location = new System.Drawing.Point(310, 3);
       this.statItemCount.Name = "statItemCount";
-      this.statItemCount.Size = new System.Drawing.Size(186, 20);
+      this.statItemCount.Size = new System.Drawing.Size(71, 16);
       this.statItemCount.TabIndex = 1;
       // 
       // statCurrent
@@ -425,7 +461,7 @@
       this.statCurrent.Dock = System.Windows.Forms.DockStyle.Fill;
       this.statCurrent.Location = new System.Drawing.Point(3, 3);
       this.statCurrent.Name = "statCurrent";
-      this.statCurrent.Size = new System.Drawing.Size(186, 20);
+      this.statCurrent.Size = new System.Drawing.Size(301, 16);
       this.statCurrent.TabIndex = 0;
       // 
       // MainForm
@@ -450,6 +486,8 @@
       this.toolStrip1.ResumeLayout(false);
       this.toolStrip1.PerformLayout();
       this.statusControls.ResumeLayout(false);
+      this.panelFileName.ResumeLayout(false);
+      this.panelFileName.PerformLayout();
       this.ResumeLayout(false);
       this.PerformLayout();
 
@@ -490,5 +528,8 @@
     private System.Windows.Forms.ToolStripMenuItem singleJSONToolStripMenuItem;
     private System.Windows.Forms.ToolStripMenuItem dumpSingleJSONJToolStripMenuItem;
     private wyDay.Controls.Windows7ProgressBar statItemCount;
+    private System.Windows.Forms.Panel panelFileName;
+    private System.Windows.Forms.TextBox textFileName;
+    private System.Windows.Forms.Label label1;
   }
 }

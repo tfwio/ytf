@@ -51,23 +51,42 @@ namespace YouTubeDownloadUtil
   // a mvc view
   partial class MainForm
   {
+    void StateName_Show()
+    {
+      statusControls.RowStyles[1].SizeType = System.Windows.Forms.SizeType.Absolute;
+      statusControls.RowStyles[1].Height = 32;
+      panelFileName.Visible = true;
+    }
+    void StateName_Hide()
+    {
+      statusControls.RowStyles[1].SizeType  = System.Windows.Forms.SizeType.AutoSize;
+      panelFileName.Visible = false;
+    }
+    // hide status controls
+    void StateProgress_Hide()
+    {
+      statCurrent.Visible = false;
+      statItemCount.Visible = false;
+    }
     // single download
     void StateProgress_OneColumn()
     {
+      statCurrent.Visible = true;
       statItemCount.Visible = false;
       statusControls.ColumnStyles[1].SizeType = System.Windows.Forms.SizeType.Percent;
       statusControls.ColumnStyles[0].SizeType = System.Windows.Forms.SizeType.Percent;
-      statusControls.ColumnStyles[1].Width = 0F;
       statusControls.ColumnStyles[0].Width = 100F;
+      statusControls.ColumnStyles[1].Width = 0F;
     }
     // multiple downloads
     void StateProgress_TwoColumn()
     {
+      statCurrent.Visible = true;
       statItemCount.Visible = true;
       statusControls.ColumnStyles[1].SizeType = System.Windows.Forms.SizeType.Percent;
       statusControls.ColumnStyles[0].SizeType = System.Windows.Forms.SizeType.Percent;
-      statusControls.ColumnStyles[1].Width = 50F;
-      statusControls.ColumnStyles[0].Width = 50F;
+      statusControls.ColumnStyles[0].Width = 80F;
+      statusControls.ColumnStyles[1].Width = 100F;
     }
 
     // See UI_WorkerThread_DataHandler

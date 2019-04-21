@@ -6,4 +6,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct("youtube-dl utility")]
 [assembly: AssemblyCopyright("Copyright 2018")]
 [assembly: ComVisible(false)]
-[assembly: AssemblyVersion("0.1.2")]
+[assembly: AssemblyVersion("0.1.3.0")]

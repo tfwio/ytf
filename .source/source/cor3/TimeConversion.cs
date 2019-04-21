@@ -150,16 +150,12 @@ namespace TimeHelper
     
     static public TimeClass FromSeconds(double input)
     {
-      var t = new TimeClass();
-      t.TotalSeconds = input;
-      return t;
+      return new TimeClass { TotalSeconds = input };
     }
     
     static public TimeClass FromMilliseconds(double input)
     {
-      var t = new TimeClass();
-      t.TotalMilliseconds = input;
-      return t;
+      return new TimeClass { TotalMilliseconds = input };
     }
     
     public static void FromString(string input, ref TimeClass time, int precision=5) { time.ParseString(input,precision); }

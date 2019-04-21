@@ -4,7 +4,7 @@
  * Time: 11:33 PM
  */
 using System;
-namespace System
+namespace System.Windows.Forms
 {
 	public class SimpleProgressEventArgs : EventArgs
 	{

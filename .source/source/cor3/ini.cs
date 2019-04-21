@@ -55,7 +55,7 @@ namespace System.IO
 			foreach (var i in WritableProperties)
 			{
 				string group_name = null, key_name = i.Name;
-				bool isroot = false;
+				//bool isroot = false;
 				var ign_attr = i.GetCustomAttribute<IgnoreAttribute>(false);
 				var ali_attr = i.GetCustomAttribute<IniKeyAttribute>(false);
 
