@@ -145,7 +145,8 @@ namespace YouTubeDownloadUtil
       };
 
       // additional properties
-      StateName_Show();
+      StateName_Hide();
+      StateProgress_OneColumn();
       StateProgress_Hide();
       textMaxDownloads.Text = ConfigModel.Instance.MaxDownloads;
 
@@ -164,9 +165,6 @@ namespace YouTubeDownloadUtil
       FormClosing += (s, e) => ConfigModel.Instance.Save(true);
 
       CreateToolStrip();
-      StateProgress_Hide();
-      StateName_Show();
-      StateName_Hide();
 
       // drag-drop
       this.ApplyDragDropMethod(

@@ -56,11 +56,13 @@ namespace YouTubeDownloadUtil
       statusControls.RowStyles[1].SizeType = System.Windows.Forms.SizeType.Absolute;
       statusControls.RowStyles[1].Height = 32;
       panelFileName.Visible = true;
+      statusControls.Refresh();
     }
     void StateName_Hide()
     {
       statusControls.RowStyles[1].SizeType  = System.Windows.Forms.SizeType.AutoSize;
       panelFileName.Visible = false;
+      statusControls.Refresh();
     }
     // hide status controls
     void StateProgress_Hide()
@@ -77,6 +79,8 @@ namespace YouTubeDownloadUtil
       statusControls.ColumnStyles[0].SizeType = System.Windows.Forms.SizeType.Percent;
       statusControls.ColumnStyles[0].Width = 100F;
       statusControls.ColumnStyles[1].Width = 0F;
+      statCurrent.Refresh();
+      statusControls.Refresh();
     }
     // multiple downloads
     void StateProgress_TwoColumn()
@@ -87,6 +91,27 @@ namespace YouTubeDownloadUtil
       statusControls.ColumnStyles[0].SizeType = System.Windows.Forms.SizeType.Percent;
       statusControls.ColumnStyles[0].Width = 80F;
       statusControls.ColumnStyles[1].Width = 100F;
+      statCurrent.Refresh();
+      statusControls.Refresh();
+    }
+    void StateDownload_Begin()
+    {
+      StateProgress_OneColumn();
+      btnAbort.Visible = true;
+      statCurrent.Value = 0;
+      statusControls.Visible = true;
+      statCurrent.ShowInTaskbar = true;
+    }
+    void StateDownload_End()
+    {
+      foreach (var c in TogglableControls) c.Enabled = true;
+      btnAbort.Visible = false;
+      statusControls.Visible = false;
+      statText.Text = "youtube-dl";
+      StateProgress_OneColumn(); // reset to a single column state.
+      statCurrent.Value = 0;
+      statCurrent.ShowInTaskbar = false;
+      statItemCount.Value = 1;
     }
 
     // See UI_WorkerThread_DataHandler
@@ -148,17 +173,13 @@ namespace YouTubeDownloadUtil
       OutputData.Add(content);
       richTextBox1.AppendText($"{content}\n");
       richTextBox1.Focus();
-      btnAbort.Visible = true;
-      statCurrent.Value = 0;
-      statusControls.Visible = true;
-      statCurrent.ShowInTaskbar = true;
+      StateDownload_Begin();
     }
 
     // After downloading or Process is complete, we then restore
     // the application to a "ready" state.
     void UI_WorkerProcess_Post(YoutubeDownloader obj)
     {
-
       if (obj.Aborted && obj.KnownTargetFile!=null)
       {
         var fi = new FileInfo(Path.Combine(obj.TargetPath, obj.KnownTargetFile));
@@ -171,16 +192,7 @@ namespace YouTubeDownloadUtil
       var content = $"<APP:ERRORSTATUS>: {obj.ExitCode}{abort}";
       OutputData.Add($"{content}\n");
       richTextBox1.AppendText($"{content}\n");
-      foreach (var c in TogglableControls) c.Enabled = true;
-      btnAbort.Visible = false;
-      statusControls.Visible = false;
-      statText.Text = "youtube-dl";
-
-      StateProgress_OneColumn(); // reset to a single column state.
-
-      statCurrent.Value = 0;
-      statCurrent.ShowInTaskbar = false;
-      statItemCount.Value = 1;
+      StateDownload_End();
     }
 
   }
