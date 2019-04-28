@@ -1,40 +1,72 @@
 #! /usr/bin/sh
 
 # usage: ./gensum.sh /path/to/directory/with/zip-files
-# see: https://stackoverflow.com/questions/3679296/only-get-hash-value-using-md5sum-without-filename#5773761
 
-md5_32=($(md5sum       ${1}/ytdl_util-*-win32.zip))
-sha1_32=($(sha1sum     ${1}/ytdl_util-*-win32.zip))
-sha256_32=($(sha256sum ${1}/ytdl_util-*-win32.zip))
+md5_32_z=($(md5sum       ${1}/ytdl_util-*-win32.zip))
+sha1_32_z=($(sha1sum     ${1}/ytdl_util-*-win32.zip))
+sha256_32_z=($(sha256sum ${1}/ytdl_util-*-win32.zip))
 
-md5_64=($(md5sum       ${1}/ytdl_util-*-win64.zip))
-sha1_64=($(sha1sum     ${1}/ytdl_util-*-win64.zip))
-sha256_64=($(sha256sum ${1}/ytdl_util-*-win64.zip))
+md5_64_z=($(md5sum       ${1}/ytdl_util-*-win64.zip))
+sha1_64_z=($(sha1sum     ${1}/ytdl_util-*-win64.zip))
+sha256_64_z=($(sha256sum ${1}/ytdl_util-*-win64.zip))
 
-echo "
-32 BIT
+md5_32_7z=($(md5sum       ${1}/ytdl_util-*-win32.7z))
+sha1_32_7z=($(sha1sum     ${1}/ytdl_util-*-win32.7z))
+sha256_32_7z=($(sha256sum ${1}/ytdl_util-*-win32.7z))
 
-md5    : \`${md5_32}\`  
-sha1   : \`${sha1_32}\`  
-sha256 : \`${sha256_32}\`
-
-64 BIT
-
-md5    : \`${md5_64}\`  
-sha1   : \`${sha1_64}\`  
-sha256 : \`${sha256_64}\`
-"
+md5_64_7z=($(md5sum       ${1}/ytdl_util-*-win64.7z))
+sha1_64_7z=($(sha1sum     ${1}/ytdl_util-*-win64.7z))
+sha256_64_7z=($(sha256sum ${1}/ytdl_util-*-win64.7z))
 
 echo "
-32 BIT
+**$(echo ytdl_util-*-win32.zip)**
 
-md5    : \`${md5_32}\`  
-sha1   : \`${sha1_32}\`  
-sha256 : \`${sha256_32}\`
+md5    : \`${md5_32_z}\`  
+sha1   : \`${sha1_32_z}\`  
+sha256 : \`${sha256_32_z}\`
 
-64 BIT
+**$(echo ytdl_util-*-win64.zip)**
 
-md5    : \`${md5_64}\`  
-sha1   : \`${sha1_64}\`  
-sha256 : \`${sha256_64}\`
+md5    : \`${md5_64_z}\`  
+sha1   : \`${sha1_64_z}\`  
+sha256 : \`${sha256_64_z}\`
+
+**$(echo ytdl_util-*-win32.7z)**
+
+md5    : \`${md5_32_7z}\`  
+sha1   : \`${sha1_32_7z}\`  
+sha256 : \`${sha256_32_7z}\`
+
+**$(echo ytdl_util-*-win64.7z)**
+
+md5    : \`${md5_64_7z}\`  
+sha1   : \`${sha1_64_7z}\`  
+sha256 : \`${sha256_64_7z}\`
 " > sha_sums.txt
+
+
+echo "
+**$(echo ytdl_util-*-win32.zip)**
+
+md5    : \`${md5_32_z}\`  
+sha1   : \`${sha1_32_z}\`  
+sha256 : \`${sha256_32_z}\`
+
+**$(echo ytdl_util-*-win64.zip)**
+
+md5    : \`${md5_64_z}\`  
+sha1   : \`${sha1_64_z}\`  
+sha256 : \`${sha256_64_z}\`
+
+**$(echo ytdl_util-*-win32.7z)**
+
+md5    : \`${md5_32_7z}\`  
+sha1   : \`${sha1_32_7z}\`  
+sha256 : \`${sha256_32_7z}\`
+
+**$(echo ytdl_util-*-win64.7z)**
+
+md5    : \`${md5_64_7z}\`  
+sha1   : \`${sha1_64_7z}\`  
+sha256 : \`${sha256_64_7z}\`
+"
