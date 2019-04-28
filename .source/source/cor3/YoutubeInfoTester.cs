@@ -18,7 +18,6 @@ namespace YouTubeDownloadUtil
       {
         //foreach (string p in uriInput.Params)
         //  Console.WriteLine($"    param:   {p}={uriInput.Params[p]}");
-
         for (int i = 0; i < uriInput.Params.Count; i++)
         {
           var k = uriInput.Params.Keys[i];
@@ -27,13 +26,31 @@ namespace YouTubeDownloadUtil
         }
       }
     }
+    public static void PrintUriParams(string uriTarget)
+    {
+      var uriInput = new UrlInfo(uriTarget);
+      Console.WriteLine($"----------------------------------------------");
+      Console.WriteLine($"INPUT: {uriInput.BaseUri}");
+      Console.WriteLine($"  rewrite: {uriInput.Rewrite()}");
+      Console.WriteLine($"  remains: {uriInput.UriLeftovers}");
+      Console.WriteLine($"  params:  {uriInput.UriParamString}");
+      Console.WriteLine($"  path:    {uriInput.UriPath}");
+      Console.WriteLine("  Params List:");
+      if (uriInput != null)
+      {
+        for (int i = 0; i < uriInput.Params.Count; i++)
+        {
+          var k = uriInput.Params.Keys[i];
+          Console.WriteLine($"    param{i}: {k}={uriInput.Params[k]}");
+        }
+      }
+    }
 
     static public void Test()
     {
-      PrintUriInfo("https://www.youtube.com/watch?v=dKuvCu0KG5g");
-      PrintUriInfo("https://youtu.be/dKuvCu0KG5g");
-
-      var data = new UrlInfo("https://www.youtube.com/watch?v=FO7spLjad3k")
+      // PrintUriInfo("https://www.youtube.com/watch?v=___________");
+      // PrintUriInfo("https://youtu.be/___________");
+      var data = new UrlInfo("https://www.youtube.com/watch?v=___________")
         .Rewrite()
         .GetYoutubeDataParams();
       foreach (var k in "t,title,author,length_seconds,timestamp,thumbnail_url,cver,fexp,player_response".Split(','))
@@ -61,15 +78,12 @@ namespace YouTubeDownloadUtil
         }
         Console.WriteLine($"  -{k,-9}: {value ?? "(null)"}");
       }
+      // Console.WriteLine("keys:");
+      // for (int i = 0; i < data.Count; i++)
+      // {
+      //   string key = data.Keys[i];
+      //   Console.WriteLine($"  {key}");
+      // }
     }
-
-    //Console.WriteLine($"  -{k,-9}: {value ?? "(null)"}");
-
-    // Console.WriteLine("keys:");
-    // for (int i = 0; i < data.Count; i++)
-    // {
-    //   string key = data.Keys[i];
-    //   Console.WriteLine($"  {key}");
-    // }
   }
 }
