@@ -31,6 +31,7 @@ namespace YouTubeDownloadUtil
     string StrWriteSub           { get { return Flags.HasFlag(YtFlag.WriteSubs) ? " --write-sub" : string.Empty; } }
     // file-naming
     string NameFromURL           { get { return Flags.HasFlag(YtFlag.NameFromURL) ? $" -o \"{TargetOutput}.%(ext)s\"" : string.Empty; } }
+    string UserAgent             { get { return Flags.HasFlag(YtFlag.UserAgent) ? $"--user-agent \"{ConfigModel.Instance.UserAgent}\"" : string.Empty; } }
 
     string TargetOutput          { get { return TargetUri.GetBasenameFromURL();  } }
 
@@ -49,7 +50,7 @@ namespace YouTubeDownloadUtil
         return $"-{part1}{StrTargetType}";
       }
     }
-    public string CommandText    { get { return $"{CombinedVar}{StrWriteSub}{StrWriteAnnotations}{StrPlaylist}{StrFlatPlaylist}{StrSubLang}{StrWriteAutoSub}{StrEmbedSubs}{StrEmbedThumbnail}{StrAddMetaData}{StrPreferFFmpeg} \"{TargetUri}\" {NameFromURL}"; } }
+    public string CommandText    { get { return $"{CombinedVar}{StrWriteSub}{StrWriteAnnotations}{StrPlaylist}{StrFlatPlaylist}{StrSubLang}{StrWriteAutoSub}{StrEmbedSubs}{StrEmbedThumbnail}{StrAddMetaData}{StrPreferFFmpeg}{UserAgent} \"{TargetUri}\" {NameFromURL}"; } }
 
 
     ProcessStartInfo NewStartInfo {

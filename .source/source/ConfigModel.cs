@@ -29,7 +29,7 @@ namespace YouTubeDownloadUtil
 		MaxDownloads      = 8 * 0x1000,
 		Simulate          = 1 * 0x10000,
 		NameFromURL       = 2 * 0x10000,
-		ReservedC         = 4 * 0x10000,
+		UserAgent         = 4 * 0x10000,
 		ReservedB         = 8 * 0x10000,
 		ReservedA         = 1 * 0x100000,
 		Reserved9         = 2 * 0x100000,
@@ -47,15 +47,15 @@ namespace YouTubeDownloadUtil
 
 	/// <summary>Specify audio format: "best", "aac", "flac", "mp3", "m4a", "opus", "vorbis", or "wav"; "best" by default; No effect without -x.</summary>
 	[Flags] enum ExtractAudioTypes {
-		none = 0,
-		best = 1,
-		aac = 2,
-		flac = 4,
-		mp3 = 8,
-		m4a = 1 * 16,
-		opus = 2 * 16,
-		vorbis = 4 * 16,
-		wav = 8 * 16,
+		none    = 0,
+		best    = 1,
+		aac     = 2,
+		flac    = 4,
+		mp3     = 8,
+		m4a     = 1 * 16,
+		opus    = 2 * 16,
+		vorbis  = 4 * 16,
+		wav     = 8 * 16,
 	}
 
 	/// <summary>see: --convert-subs flag</summary>
@@ -150,6 +150,9 @@ namespace YouTubeDownloadUtil
 
 		/// <summary>Keep the Window at top-level.</summary>
 		[IniKey(Group = "global", Alias = "keep-on-top")] public string KeepOnTopStr { get; set; }
+
+    [IniKey(Group = "global", Alias = "user-agent")] public string UserAgent { get; set; }
+
 		const bool DefaultKeepOnTopValue = false;
 		[Ignore]
 		public bool KeepOnTop
@@ -204,9 +207,10 @@ namespace YouTubeDownloadUtil
 				PathFFmpeg = string.Empty,
 				PathAVConv = string.Empty,
 				MaxDownloads = "1",
-				// XAudioTypes = string.Empty,
-				// XSubtitleTypes = string.Empty,
-				RestoreBounds = string.Empty,
+        UserAgent = " Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+        // XAudioTypes = string.Empty,
+        // XSubtitleTypes = string.Empty,
+        RestoreBounds = string.Empty,
 				KeepOnTop = false,
 			};
 			if (!confDotIni.Exists) ini.Save();

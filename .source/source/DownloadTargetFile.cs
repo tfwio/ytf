@@ -26,7 +26,9 @@ namespace YouTubeDownloadUtil
       {
         UseDefaultCredentials = true,
       };
-      client.Headers["user-agent"] = @"Mozilla/5.0 (X11; Linux x86_64; rv:59.0) Gecko/20100101 Firefox/59.0 (Chrome)";
+      // Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36
+      // Mozilla/5.0 (X11; Linux x86_64; rv:59.0) Gecko/20100101 Firefox/59.0 (Chrome)
+      // client.Headers["user-agent"] = @"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36";
       client.DownloadFile(new Uri(targetUri),destFile.FileRelativeToExe());
       // note the lack of error handling.
       client.DownloadFileCompleted += (e, a) => client.Dispose();
