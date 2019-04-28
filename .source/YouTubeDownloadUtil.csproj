@@ -221,7 +221,6 @@
     </Compile>
     <Compile Include="source\MainForm.Worker.cs" />
     <Compile Include="source\DownloadTargetFile.cs" />
-    <None Include="app.config" />
     <None Include="source\Microsoft_WMF_EMF.cs" />
     <Compile Include="source\ResImage.Designer.cs">
       <DependentUpon>ResImage.resx</DependentUpon>
